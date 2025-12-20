@@ -1,0 +1,144 @@
+-- Migration: Create accounting module tables
+-- UP
+CREATE TABLE chart_of_accounts (
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    account_code VARCHAR(50) NOT NULL UNIQUE,
+    account_name VARCHAR(200) NOT NULL,
+    account_type ENUM('ASSET', 'LIABILITY', 'EQUITY', 'REVENUE', 'EXPENSE') NOT NULL,
+    account_category VARCHAR(100),
+    parent_account_id VARCHAR(36),
+    is_active BOOLEAN DEFAULT TRUE,
+    description TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (parent_account_id) REFERENCES chart_of_accounts(id) ON DELETE SET NULL,
+    INDEX idx_account_code (account_code),
+    INDEX idx_account_type (account_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE invoices (
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    invoice_number VARCHAR(50) NOT NULL UNIQUE,
+    invoice_date DATE NOT NULL,
+    invoice_type ENUM('PURCHASE', 'SALES') NOT NULL,
+    supplier_id VARCHAR(36),
+    customer_id VARCHAR(36),
+    po_id VARCHAR(36),
+    due_date DATE NOT NULL,
+    payment_terms VARCHAR(100),
+    status ENUM('DRAFT', 'PENDING', 'APPROVED', 'PAID', 'PARTIAL', 'OVERDUE', 'CANCELLED') DEFAULT 'DRAFT',
+    subtotal DECIMAL(15, 2) DEFAULT 0,
+    tax_amount DECIMAL(15, 2) DEFAULT 0,
+    discount_amount DECIMAL(15, 2) DEFAULT 0,
+    total_amount DECIMAL(15, 2) DEFAULT 0,
+    paid_amount DECIMAL(15, 2) DEFAULT 0,
+    balance_amount DECIMAL(15, 2) GENERATED ALWAYS AS (total_amount - paid_amount) STORED,
+    approved_by VARCHAR(36),
+    approved_date DATETIME,
+    notes TEXT,
+    created_by VARCHAR(36) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE SET NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL,
+    FOREIGN KEY (po_id) REFERENCES purchase_orders(id) ON DELETE SET NULL,
+    FOREIGN KEY (approved_by) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (created_by) REFERENCES users(id),
+    INDEX idx_invoice_number (invoice_number),
+    INDEX idx_invoice_date (invoice_date),
+    INDEX idx_due_date (due_date),
+    INDEX idx_status (status),
+    INDEX idx_invoice_type (invoice_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE invoice_items (
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    invoice_id VARCHAR(36) NOT NULL,
+    item_id VARCHAR(36),
+    description TEXT NOT NULL,
+    quantity DECIMAL(15, 3) NOT NULL,
+    unit_price DECIMAL(15, 2) NOT NULL,
+    total_price DECIMAL(15, 2) NOT NULL,
+    tax_rate DECIMAL(5, 2) DEFAULT 0,
+    discount_rate DECIMAL(5, 2) DEFAULT 0,
+    account_id VARCHAR(36),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE SET NULL,
+    FOREIGN KEY (account_id) REFERENCES chart_of_accounts(id) ON DELETE SET NULL,
+    INDEX idx_invoice_id (invoice_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE payments (
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    payment_number VARCHAR(50) NOT NULL UNIQUE,
+    payment_date DATE NOT NULL,
+    payment_type ENUM('PAYMENT', 'RECEIPT') NOT NULL,
+    payment_method ENUM('CASH', 'CHECK', 'BANK_TRANSFER', 'CREDIT_CARD', 'OTHER') NOT NULL,
+    invoice_id VARCHAR(36),
+    supplier_id VARCHAR(36),
+    customer_id VARCHAR(36),
+    amount DECIMAL(15, 2) NOT NULL,
+    reference_number VARCHAR(100),
+    bank_account VARCHAR(100),
+    status ENUM('DRAFT', 'PENDING', 'APPROVED', 'COMPLETED', 'CANCELLED') DEFAULT 'DRAFT',
+    approved_by VARCHAR(36),
+    approved_date DATETIME,
+    notes TEXT,
+    created_by VARCHAR(36) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE SET NULL,
+    FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE SET NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL,
+    FOREIGN KEY (approved_by) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (created_by) REFERENCES users(id),
+    INDEX idx_payment_number (payment_number),
+    INDEX idx_payment_date (payment_date),
+    INDEX idx_payment_type (payment_type),
+    INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE journal_entries (
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    entry_number VARCHAR(50) NOT NULL UNIQUE,
+    entry_date DATE NOT NULL,
+    entry_type VARCHAR(50),
+    reference_type VARCHAR(50),
+    reference_id VARCHAR(36),
+    description TEXT,
+    status ENUM('DRAFT', 'POSTED', 'CANCELLED') DEFAULT 'DRAFT',
+    posted_by VARCHAR(36),
+    posted_date DATETIME,
+    created_by VARCHAR(36) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (posted_by) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (created_by) REFERENCES users(id),
+    INDEX idx_entry_number (entry_number),
+    INDEX idx_entry_date (entry_date),
+    INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE journal_entry_lines (
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    entry_id VARCHAR(36) NOT NULL,
+    account_id VARCHAR(36) NOT NULL,
+    debit_amount DECIMAL(15, 2) DEFAULT 0,
+    credit_amount DECIMAL(15, 2) DEFAULT 0,
+    description TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (entry_id) REFERENCES journal_entries(id) ON DELETE CASCADE,
+    FOREIGN KEY (account_id) REFERENCES chart_of_accounts(id),
+    INDEX idx_entry_id (entry_id),
+    INDEX idx_account_id (account_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- DOWN
+DROP TABLE IF EXISTS journal_entry_lines;
+DROP TABLE IF EXISTS journal_entries;
+DROP TABLE IF EXISTS payments;
+DROP TABLE IF EXISTS invoice_items;
+DROP TABLE IF EXISTS invoices;
+DROP TABLE IF EXISTS chart_of_accounts;

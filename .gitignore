@@ -36,7 +36,6 @@ yarn-error.log*
 *.sw?
 
 # Database
-*.sql
 *.sqlite
 
 # Logs
