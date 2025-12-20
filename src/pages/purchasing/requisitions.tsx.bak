@@ -1,0 +1,467 @@
+import { useState, useEffect } from 'react';
+import { MainLayout } from '@/components/layout/main-layout';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Search, Plus, Trash2, CheckCircle, XCircle } from 'lucide-react';
+import { formatDate, formatCurrency, getStatusColor } from '@/lib/utils';
+
+interface PRItem {
+  id?: string;
+  itemId: string;
+  itemName?: string;
+  quantity: number;
+  estimatedUnitPrice: number;
+  estimatedTotalPrice: number;
+  requiredDate: string;
+  purpose: string;
+}
+
+interface PurchaseRequisition {
+  id: string;
+  prNumber: string;
+  prDate: string;
+  requestedBy: string;
+  requestedByName: string;
+  department: string;
+  requiredDate: string;
+  status: string;
+  approvedBy?: string;
+  approvedByName?: string;
+  approvedDate?: string;
+  notes?: string;
+  items?: PRItem[];
+}
+
+export default function PurchaseRequisitionsPage() {
+  const [requisitions, setRequisitions] = useState<PurchaseRequisition[]>([]);
+  const [items, setItems] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [editingPR, setEditingPR] = useState<PurchaseRequisition | null>(null);
+  const [userRole, setUserRole] = useState<string>('');
+  const [formData, setFormData] = useState({
+    prDate: new Date().toISOString().split('T')[0],
+    department: '',
+    requiredDate: '',
+    notes: '',
+  });
+  const [prItems, setPrItems] = useState<PRItem[]>([
+    { itemId: '', quantity: 0, estimatedUnitPrice: 0, estimatedTotalPrice: 0, requiredDate: '', purpose: '' },
+  ]);
+
+  useEffect(() => {
+    fetchRequisitions();
+    fetchItems();
+    fetchUserRole();
+  }, []);
+
+  const fetchUserRole = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/auth/me', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (data.user) {
+        setUserRole(data.user.role);
+      }
+    } catch (error) {
+      console.error('Error fetching user role:', error);
+    }
+  };
+
+  const fetchItems = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/inventory/items', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      setItems(data.items || []);
+    } catch (error) {
+      console.error('Error fetching items:', error);
+    }
+  };
+
+  const fetchRequisitions = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/purchasing/requisitions', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      setRequisitions(data.requisitions || []);
+    } catch (error) {
+      console.error('Error fetching requisitions:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const url = editingPR
+        ? `/api/purchasing/requisitions/${editingPR.id}`
+        : '/api/purchasing/requisitions';
+      const method = editingPR ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...formData,
+          items: prItems.filter(item => item.itemId && item.quantity > 0),
+        }),
+      });
+
+      if (response.ok) {
+        fetchRequisitions();
+        resetForm();
+      }
+    } catch (error) {
+      console.error('Error saving requisition:', error);
+    }
+  };
+
+  const handleApprove = async (id: string) => {
+    if (!confirm('Approve this purchase requisition?')) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/purchasing/requisitions/${id}/approve`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        fetchRequisitions();
+      }
+    } catch (error) {
+      console.error('Error approving requisition:', error);
+    }
+  };
+
+  const handleReject = async (id: string) => {
+    const reason = prompt('Enter rejection reason:');
+    if (!reason) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/purchasing/requisitions/${id}/reject`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ reason }),
+      });
+
+      if (response.ok) {
+        fetchRequisitions();
+      }
+    } catch (error) {
+      console.error('Error rejecting requisition:', error);
+    }
+  };
+
+  const addItemRow = () => {
+    setPrItems([
+      ...prItems,
+      { itemId: '', quantity: 0, estimatedUnitPrice: 0, estimatedTotalPrice: 0, requiredDate: '', purpose: '' },
+    ]);
+  };
+
+  const removeItemRow = (index: number) => {
+    setPrItems(prItems.filter((_, i) => i !== index));
+  };
+
+  const updateItemRow = (index: number, field: string, value: any) => {
+    const updated = [...prItems];
+    updated[index] = { ...updated[index], [field]: value };
+    
+    if (field === 'quantity' || field === 'estimatedUnitPrice') {
+      const qty = field === 'quantity' ? value : updated[index].quantity;
+      const price = field === 'estimatedUnitPrice' ? value : updated[index].estimatedUnitPrice;
+      updated[index].estimatedTotalPrice = qty * price;
+    }
+    
+    setPrItems(updated);
+  };
+
+  const resetForm = () => {
+    setFormData({
+      prDate: new Date().toISOString().split('T')[0],
+      department: '',
+      requiredDate: '',
+      notes: '',
+    });
+    setPrItems([
+      { itemId: '', quantity: 0, estimatedUnitPrice: 0, estimatedTotalPrice: 0, requiredDate: '', purpose: '' },
+    ]);
+    setEditingPR(null);
+    setShowForm(false);
+  };
+
+  const canCreatePR = () => {
+    return ['PURCHASING_STAFF', 'DEPARTMENT_HEAD', 'GENERAL_MANAGER'].includes(userRole);
+  };
+
+  const canApprovePR = () => {
+    return ['DEPARTMENT_HEAD', 'GENERAL_MANAGER', 'PRESIDENT'].includes(userRole);
+  };
+
+  const filteredRequisitions = requisitions.filter(
+    (pr) =>
+      pr.prNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      pr.department.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <MainLayout>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Purchase Requisitions</h1>
+            <p className="text-muted-foreground">View purchase requests</p>
+          </div>
+          {canCreatePR() && (
+            <Button onClick={() => setShowForm(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              New PR
+            </Button>
+          )}
+        </div>
+
+        {showForm && (
+          <Card>
+            <CardHeader>
+              <CardTitle>{editingPR ? 'Edit' : 'Create'} Purchase Requisition</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="prDate">PR Date *</Label>
+                    <Input
+                      id="prDate"
+                      type="date"
+                      value={formData.prDate}
+                      onChange={(e) => setFormData({ ...formData, prDate: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="department">Department *</Label>
+                    <Input
+                      id="department"
+                      value={formData.department}
+                      onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="requiredDate">Required Date</Label>
+                    <Input
+                      id="requiredDate"
+                      type="date"
+                      value={formData.requiredDate}
+                      onChange={(e) => setFormData({ ...formData, requiredDate: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <Label>Items *</Label>
+                    <Button type="button" size="sm" onClick={addItemRow}>
+                      <Plus className="h-4 w-4 mr-1" />
+                      Add Item
+                    </Button>
+                  </div>
+                  <div className="border rounded-lg overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Item</TableHead>
+                          <TableHead>Quantity</TableHead>
+                          <TableHead>Est. Unit Price</TableHead>
+                          <TableHead>Est. Total</TableHead>
+                          <TableHead>Required Date</TableHead>
+                          <TableHead>Purpose</TableHead>
+                          <TableHead></TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {prItems.map((item, index) => (
+                          <TableRow key={index}>
+                            <TableCell>
+                              <Select
+                                value={item.itemId}
+                                onChange={(e) => updateItemRow(index, 'itemId', e.target.value)}
+                                required
+                              >
+                                <option value="">Select Item</option>
+                                {items.map((i) => (
+                                  <option key={i.id} value={i.id}>
+                                    {i.code} - {i.name}
+                                  </option>
+                                ))}
+                              </Select>
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                type="number"
+                                step="0.001"
+                                value={item.quantity}
+                                onChange={(e) => updateItemRow(index, 'quantity', parseFloat(e.target.value))}
+                                required
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                type="number"
+                                step="0.01"
+                                value={item.estimatedUnitPrice}
+                                onChange={(e) => updateItemRow(index, 'estimatedUnitPrice', parseFloat(e.target.value))}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              {formatCurrency(item.estimatedTotalPrice)}
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                type="date"
+                                value={item.requiredDate}
+                                onChange={(e) => updateItemRow(index, 'requiredDate', e.target.value)}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                value={item.purpose}
+                                onChange={(e) => updateItemRow(index, 'purpose', e.target.value)}
+                                placeholder="Purpose"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              {prItems.length > 1 && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => removeItemRow(index)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="notes">Notes</Label>
+                  <Textarea
+                    id="notes"
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    rows={3}
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <Button type="submit">Submit PR</Button>
+                  <Button type="button" variant="outline" onClick={resetForm}>
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        )}
+
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Purchase Requisitions</CardTitle>
+              <div className="flex items-center gap-2">
+                <Search className="h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search PRs..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-64"
+                />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="text-center py-8">Loading...</div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>PR Number</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Department</TableHead>
+                    <TableHead>Requested By</TableHead>
+                    <TableHead>Required Date</TableHead>
+                    <TableHead>Status</TableHead>
+                    {canApprovePR() && <TableHead>Actions</TableHead>}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredRequisitions.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={canApprovePR() ? 7 : 6} className="text-center py-8 text-muted-foreground">
+                        No purchase requisitions found
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredRequisitions.map((pr) => (
+                      <TableRow key={pr.id}>
+                        <TableCell className="font-medium">{pr.prNumber}</TableCell>
+                        <TableCell>{formatDate(pr.prDate)}</TableCell>
+                        <TableCell>{pr.department}</TableCell>
+                        <TableCell>{pr.requestedByName}</TableCell>
+                        <TableCell>{pr.requiredDate ? formatDate(pr.requiredDate) : '-'}</TableCell>
+                        <TableCell>
+                          <Badge className={getStatusColor(pr.status)}>{pr.status}</Badge>
+                        </TableCell>
+                        {canApprovePR() && (
+                          <TableCell>
+                            {pr.status === 'PENDING' && (
+                              <div className="flex gap-2">
+                                <Button
+            )}
+          </TableRow>
+        ))
+      )}
+    </TableBody>
+  </Table>
+)}
+</CardContent>
+</Card>
+</div>
+</MainLayout>
+);
+        </Card>
+      </div>
+    </MainLayout>
+  );
+}
