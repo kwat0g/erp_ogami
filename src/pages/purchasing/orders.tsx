@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/main-layout';
+import { withAuth } from '@/components/auth/withAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,8 +9,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Search, Plus, Trash2, CheckCircle, XCircle, FileText, Send } from 'lucide-react';
-import { formatDate, formatCurrency, getStatusColor } from '@/lib/utils';
+import { Search, Plus, Trash2, CheckCircle, XCircle, FileText, Send, Edit2 } from 'lucide-react';
+import { formatDate, formatCurrency, getStatusColor, formatIntegerInput, sanitizeInteger } from '@/lib/utils';
 
 interface POItem {
   id?: string;
@@ -33,7 +34,7 @@ interface PurchaseOrder {
   createdByName: string;
 }
 
-export default function PurchaseOrdersPage() {
+function PurchaseOrdersPage() {
   const [orders, setOrders] = useState<PurchaseOrder[]>([]);
   const [suppliers, setSuppliers] = useState<any[]>([]);
   const [items, setItems] = useState<any[]>([]);
@@ -41,8 +42,11 @@ export default function PurchaseOrdersPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [supplierFilter, setSupplierFilter] = useState('');
   const [userRole, setUserRole] = useState<string>('');
   const [editingPO, setEditingPO] = useState<PurchaseOrder | null>(null);
+  const [originalData, setOriginalData] = useState<any>(null);
   const [formData, setFormData] = useState({
     poDate: new Date().toISOString().split('T')[0],
     supplierId: '',
@@ -234,9 +238,37 @@ export default function PurchaseOrdersPage() {
 
   const updateItemRow = (index: number, field: string, value: any) => {
     const updated = [...poItems];
-    updated[index] = { ...updated[index], [field]: value };
     
-    if (field === 'quantity' || field === 'unitPrice' || field === 'taxRate' || field === 'discountRate') {
+    // Handle quantity as integer only (no decimals)
+    if (field === 'quantity') {
+      const sanitized = sanitizeInteger(value);
+      updated[index].quantity = sanitized.toString();
+      const price = parseFloat(updated[index].unitPrice) || 0;
+      const itemTotal = sanitized * price;
+      const discount = (itemTotal * (parseFloat(updated[index].discountRate) || 0)) / 100;
+      const afterDiscount = itemTotal - discount;
+      const tax = (afterDiscount * (parseFloat(updated[index].taxRate) || 0)) / 100;
+      updated[index].totalPrice = afterDiscount + tax;
+    }
+    // Auto-populate unit price when item is selected (read-only)
+    else if (field === 'itemId') {
+      updated[index].itemId = value;
+      const selectedItem = items.find(i => i.id === value);
+      if (selectedItem) {
+        updated[index].itemName = selectedItem.name;
+        updated[index].unitPrice = selectedItem.standardCost?.toString() || '0';
+        const qty = parseFloat(updated[index].quantity) || 0;
+        const price = parseFloat(selectedItem.standardCost) || 0;
+        const itemTotal = qty * price;
+        const discount = (itemTotal * (parseFloat(updated[index].discountRate) || 0)) / 100;
+        const afterDiscount = itemTotal - discount;
+        const tax = (afterDiscount * (parseFloat(updated[index].taxRate) || 0)) / 100;
+        updated[index].totalPrice = afterDiscount + tax;
+      }
+    }
+    // Handle tax and discount rate changes
+    else if (field === 'taxRate' || field === 'discountRate') {
+      updated[index] = { ...updated[index], [field]: value };
       const qty = parseFloat(updated[index].quantity) || 0;
       const price = parseFloat(updated[index].unitPrice) || 0;
       const itemTotal = qty * price;
@@ -245,8 +277,51 @@ export default function PurchaseOrdersPage() {
       const tax = (afterDiscount * (parseFloat(updated[index].taxRate) || 0)) / 100;
       updated[index].totalPrice = afterDiscount + tax;
     }
+    // For other fields
+    else {
+      updated[index] = { ...updated[index], [field]: value };
+    }
     
     setPoItems(updated);
+  };
+
+  const handleSupplierChange = (supplierId: string) => {
+    const selectedSupplier = suppliers.find(s => s.id === supplierId);
+    console.log('PO Form - Selected supplier:', selectedSupplier);
+    console.log('PO Form - All suppliers:', suppliers);
+    
+    if (selectedSupplier) {
+      setFormData({
+        ...formData,
+        supplierId: supplierId,
+        paymentTerms: selectedSupplier.paymentTerms || '',
+        deliveryAddress: selectedSupplier.address || '',
+      });
+      console.log('PO Form - Setting payment terms:', selectedSupplier.paymentTerms);
+      console.log('PO Form - Setting address:', selectedSupplier.address);
+    } else {
+      setFormData({
+        ...formData,
+        supplierId: supplierId,
+      });
+    }
+  };
+
+  const hasChanges = () => {
+    if (!editingPO || !originalData) return true;
+    
+    const currentData = {
+      formData,
+      poItems: poItems.map(item => ({
+        itemId: item.itemId,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        taxRate: item.taxRate,
+        discountRate: item.discountRate,
+      })),
+    };
+    
+    return JSON.stringify(currentData) !== JSON.stringify(originalData);
   };
 
   const resetForm = () => {
@@ -262,6 +337,7 @@ export default function PurchaseOrdersPage() {
       { itemId: '', quantity: '', unitPrice: '', totalPrice: 0, taxRate: '12', discountRate: '' },
     ]);
     setEditingPO(null);
+    setOriginalData(null);
     setShowForm(false);
   };
 
@@ -271,6 +347,29 @@ export default function PurchaseOrdersPage() {
 
   const canApprovePO = () => {
     return ['GENERAL_MANAGER', 'PRESIDENT'].includes(userRole);
+  };
+
+  const handleSubmitForApproval = async (id: string) => {
+    if (!confirm('Submit this purchase order for approval?')) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/purchasing/orders/${id}/submit`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        fetchOrders();
+        alert('Purchase order submitted for approval');
+      } else {
+        const data = await response.json();
+        alert(data.message || 'Error submitting purchase order');
+      }
+    } catch (error) {
+      console.error('Error submitting order:', error);
+      alert('Error submitting purchase order');
+    }
   };
 
   const handleApprove = async (id: string) => {
@@ -311,62 +410,94 @@ export default function PurchaseOrdersPage() {
     }
   };
 
-  const addItemRow = () => {
-    setPoItems([
-      ...poItems,
-      { itemId: '', quantity: '', unitPrice: '', totalPrice: 0, taxRate: '12', discountRate: '' },
-    ]);
-  };
-
-  const removeItemRow = (index: number) => {
-    setPoItems(poItems.filter((_, i) => i !== index));
-  };
-
-  const updateItemRow = (index: number, field: string, value: any) => {
-    const updated = [...poItems];
-    updated[index] = { ...updated[index], [field]: value };
-
-    if (field === 'itemId') {
-      const selectedItem = items.find(i => i.id === value);
-      if (selectedItem) {
-        updated[index].itemName = selectedItem.name;
-        updated[index].unitPrice = selectedItem.standardCost?.toString() || '';
+  const handleEdit = async (po: PurchaseOrder) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/purchasing/orders/${po.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      
+      if (data.order) {
+        const orderData = data.order;
+        setEditingPO(po);
+        
+        const formDataToSet = {
+          poDate: orderData.poDate.split('T')[0],
+          supplierId: orderData.supplierId,
+          deliveryDate: orderData.deliveryDate ? orderData.deliveryDate.split('T')[0] : '',
+          deliveryAddress: orderData.deliveryAddress || '',
+          paymentTerms: orderData.paymentTerms || '',
+          notes: orderData.notes || '',
+        };
+        setFormData(formDataToSet);
+        
+        const itemsToSet = orderData.items && orderData.items.length > 0
+          ? orderData.items.map((item: any) => ({
+              itemId: item.itemId,
+              quantity: item.quantity.toString(),
+              unitPrice: item.unitPrice.toString(),
+              totalPrice: parseFloat(item.totalPrice),
+              taxRate: item.taxRate.toString(),
+              discountRate: item.discountRate.toString(),
+            }))
+          : [];
+        setPoItems(itemsToSet);
+        
+        // Store original data for change detection
+        setOriginalData({
+          formData: formDataToSet,
+          poItems: itemsToSet.map(item => ({
+            itemId: item.itemId,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            taxRate: item.taxRate,
+            discountRate: item.discountRate,
+          })),
+        });
+        
+        setShowForm(true);
       }
+    } catch (error) {
+      console.error('Error loading PO for edit:', error);
+      alert('Error loading purchase order');
     }
-
-    if (field === 'quantity' || field === 'unitPrice' || field === 'taxRate' || field === 'discountRate') {
-      const qty = parseFloat(updated[index].quantity) || 0;
-      const price = parseFloat(updated[index].unitPrice) || 0;
-      const itemTotal = qty * price;
-      const discount = (itemTotal * (parseFloat(updated[index].discountRate) || 0)) / 100;
-      const afterDiscount = itemTotal - discount;
-      const tax = (afterDiscount * (parseFloat(updated[index].taxRate) || 0)) / 100;
-      updated[index].totalPrice = afterDiscount + tax;
-    }
-
-    setPoItems(updated);
   };
 
-  const resetForm = () => {
-    setFormData({
-      poDate: new Date().toISOString().split('T')[0],
-      supplierId: '',
-      deliveryDate: '',
-      deliveryAddress: '',
-      paymentTerms: '',
-      notes: '',
-    });
-    setPoItems([
-      { itemId: '', quantity: '', unitPrice: '', totalPrice: 0, taxRate: '12', discountRate: '' },
-    ]);
-    setShowForm(false);
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this purchase order? This action cannot be undone.')) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/purchasing/orders/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        alert('Purchase order deleted successfully');
+        fetchOrders();
+      } else {
+        const data = await response.json();
+        alert(data.message || 'Error deleting purchase order');
+      }
+    } catch (error) {
+      console.error('Error deleting purchase order:', error);
+      alert('Error deleting purchase order');
+    }
   };
 
-  const filteredOrders = orders.filter(
-    (po) =>
-      po.poNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      po.supplierName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredOrders = orders.filter((po) => {
+    const matchesSearch = 
+      po.poNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      po.supplierName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      po.createdByName?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = !statusFilter || po.status === statusFilter;
+    const matchesSupplier = !supplierFilter || po.supplierName === supplierFilter;
+    
+    return matchesSearch && matchesStatus && matchesSupplier;
+  });
 
   const totals = calculateTotals();
 
@@ -389,7 +520,7 @@ export default function PurchaseOrdersPage() {
         {showForm && (
           <Card>
             <CardHeader>
-              <CardTitle>Create Purchase Order</CardTitle>
+              <CardTitle>{editingPO ? 'Edit' : 'Create'} Purchase Order</CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -409,16 +540,19 @@ export default function PurchaseOrdersPage() {
                     <Select
                       id="supplierId"
                       value={formData.supplierId}
-                      onChange={(e) => setFormData({ ...formData, supplierId: e.target.value })}
+                      onChange={(e) => handleSupplierChange(e.target.value)}
                       required
                     >
                       <option value="">Select Supplier</option>
                       {suppliers.map((sup) => (
                         <option key={sup.id} value={sup.id}>
-                          {sup.name}
+                          {sup.code} - {sup.name}
                         </option>
                       ))}
                     </Select>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Payment terms and address will auto-fill from supplier info
+                    </p>
                   </div>
                   <div>
                     <Label htmlFor="deliveryDate">Delivery Date</Label>
@@ -433,18 +567,24 @@ export default function PurchaseOrdersPage() {
                     <Label htmlFor="paymentTerms">Payment Terms</Label>
                     <Input
                       id="paymentTerms"
-                      placeholder="e.g., Net 30"
+                      placeholder="Auto-filled from supplier"
                       value={formData.paymentTerms}
-                      onChange={(e) => setFormData({ ...formData, paymentTerms: e.target.value })}
+                      readOnly
+                      disabled
+                      className="bg-gray-50 cursor-not-allowed"
+                      title="Payment terms are set in supplier information. Edit supplier to change."
                     />
                   </div>
                   <div className="col-span-2">
                     <Label htmlFor="deliveryAddress">Delivery Address</Label>
                     <Input
                       id="deliveryAddress"
-                      placeholder="Enter delivery address"
+                      placeholder="Auto-filled from supplier"
                       value={formData.deliveryAddress}
-                      onChange={(e) => setFormData({ ...formData, deliveryAddress: e.target.value })}
+                      readOnly
+                      disabled
+                      className="bg-gray-50 cursor-not-allowed"
+                      title="Delivery address is set in supplier information. Edit supplier to change."
                     />
                   </div>
                 </div>
@@ -489,24 +629,21 @@ export default function PurchaseOrdersPage() {
                             </TableCell>
                             <TableCell>
                               <Input
-                                type="number"
-                                step="0.001"
-                                min="0"
-                                placeholder="0.00"
-                                value={item.quantity}
-                                onChange={(e) => updateItemRow(index, 'quantity', e.target.value)}
+                                type="text"
+                                value={item.quantity || ''}
+                                onChange={(e) => updateItemRow(index, 'quantity', formatIntegerInput(e.target.value))}
+                                placeholder="0"
                                 required
                               />
                             </TableCell>
                             <TableCell>
                               <Input
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                placeholder="0.00"
-                                value={item.unitPrice}
-                                onChange={(e) => updateItemRow(index, 'unitPrice', e.target.value)}
-                                required
+                                type="text"
+                                value={formatCurrency(parseFloat(item.unitPrice) || 0)}
+                                readOnly
+                                disabled
+                                className="bg-gray-50 cursor-not-allowed"
+                                title="Price is auto-filled from item's standard cost"
                               />
                             </TableCell>
                             <TableCell>
@@ -585,10 +722,17 @@ export default function PurchaseOrdersPage() {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button type="submit">Create PO</Button>
+                  <Button type="submit" disabled={editingPO && !hasChanges()}>
+                    {editingPO ? 'Update PO' : 'Create PO'}
+                  </Button>
                   <Button type="button" variant="outline" onClick={resetForm}>
                     Cancel
                   </Button>
+                  {editingPO && !hasChanges() && (
+                    <span className="text-sm text-muted-foreground self-center ml-2">
+                      No changes detected
+                    </span>
+                  )}
                 </div>
               </form>
             </CardContent>
@@ -597,16 +741,57 @@ export default function PurchaseOrdersPage() {
 
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Purchase Orders</CardTitle>
-              <div className="flex items-center gap-2">
-                <Search className="h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search POs..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-64"
-                />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <CardTitle>Purchase Orders</CardTitle>
+                <div className="flex items-center gap-2">
+                  <Search className="h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search POs..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-64"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="w-40"
+                >
+                  <option value="">All Status</option>
+                  <option value="DRAFT">DRAFT</option>
+                  <option value="PENDING">PENDING</option>
+                  <option value="APPROVED">APPROVED</option>
+                  <option value="SENT">SENT</option>
+                  <option value="COMPLETED">COMPLETED</option>
+                  <option value="CANCELLED">CANCELLED</option>
+                </Select>
+                <Select
+                  value={supplierFilter}
+                  onChange={(e) => setSupplierFilter(e.target.value)}
+                  className="w-48"
+                >
+                  <option value="">All Suppliers</option>
+                  {Array.from(new Set(orders.map(o => o.supplierName))).map((supplier) => (
+                    <option key={supplier} value={supplier}>
+                      {supplier}
+                    </option>
+                  ))}
+                </Select>
+                {(statusFilter || supplierFilter) && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setStatusFilter('');
+                      setSupplierFilter('');
+                    }}
+                  >
+                    Clear Filters
+                  </Button>
+                )}
               </div>
             </div>
           </CardHeader>
@@ -648,6 +833,36 @@ export default function PurchaseOrdersPage() {
                         <TableCell>{po.createdByName}</TableCell>
                         <TableCell>
                           <div className="flex gap-2">
+                            {po.status === 'DRAFT' && canCreatePO() && (
+                              <>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleEdit(po)}
+                                  title="Edit PO"
+                                >
+                                  <Edit2 className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleDelete(po.id)}
+                                  className="text-destructive"
+                                  title="Delete PO"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleSubmitForApproval(po.id)}
+                                  className="text-blue-600"
+                                >
+                                  <FileText className="h-4 w-4 mr-1" />
+                                  Submit
+                                </Button>
+                              </>
+                            )}
                             {po.status === 'PENDING' && canApprovePO() && (
                               <Button
                                 variant="ghost"
@@ -670,7 +885,7 @@ export default function PurchaseOrdersPage() {
                                 Send
                               </Button>
                             )}
-                            {po.status !== 'PENDING' && po.status !== 'APPROVED' && (
+                            {!['DRAFT', 'PENDING', 'APPROVED'].includes(po.status) && (
                               <span className="text-muted-foreground text-sm">-</span>
                             )}
                           </div>
@@ -687,3 +902,5 @@ export default function PurchaseOrdersPage() {
     </MainLayout>
   );
 }
+
+export default withAuth(PurchaseOrdersPage, { allowedRoles: ['PURCHASING_STAFF', 'GENERAL_MANAGER', 'SYSTEM_ADMIN'] });

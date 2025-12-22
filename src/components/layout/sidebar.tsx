@@ -110,6 +110,7 @@ export function Sidebar() {
       id: 'purchasing',
       allowedRoles: ['SYSTEM_ADMIN', 'GENERAL_MANAGER', 'PRESIDENT', 'PURCHASING_STAFF', 'DEPARTMENT_HEAD'],
       submenu: [
+        { title: 'Suppliers', href: '/purchasing/suppliers' },
         { title: 'Requisitions', href: '/purchasing/requisitions' },
         { title: 'Purchase Orders', href: '/purchasing/orders' },
       ],

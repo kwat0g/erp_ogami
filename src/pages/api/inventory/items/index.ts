@@ -3,6 +3,7 @@ import { query, execute } from '@/lib/db';
 import { findSessionByToken } from '@/lib/auth';
 import { createAuditLog } from '@/lib/audit';
 import { hasWritePermission } from '@/lib/permissions';
+import { autoSetInactiveIfZeroStock } from '@/lib/inventory-utils';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const token = req.headers.authorization?.replace('Bearer ', '');
@@ -59,21 +60,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         code,
         name,
         description,
-        categoryId,
-        uomId,
         itemType,
-        reorderLevel,
-        reorderQuantity,
-        minStockLevel,
-        maxStockLevel,
         standardCost,
         sellingPrice,
         isActive,
+        initialStock,
+        warehouseId,
       } = req.body;
 
-      if (!code || !name || !uomId || !itemType) {
+      if (!code || !name || !itemType) {
         return res.status(400).json({ message: 'Missing required fields' });
       }
+
+      // Get or create default UOM
+      let [defaultUom]: any = await query('SELECT id FROM units_of_measure LIMIT 1');
+      
+      if (!defaultUom) {
+        // Create a default UOM if none exists
+        await execute(
+          `INSERT INTO units_of_measure (code, name, description) VALUES (?, ?, ?)`,
+          ['PCS', 'Pieces', 'Default unit of measure']
+        );
+        [defaultUom] = await query('SELECT id FROM units_of_measure WHERE code = ?', ['PCS']);
+      }
+      
+      const uomId = defaultUom.id;
 
       const sql = `
         INSERT INTO items (
@@ -87,27 +98,85 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         code,
         name,
         description || null,
-        categoryId || null,
+        null, // categoryId
         uomId,
         itemType,
-        reorderLevel || 0,
-        reorderQuantity || 0,
-        minStockLevel || 0,
-        maxStockLevel || 0,
+        0, // reorderLevel
+        0, // reorderQuantity
+        0, // minStockLevel
+        0, // maxStockLevel
         standardCost || 0,
         sellingPrice || 0,
         isActive !== false,
       ]);
 
+      // Get the UUID of the newly created item
+      const [newItem]: any = await query('SELECT id FROM items WHERE code = ?', [code]);
+      const itemId = newItem.id;
+
+      // Create initial stock if warehouse is provided (even for 0 quantity)
+      if (warehouseId && initialStock !== undefined && initialStock !== null && initialStock !== '') {
+        try {
+          const stockQty = parseFloat(initialStock) || 0;
+          console.log('Creating initial stock:', { itemId, warehouseId, stockQty });
+          
+          // Insert or update inventory stock
+          const stockResult = await execute(
+            `INSERT INTO inventory_stock (item_id, warehouse_id, quantity, last_transaction_date) 
+             VALUES (?, ?, ?, NOW())
+             ON DUPLICATE KEY UPDATE 
+               quantity = quantity + VALUES(quantity),
+               last_transaction_date = NOW()`,
+            [itemId, warehouseId, stockQty]
+          );
+          console.log('Stock insert result:', stockResult);
+
+          // Generate transaction number
+          const year = new Date().getFullYear();
+          const [lastTxn]: any = await query(
+            `SELECT transaction_number FROM inventory_transactions 
+             WHERE YEAR(transaction_date) = ? 
+             ORDER BY transaction_number DESC LIMIT 1`,
+            [year]
+          );
+
+          let txnNumber;
+          if (lastTxn && lastTxn.transaction_number) {
+            const lastNum = parseInt(lastTxn.transaction_number.split('-')[1]);
+            txnNumber = `TXN${year}-${String(lastNum + 1).padStart(6, '0')}`;
+          } else {
+            txnNumber = `TXN${year}-000001`;
+          }
+          console.log('Generated transaction number:', txnNumber);
+
+          // Create inventory transaction for initial stock
+          const txnResult = await execute(
+            `INSERT INTO inventory_transactions (
+              transaction_number, transaction_date, transaction_type, 
+              item_id, warehouse_id, quantity, 
+              reference_type, notes, created_by
+            ) VALUES (?, NOW(), 'ADJUSTMENT', ?, ?, ?, 'INITIAL_STOCK', 'Initial stock entry', ?)`,
+            [txnNumber, itemId, warehouseId, stockQty, session.userId]
+          );
+          console.log('Transaction insert result:', txnResult);
+
+          // Auto-manage item active status based on stock
+          await autoSetInactiveIfZeroStock(itemId);
+        } catch (stockError) {
+          console.error('Error creating initial stock:', stockError);
+          // Don't fail the item creation if stock creation fails
+        }
+      }
+
       await createAuditLog({
         userId: session.userId,
         action: 'CREATE',
         tableName: 'items',
-        recordId: result.insertId,
+        recordId: itemId,
         newValues: req.body,
       });
 
-      return res.status(201).json({ message: 'Item created successfully', id: result.insertId });
+      return res.status(201).json({ message: 'Item created successfully', id: itemId });
     } catch (error: any) {
       console.error('Error creating item:', error);
       if (error.code === 'ER_DUP_ENTRY') {

@@ -3,6 +3,7 @@ import { query, queryOne, execute } from '@/lib/db';
 import { findSessionByToken } from '@/lib/auth';
 import { createAuditLog } from '@/lib/audit';
 import { hasWritePermission } from '@/lib/permissions';
+import { updateStockWithAutoStatus } from '@/lib/inventory-utils';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const token = req.headers.authorization?.replace('Bearer ', '');
@@ -66,23 +67,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         code,
         name,
         description,
-        categoryId,
-        uomId,
         itemType,
-        reorderLevel,
-        reorderQuantity,
-        minStockLevel,
-        maxStockLevel,
         standardCost,
         sellingPrice,
         isActive,
+        initialStock,
+        warehouseId,
       } = req.body;
 
       const sql = `
         UPDATE items SET
-          code = ?, name = ?, description = ?, category_id = ?, uom_id = ?,
-          item_type = ?, reorder_level = ?, reorder_quantity = ?,
-          min_stock_level = ?, max_stock_level = ?, standard_cost = ?,
+          code = ?, name = ?, description = ?,
+          item_type = ?, standard_cost = ?,
           selling_price = ?, is_active = ?
         WHERE id = ?
       `;
@@ -91,18 +87,57 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         code,
         name,
         description || null,
-        categoryId || null,
-        uomId,
         itemType,
-        reorderLevel || 0,
-        reorderQuantity || 0,
-        minStockLevel || 0,
-        maxStockLevel || 0,
         standardCost || 0,
         sellingPrice || 0,
         isActive !== false,
         id,
       ]);
+
+      // Update stock if warehouse and stock quantity are provided
+      if (warehouseId && initialStock !== undefined && initialStock !== null && initialStock !== '') {
+        const stockQty = parseFloat(initialStock);
+        
+        // Get current stock for this item in the warehouse
+        const [currentStock]: any = await query(
+          `SELECT quantity FROM inventory_stock WHERE item_id = ? AND warehouse_id = ?`,
+          [id, warehouseId]
+        );
+
+        const currentQty = currentStock?.quantity || 0;
+        const quantityChange = stockQty - currentQty;
+
+        // Update stock using the helper function (which also manages active status)
+        await updateStockWithAutoStatus(id as string, warehouseId, quantityChange);
+
+        // Create transaction record if there was a change
+        if (quantityChange !== 0) {
+          const year = new Date().getFullYear();
+          const [lastTxn]: any = await query(
+            `SELECT transaction_number FROM inventory_transactions 
+             WHERE YEAR(transaction_date) = ? 
+             ORDER BY transaction_number DESC LIMIT 1`,
+            [year]
+          );
+
+          let txnNumber;
+          if (lastTxn && lastTxn.transaction_number) {
+            const lastNum = parseInt(lastTxn.transaction_number.split('-')[1]);
+            txnNumber = `TXN${year}-${String(lastNum + 1).padStart(6, '0')}`;
+          } else {
+            txnNumber = `TXN${year}-000001`;
+          }
+
+          await execute(
+            `INSERT INTO inventory_transactions (
+              transaction_number, transaction_date, transaction_type, 
+              item_id, warehouse_id, quantity, 
+              reference_type, notes, created_by
+            ) VALUES (?, NOW(), 'ADJUSTMENT', ?, ?, ?, 'ITEM_EDIT', 'Stock adjusted via item edit', ?)`,
+            [txnNumber, id, warehouseId, quantityChange, session.userId]
+          );
+        }
+      }
 
       await createAuditLog({
         userId: session.userId,

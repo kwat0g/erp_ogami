@@ -22,7 +22,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const sql = `
         SELECT 
           pr.id, pr.pr_number as prNumber, pr.pr_date as prDate,
-          pr.requested_by as requestedBy, pr.department, pr.required_date as requiredDate,
+          pr.requested_by as requestedBy, pr.department, pr.source_type as sourceType,
+          pr.source_reference as sourceReference, pr.required_date as requiredDate,
           pr.status, pr.approved_by as approvedBy, pr.approved_date as approvedDate,
           pr.rejection_reason as rejectionReason, pr.notes,
           CONCAT(u1.first_name, ' ', u1.last_name) as requestedByName,
@@ -51,7 +52,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-      const { prDate, department, requiredDate, notes, items } = req.body;
+      const { prDate, department, requiredDate, notes, items, sourceType, sourceReference } = req.body;
 
       // Validation
       if (!prDate || !department) {
@@ -84,12 +85,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Insert PR
         const [prResult] = await connection.query(
           `INSERT INTO purchase_requisitions (
-            pr_number, pr_date, requested_by, department, required_date, status, notes
-          ) VALUES (?, ?, ?, ?, ?, 'DRAFT', ?)`,
-          [prNumber, prDate, session.userId, department, requiredDate || null, notes || null]
+            pr_number, pr_date, requested_by, department, source_type, source_reference, required_date, status, notes
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, 'DRAFT', ?)`,
+          [prNumber, prDate, session.userId, department, sourceType || 'MANUAL', sourceReference || null, requiredDate || null, notes || null]
         );
 
-        const prId = prResult.insertId;
+        // Get the UUID of the newly created PR
+        const [newPR]: any = await connection.query(
+          'SELECT id FROM purchase_requisitions WHERE pr_number = ?',
+          [prNumber]
+        );
+        const prId = newPR[0].id;
 
         // Insert PR items
         for (const item of items) {

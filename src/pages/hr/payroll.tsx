@@ -489,4 +489,4 @@ function PayrollSupportPage() {
   );
 }
 
-export default withAuth(PayrollSupportPage, { allowedRoles: ['SYSTEM_ADMIN', 'HR_STAFF'] });
+export default withAuth(PayrollSupportPage, { allowedRoles: ['HR_STAFF'] });

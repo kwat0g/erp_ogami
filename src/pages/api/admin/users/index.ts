@@ -28,7 +28,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         SELECT 
           u.id, u.email, u.username, u.first_name as firstName, 
           u.last_name as lastName, u.role, 
-          d.name as department,
+          u.department as departmentId,
+          d.name as departmentName,
           u.is_active as isActive, u.last_login as lastLogin
         FROM users u
         LEFT JOIN departments d ON u.department = d.id

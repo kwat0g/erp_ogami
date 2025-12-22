@@ -41,26 +41,32 @@ export default function ItemsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [userRole, setUserRole] = useState<string>('');
   const [canWrite, setCanWrite] = useState(true);
+  const [warehouses, setWarehouses] = useState<any[]>([]);
+  const [originalData, setOriginalData] = useState<any>(null);
+  const [itemStockLevels, setItemStockLevels] = useState<any[]>([]);
+  const [stockAdjustment, setStockAdjustment] = useState({
+    warehouseId: '',
+    quantity: '',
+    adjustmentType: 'ADD',
+    notes: '',
+  });
   const [formData, setFormData] = useState({
     code: '',
     name: '',
     description: '',
-    categoryId: '',
-    uomId: '',
     itemType: 'RAW_MATERIAL',
-    reorderLevel: '',
-    reorderQuantity: '',
-    minStockLevel: '',
-    maxStockLevel: '',
     standardCost: '',
     sellingPrice: '',
     isActive: true,
+    initialStock: '',
+    warehouseId: '',
   });
 
   useEffect(() => {
     fetchItems();
     fetchCategories();
     fetchUoms();
+    fetchWarehouses();
     checkPermissions();
   }, []);
 
@@ -119,6 +125,19 @@ export default function ItemsPage() {
     }
   };
 
+  const fetchWarehouses = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/inventory/warehouses', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      setWarehouses(data.warehouses || []);
+    } catch (error) {
+      console.error('Error fetching warehouses:', error);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -131,20 +150,17 @@ export default function ItemsPage() {
       alert('Item name is required');
       return;
     }
-    if (!formData.uomId) {
-      alert('Unit of measure is required');
-      return;
-    }
 
     // Convert empty strings to null for numeric fields
     const submitData = {
-      ...formData,
-      reorderLevel: formData.reorderLevel ? parseFloat(formData.reorderLevel as string) : 0,
-      reorderQuantity: formData.reorderQuantity ? parseFloat(formData.reorderQuantity as string) : 0,
-      minStockLevel: formData.minStockLevel ? parseFloat(formData.minStockLevel as string) : 0,
-      maxStockLevel: formData.maxStockLevel ? parseFloat(formData.maxStockLevel as string) : 0,
+      code: formData.code,
+      name: formData.name,
+      description: formData.description,
+      itemType: formData.itemType,
       standardCost: formData.standardCost ? parseFloat(formData.standardCost as string) : 0,
       sellingPrice: formData.sellingPrice ? parseFloat(formData.sellingPrice as string) : 0,
+      initialStock: formData.initialStock ? parseFloat(formData.initialStock as string) : 0,
+      warehouseId: formData.warehouseId || null,
     };
 
     try {
@@ -178,23 +194,113 @@ export default function ItemsPage() {
     }
   };
 
-  const handleEdit = (item: Item) => {
+  const fetchItemStock = async (itemId: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/inventory/stock', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      const itemStock = data.stock?.filter((s: any) => s.itemId === itemId) || [];
+      setItemStockLevels(itemStock);
+    } catch (error) {
+      console.error('Error fetching item stock:', error);
+    }
+  };
+
+  const handleStockAdjustment = async () => {
+    if (!editingItem || !stockAdjustment.warehouseId || !stockAdjustment.quantity) {
+      alert('Please select warehouse and enter quantity');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const adjustmentQty = parseFloat(stockAdjustment.quantity);
+      const finalQty = stockAdjustment.adjustmentType === 'SET' 
+        ? adjustmentQty 
+        : (stockAdjustment.adjustmentType === 'ADD' ? adjustmentQty : -adjustmentQty);
+
+      const response = await fetch('/api/inventory/stock/adjust', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          itemId: editingItem.id,
+          warehouseId: stockAdjustment.warehouseId,
+          quantity: finalQty,
+          adjustmentType: stockAdjustment.adjustmentType,
+          notes: stockAdjustment.notes,
+        }),
+      });
+
+      if (response.ok) {
+        alert('Stock adjusted successfully');
+        fetchItemStock(editingItem.id);
+        fetchItems();
+        setStockAdjustment({
+          warehouseId: '',
+          quantity: '',
+          adjustmentType: 'ADD',
+          notes: '',
+        });
+      } else {
+        const data = await response.json();
+        alert(data.message || 'Error adjusting stock');
+      }
+    } catch (error) {
+      console.error('Error adjusting stock:', error);
+      alert('Error adjusting stock');
+    }
+  };
+
+  const handleEdit = async (item: Item) => {
     setEditingItem(item);
-    setFormData({
-      code: item.code,
-      name: item.name,
-      description: item.description || '',
-      categoryId: item.categoryId || '',
-      uomId: item.uomId,
-      itemType: item.itemType,
-      reorderLevel: item.reorderLevel?.toString() || '',
-      reorderQuantity: item.reorderQuantity?.toString() || '',
-      minStockLevel: item.minStockLevel?.toString() || '',
-      maxStockLevel: item.maxStockLevel?.toString() || '',
-      standardCost: item.standardCost?.toString() || '',
-      sellingPrice: item.sellingPrice?.toString() || '',
-      isActive: item.isActive,
-    });
+    
+    // Fetch stock data for the item
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/inventory/stock', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      const itemStock = data.stock?.filter((s: any) => s.itemId === item.id) || [];
+      
+      // Use the first warehouse's stock if available
+      const firstStock = itemStock[0];
+      
+      const editData = {
+        code: item.code,
+        name: item.name,
+        description: item.description || '',
+        itemType: item.itemType,
+        standardCost: item.standardCost?.toString() || '',
+        sellingPrice: item.sellingPrice?.toString() || '',
+        isActive: item.isActive,
+        initialStock: firstStock ? firstStock.quantity?.toString() : '',
+        warehouseId: firstStock ? firstStock.warehouseId : '',
+      };
+      setFormData(editData);
+      setOriginalData(editData);
+    } catch (error) {
+      console.error('Error loading item stock:', error);
+      const editData = {
+        code: item.code,
+        name: item.name,
+        description: item.description || '',
+        itemType: item.itemType,
+        standardCost: item.standardCost?.toString() || '',
+        sellingPrice: item.sellingPrice?.toString() || '',
+        isActive: item.isActive,
+        initialStock: '',
+        warehouseId: '',
+      };
+      setFormData(editData);
+      setOriginalData(editData);
+    }
+    
     setShowForm(true);
   };
 
@@ -221,19 +327,21 @@ export default function ItemsPage() {
       code: '',
       name: '',
       description: '',
-      categoryId: '',
-      uomId: '',
       itemType: 'RAW_MATERIAL',
-      reorderLevel: '',
-      reorderQuantity: '',
-      minStockLevel: '',
-      maxStockLevel: '',
       standardCost: '',
       sellingPrice: '',
       isActive: true,
+      initialStock: '',
+      warehouseId: '',
     });
     setEditingItem(null);
+    setOriginalData(null);
     setShowForm(false);
+  };
+
+  const hasChanges = () => {
+    if (!editingItem || !originalData) return true;
+    return JSON.stringify(formData) !== JSON.stringify(originalData);
   };
 
   const filteredItems = items.filter(
@@ -304,37 +412,6 @@ export default function ItemsPage() {
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="categoryId">Category</Label>
-                    <Select
-                      id="categoryId"
-                      value={formData.categoryId}
-                      onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                    >
-                      <option value="">Select Category</option>
-                      {categories.map((cat) => (
-                        <option key={cat.id} value={cat.id}>
-                          {cat.name}
-                        </option>
-                      ))}
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="uomId">Unit of Measure *</Label>
-                    <Select
-                      id="uomId"
-                      value={formData.uomId}
-                      onChange={(e) => setFormData({ ...formData, uomId: e.target.value })}
-                      required
-                    >
-                      <option value="">Select UOM</option>
-                      {uoms.map((uom) => (
-                        <option key={uom.id} value={uom.id}>
-                          {uom.name} ({uom.code})
-                        </option>
-                      ))}
-                    </Select>
-                  </div>
-                  <div>
                     <Label htmlFor="standardCost">Standard Cost</Label>
                     <Input
                       id="standardCost"
@@ -363,58 +440,33 @@ export default function ItemsPage() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="reorderLevel">Reorder Level</Label>
-                    <Input
-                      id="reorderLevel"
-                      type="number"
-                      step="0.001"
-                      min="0"
-                      placeholder="Enter reorder level"
-                      value={formData.reorderLevel}
+                    <Label htmlFor="warehouseId">{editingItem ? 'Warehouse' : 'Initial Warehouse'}</Label>
+                    <Select
+                      id="warehouseId"
+                      value={formData.warehouseId}
                       onChange={(e) =>
-                        setFormData({ ...formData, reorderLevel: e.target.value })
+                        setFormData({ ...formData, warehouseId: e.target.value })
                       }
-                    />
+                    >
+                      <option value="">Select warehouse (optional)</option>
+                      {warehouses.map((w) => (
+                        <option key={w.id} value={w.id}>
+                          {w.name}
+                        </option>
+                      ))}
+                    </Select>
                   </div>
                   <div>
-                    <Label htmlFor="reorderQuantity">Reorder Quantity</Label>
+                    <Label htmlFor="initialStock">{editingItem ? 'Stock Quantity' : 'Initial Stock Quantity'}</Label>
                     <Input
-                      id="reorderQuantity"
+                      id="initialStock"
                       type="number"
                       step="0.001"
                       min="0"
-                      placeholder="Enter reorder quantity"
-                      value={formData.reorderQuantity}
+                      placeholder="Enter stock quantity"
+                      value={formData.initialStock}
                       onChange={(e) =>
-                        setFormData({ ...formData, reorderQuantity: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="minStockLevel">Min Stock Level</Label>
-                    <Input
-                      id="minStockLevel"
-                      type="number"
-                      step="0.001"
-                      min="0"
-                      placeholder="Enter minimum stock"
-                      value={formData.minStockLevel}
-                      onChange={(e) =>
-                        setFormData({ ...formData, minStockLevel: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="maxStockLevel">Max Stock Level</Label>
-                    <Input
-                      id="maxStockLevel"
-                      type="number"
-                      step="0.001"
-                      min="0"
-                      placeholder="Enter maximum stock"
-                      value={formData.maxStockLevel}
-                      onChange={(e) =>
-                        setFormData({ ...formData, maxStockLevel: e.target.value })
+                        setFormData({ ...formData, initialStock: e.target.value })
                       }
                     />
                   </div>
@@ -439,7 +491,9 @@ export default function ItemsPage() {
                   <Label htmlFor="isActive">Active</Label>
                 </div>
                 <div className="flex gap-2">
-                  <Button type="submit">{editingItem ? 'Update' : 'Create'} Item</Button>
+                  <Button type="submit" disabled={editingItem && !hasChanges()}>
+                    {editingItem ? 'Update' : 'Create'} Item
+                  </Button>
                   <Button type="button" variant="outline" onClick={resetForm}>
                     Cancel
                   </Button>
@@ -474,8 +528,6 @@ export default function ItemsPage() {
                     <TableHead>Code</TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Type</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>UOM</TableHead>
                     <TableHead>Cost</TableHead>
                     <TableHead>Price</TableHead>
                     <TableHead>Stock</TableHead>
@@ -486,7 +538,7 @@ export default function ItemsPage() {
                 <TableBody>
                   {filteredItems.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                         No items found
                       </TableCell>
                     </TableRow>
@@ -500,12 +552,10 @@ export default function ItemsPage() {
                             {item.itemType.replace('_', ' ')}
                           </Badge>
                         </TableCell>
-                        <TableCell>{item.categoryName || '-'}</TableCell>
-                        <TableCell>{item.uomName || '-'}</TableCell>
                         <TableCell>₱{Number(item.standardCost || 0).toFixed(2)}</TableCell>
                         <TableCell>₱{Number(item.sellingPrice || 0).toFixed(2)}</TableCell>
                         <TableCell>
-                          {item.currentStock !== undefined ? Number(item.currentStock || 0).toFixed(2) : '-'}
+                          {item.currentStock !== undefined ? Math.floor(Number(item.currentStock || 0)) : '-'}
                         </TableCell>
                         <TableCell>
                           <Badge variant={item.isActive ? 'success' : 'secondary'}>

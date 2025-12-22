@@ -685,4 +685,4 @@ function LeaveManagementPage() {
   );
 }
 
-export default withAuth(LeaveManagementPage, { allowedRoles: ['SYSTEM_ADMIN', 'HR_STAFF', 'DEPARTMENT_HEAD', 'GENERAL_MANAGER'] });
+export default withAuth(LeaveManagementPage, { allowedRoles: ['HR_STAFF', 'DEPARTMENT_HEAD', 'GENERAL_MANAGER'] });

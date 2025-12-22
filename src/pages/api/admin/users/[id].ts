@@ -33,11 +33,40 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const { email, username, password, firstName, lastName, role, department, isActive } = req.body;
 
+      // Check for duplicate username or email (excluding current user)
+      if (username && username !== oldUser.username) {
+        const existingUsername = await queryOne(
+          'SELECT id FROM users WHERE username = ? AND id != ?',
+          [username, id]
+        );
+        if (existingUsername) {
+          return res.status(400).json({ message: 'Username already exists' });
+        }
+      }
+
+      if (email && email !== oldUser.email) {
+        const existingEmail = await queryOne(
+          'SELECT id FROM users WHERE email = ? AND id != ?',
+          [email, id]
+        );
+        if (existingEmail) {
+          return res.status(400).json({ message: 'Email already exists' });
+        }
+      }
+
       let updateSql = `UPDATE users 
          SET email = ?, username = ?, first_name = ?, last_name = ?, 
              role = ?, department = ?, is_active = ?`;
       
-      let params = [email, username, firstName, lastName, role, department || null, isActive !== false];
+      let params = [
+        email || oldUser.email,
+        username || oldUser.username,
+        firstName || oldUser.first_name,
+        lastName || oldUser.last_name,
+        role || oldUser.role,
+        department !== undefined ? (department || null) : oldUser.department,
+        isActive !== undefined ? isActive : oldUser.is_active
+      ];
 
       // Only update password if provided
       if (password) {
@@ -51,13 +80,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       await execute(updateSql, params);
 
+      // Also update employee status if user has an employee_id
+      if (oldUser.employee_id) {
+        const employeeStatus = isActive !== undefined && !isActive ? 'INACTIVE' : 'ACTIVE';
+        await execute(
+          `UPDATE employees SET status = ?, email = ?, first_name = ?, last_name = ? WHERE id = ?`,
+          [employeeStatus, email || oldUser.email, firstName || oldUser.first_name, lastName || oldUser.last_name, oldUser.employee_id]
+        );
+      }
+
       await createAuditLog({
         userId: session.userId,
         action: 'UPDATE',
         tableName: 'users',
         recordId: id as string,
-        oldValues: { email: oldUser.email, role: oldUser.role },
-        newValues: { email, role },
+        oldValues: { email: oldUser.email, role: oldUser.role, isActive: oldUser.is_active },
+        newValues: { email, role, isActive },
       });
 
       return res.status(200).json({ message: 'User updated successfully' });

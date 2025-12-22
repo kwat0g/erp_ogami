@@ -65,28 +65,37 @@ export default function StockPage() {
   };
 
   const getStockStatus = (item: StockItem) => {
-    if (item.availableQuantity <= 0) return { label: 'Out of Stock', color: 'destructive' };
-    if (item.availableQuantity <= item.reorderLevel) return { label: 'Low Stock', color: 'warning' };
-    if (item.availableQuantity >= item.maxStockLevel) return { label: 'Overstock', color: 'secondary' };
-    return { label: 'Normal', color: 'success' };
+    const availableQty = item.availableQuantity || 0;
+    if (availableQty <= 0) return { label: 'Out of Stock', color: 'destructive' };
+    if (item.minStockLevel && availableQty <= item.minStockLevel) return { label: 'Low Stock', color: 'warning' };
+    if (item.maxStockLevel && availableQty >= item.maxStockLevel) return { label: 'Overstock', color: 'secondary' };
+    return { label: 'In Stock', color: 'success' };
   };
 
   const filteredStock = stockItems.filter((item) => {
     const matchesSearch =
-      item.itemCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.itemName.toLowerCase().includes(searchTerm.toLowerCase());
+      item.itemCode?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.itemName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      '';
+
+    const availableQty = item.availableQuantity || 0;
+    const minLevel = item.minStockLevel || 0;
 
     if (filterType === 'LOW_STOCK') {
-      return matchesSearch && item.availableQuantity <= item.reorderLevel;
+      return matchesSearch && availableQty <= minLevel && availableQty > 0;
     }
     if (filterType === 'OUT_OF_STOCK') {
-      return matchesSearch && item.availableQuantity <= 0;
+      return matchesSearch && availableQty <= 0;
     }
     return matchesSearch;
   });
 
-  const lowStockCount = stockItems.filter((item) => item.availableQuantity <= item.reorderLevel).length;
-  const outOfStockCount = stockItems.filter((item) => item.availableQuantity <= 0).length;
+  const lowStockCount = stockItems.filter((item) => {
+    const availableQty = item.availableQuantity || 0;
+    const minLevel = item.minStockLevel || 0;
+    return availableQty <= minLevel && availableQty > 0;
+  }).length;
+  const outOfStockCount = stockItems.filter((item) => (item.availableQuantity || 0) <= 0).length;
 
   return (
     <MainLayout>
@@ -173,17 +182,15 @@ export default function StockPage() {
                     <TableHead>Item Code</TableHead>
                     <TableHead>Item Name</TableHead>
                     <TableHead>Warehouse</TableHead>
-                    <TableHead className="text-right">On Hand</TableHead>
                     <TableHead className="text-right">Reserved</TableHead>
                     <TableHead className="text-right">Available</TableHead>
-                    <TableHead className="text-right">Reorder Level</TableHead>
                     <TableHead>Status</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredStock.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                         No stock records found
                       </TableCell>
                     </TableRow>
@@ -191,21 +198,15 @@ export default function StockPage() {
                     filteredStock.map((item) => {
                       const status = getStockStatus(item);
                       return (
-                        <TableRow key={item.id}>
+                        <TableRow key={`${item.itemId}-${item.warehouseId}`}>
                           <TableCell className="font-medium">{item.itemCode}</TableCell>
                           <TableCell>{item.itemName}</TableCell>
                           <TableCell>{item.warehouseName}</TableCell>
                           <TableCell className="text-right">
-                            {item.quantity.toFixed(2)} {item.uomName}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {item.reservedQuantity.toFixed(2)} {item.uomName}
+                            {Math.floor(Number(item.reservedQuantity))}
                           </TableCell>
                           <TableCell className="text-right font-medium">
-                            {item.availableQuantity.toFixed(2)} {item.uomName}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {item.reorderLevel.toFixed(2)} {item.uomName}
+                            {Math.floor(Number(item.availableQuantity))}
                           </TableCell>
                           <TableCell>
                             <Badge variant={status.color as any}>{status.label}</Badge>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
 import { withAuth } from '@/components/auth/withAuth';
@@ -57,6 +57,8 @@ function EmployeesPage() {
     hireDate: new Date().toISOString().split('T')[0],
     status: 'ACTIVE',
   });
+  const [originalData, setOriginalData] = useState<any>(null);
+  const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setLoading(false);
@@ -129,6 +131,7 @@ function EmployeesPage() {
       hireDate: new Date().toISOString().split('T')[0],
       status: 'ACTIVE',
     });
+    setOriginalData(null);
     setEditingEmployee(null);
     setShowForm(false);
   };
@@ -234,19 +237,31 @@ function EmployeesPage() {
     return ['HR_STAFF', 'GENERAL_MANAGER'].includes(userRole);
   };
 
+  const hasChanges = () => {
+    if (!editingEmployee || !originalData) return true;
+    return JSON.stringify(formData) !== JSON.stringify(originalData);
+  };
+
   const handleEdit = (employee: any) => {
     setEditingEmployee(employee);
-    setFormData({
+    const formDataToSet = {
       firstName: employee.firstName,
       lastName: employee.lastName,
       email: employee.email,
       phone: employee.phone,
-      departmentId: employee.departmentId,
+      departmentId: employee.departmentId || '',
       position: employee.position,
-      hireDate: employee.hireDate,
+      hireDate: employee.hireDate ? employee.hireDate.split('T')[0] : '',
       status: employee.status,
-    });
+    };
+    setFormData(formDataToSet);
+    setOriginalData(formDataToSet);
     setShowForm(true);
+    
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      formRef.current?.focus();
+    }, 100);
   };
 
   const fetchEmployees = async () => {
@@ -286,7 +301,7 @@ function EmployeesPage() {
         </div>
 
         {showForm && (
-          <Card>
+          <Card ref={formRef}>
             <CardHeader>
               <CardTitle>{editingEmployee ? 'Edit' : 'Add'} Employee</CardTitle>
             </CardHeader>
@@ -397,12 +412,17 @@ function EmployeesPage() {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button type="submit">
+                  <Button type="submit" disabled={editingEmployee && !hasChanges()}>
                     {editingEmployee ? 'Update' : 'Add'} Employee
                   </Button>
                   <Button type="button" variant="outline" onClick={resetForm}>
                     Cancel
                   </Button>
+                  {editingEmployee && !hasChanges() && (
+                    <span className="text-sm text-muted-foreground self-center ml-2">
+                      No changes detected
+                    </span>
+                  )}
                 </div>
               </form>
             </CardContent>
@@ -657,4 +677,4 @@ function EmployeesPage() {
   );
 }
 
-export default withAuth(EmployeesPage, { allowedRoles: ['HR_STAFF', 'GENERAL_MANAGER', 'SYSTEM_ADMIN'] });
+export default withAuth(EmployeesPage, { allowedRoles: ['HR_STAFF'] });

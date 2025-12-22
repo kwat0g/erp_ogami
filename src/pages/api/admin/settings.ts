@@ -45,13 +45,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Update or insert each setting
       for (const [key, value] of Object.entries(settings)) {
         await execute(
-          `INSERT INTO system_settings (setting_key, setting_value, updated_by) 
-           VALUES (?, ?, ?)
+          `INSERT INTO system_settings (setting_key, setting_value) 
+           VALUES (?, ?)
            ON DUPLICATE KEY UPDATE 
            setting_value = VALUES(setting_value),
-           updated_by = VALUES(updated_by),
            updated_at = CURRENT_TIMESTAMP`,
-          [key, value, session.userId]
+          [key, value]
         );
       }
 

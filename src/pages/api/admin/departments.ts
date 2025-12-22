@@ -17,8 +17,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === 'GET') {
-    // Allow HR_STAFF and GENERAL_MANAGER to read departments for employee assignment
-    const canReadDepartments = ['SYSTEM_ADMIN', 'GENERAL_MANAGER', 'HR_STAFF', 'DEPARTMENT_HEAD'].includes(session.role);
+    // Allow various roles to read departments for their respective functions
+    const canReadDepartments = ['SYSTEM_ADMIN', 'GENERAL_MANAGER', 'HR_STAFF', 'DEPARTMENT_HEAD', 'PURCHASING_STAFF'].includes(session.role);
     
     if (!canReadDepartments) {
       return res.status(403).json({ message: 'Access denied' });

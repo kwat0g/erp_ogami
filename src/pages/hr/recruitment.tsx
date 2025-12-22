@@ -940,4 +940,4 @@ function RecruitmentPage() {
   );
 }
 
-export default withAuth(RecruitmentPage, { allowedRoles: ['SYSTEM_ADMIN', 'GENERAL_MANAGER', 'HR_STAFF'] });
+export default withAuth(RecruitmentPage, { allowedRoles: ['HR_STAFF'] });

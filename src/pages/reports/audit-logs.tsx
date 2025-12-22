@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/main-layout';
+import { withAuth } from '@/components/auth/withAuth';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,7 +19,7 @@ interface AuditLog {
   ipAddress?: string;
 }
 
-export default function AuditLogsPage() {
+function AuditLogsPage() {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -191,3 +192,5 @@ export default function AuditLogsPage() {
     </MainLayout>
   );
 }
+
+export default withAuth(AuditLogsPage, { allowedRoles: ['SYSTEM_ADMIN', 'GENERAL_MANAGER'] });

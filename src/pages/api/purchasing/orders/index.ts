@@ -94,7 +94,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         // Insert PO
-        const [poResult] = await connection.query(
+        await connection.query(
           `INSERT INTO purchase_orders (
             po_number, po_date, supplier_id, delivery_date, delivery_address,
             payment_terms, status, subtotal, tax_amount, discount_amount,
@@ -116,7 +116,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           ]
         );
 
-        const poId = poResult.insertId;
+        // Get the UUID of the newly created PO
+        const [newPO]: any = await connection.query(
+          'SELECT id FROM purchase_orders WHERE po_number = ?',
+          [poNumber]
+        );
+        const poId = newPO[0].id;
 
         // Insert PO items
         for (const item of items) {

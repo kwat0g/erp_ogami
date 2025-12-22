@@ -58,7 +58,9 @@ function DepartmentsPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
-      setUsers(data.users || []);
+      // Filter to only show active users for manager assignment
+      const activeUsers = (data.users || []).filter((user: any) => user.isActive);
+      setUsers(activeUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
     }

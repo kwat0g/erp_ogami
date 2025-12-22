@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
 import { withAuth } from '@/components/auth/withAuth';
@@ -18,7 +18,8 @@ interface User {
   firstName: string;
   lastName: string;
   role: string;
-  department?: string;
+  departmentId?: string;
+  departmentName?: string;
   isActive: boolean;
   lastLogin?: string;
 }
@@ -31,6 +32,8 @@ function UsersPage() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentUserId, setCurrentUserId] = useState<string>('');
+  const [originalData, setOriginalData] = useState<any>(null);
+  const formRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState({
     employeeId: '',
     username: '',
@@ -116,14 +119,23 @@ function UsersPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.employeeId.trim() || !formData.username.trim()) {
-      alert('Employee and username are required');
+    
+    // Only require employeeId for new users, not when editing
+    if (!editingUser && !formData.employeeId.trim()) {
+      alert('Employee selection is required for new users');
       return;
     }
+    
+    if (!formData.username.trim()) {
+      alert('Username is required');
+      return;
+    }
+    
     if (!formData.role.trim()) {
       alert('Role is required');
       return;
     }
+    
     if (!editingUser && !formData.password.trim()) {
       alert('Password is required for new users');
       return;
@@ -160,15 +172,22 @@ function UsersPage() {
 
   const handleEdit = (user: User) => {
     setEditingUser(user);
-    setFormData({
+    const formDataToSet = {
       employeeId: '',
       username: user.username,
       password: '',
       role: user.role,
-      department: user.department || '',
+      department: user.departmentId || '',
       isActive: user.isActive,
-    });
+    };
+    setFormData(formDataToSet);
+    setOriginalData(formDataToSet);
     setShowForm(true);
+    
+    // Scroll to form and focus
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
   const handleToggleActive = async (user: User) => {
@@ -184,9 +203,12 @@ function UsersPage() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
+          email: user.email,
           username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
           role: user.role,
-          department: user.department,
+          department: user.departmentId,
           isActive: !user.isActive,
         }),
       });
@@ -194,10 +216,19 @@ function UsersPage() {
       if (response.ok) {
         fetchUsers();
         alert(`User ${action}d successfully`);
+      } else {
+        const data = await response.json();
+        alert(data.message || `Error ${action}ing user`);
       }
     } catch (error) {
       console.error(`Error ${action}ing user:`, error);
+      alert(`Error ${action}ing user`);
     }
+  };
+
+  const hasChanges = () => {
+    if (!editingUser || !originalData) return true;
+    return JSON.stringify(formData) !== JSON.stringify(originalData);
   };
 
   const resetForm = () => {
@@ -210,6 +241,7 @@ function UsersPage() {
       isActive: true,
     });
     setEditingUser(null);
+    setOriginalData(null);
     setShowForm(false);
   };
 
@@ -257,7 +289,7 @@ function UsersPage() {
         </div>
 
         {showForm && (
-          <Card>
+          <Card ref={formRef}>
             <CardHeader>
               <CardTitle>{editingUser ? 'Edit User' : 'Add New User'}</CardTitle>
             </CardHeader>
@@ -346,10 +378,17 @@ function UsersPage() {
                   <Label htmlFor="isActive">Active</Label>
                 </div>
                 <div className="flex gap-2">
-                  <Button type="submit">{editingUser ? 'Update' : 'Create'} User</Button>
+                  <Button type="submit" disabled={editingUser && !hasChanges()}>
+                    {editingUser ? 'Update' : 'Create'} User
+                  </Button>
                   <Button type="button" variant="outline" onClick={resetForm}>
                     Cancel
                   </Button>
+                  {editingUser && !hasChanges() && (
+                    <span className="text-sm text-muted-foreground self-center ml-2">
+                      No changes detected
+                    </span>
+                  )}
                 </div>
               </form>
             </CardContent>
@@ -402,7 +441,7 @@ function UsersPage() {
                       <TableCell>
                         <Badge variant="outline">{user.role ? getRoleDisplayName(user.role as any) : '-'}</Badge>
                       </TableCell>
-                      <TableCell>{user.department || '-'}</TableCell>
+                      <TableCell>{user.departmentName || '-'}</TableCell>
                       <TableCell>
                         <Badge variant={user.isActive ? 'success' : 'secondary'}>
                           {user.isActive ? 'Active' : 'Inactive'}

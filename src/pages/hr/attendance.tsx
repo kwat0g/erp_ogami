@@ -510,4 +510,4 @@ function AttendancePage() {
   );
 }
 
-export default withAuth(AttendancePage, { allowedRoles: ['SYSTEM_ADMIN', 'GENERAL_MANAGER', 'HR_STAFF'] });
+export default withAuth(AttendancePage, { allowedRoles: ['HR_STAFF'] });

@@ -1,0 +1,371 @@
+ERP SYSTEM – COMPLETE DEVELOPMENT BLUEPRINT
+This document serves as a complete, AI-ready blueprint for developing a modern, offline-capable ERP system for a
+manufacturing company. This document is intended to be provided to Claude Sonnet 4.5 for full ERP system
+generation.
+I. Company Context and ERP Design Basis
+The company is a manufacturing organization specializing in plastic automotive parts. It has been operating for 29
+years, employs around 400 employees, and consists of 11 departments. Current operations rely heavily on manual
+processes and Excel files, with limited accounting software usage. Due to weak internet connectivity, the ERP
+system must operate reliably in an offline or LAN-based environment.
+II. ERP Objectives
+The ERP system aims to integrate all departments, reduce manual encoding, eliminate Excel dependency, improve
+inventory accuracy, enhance production planning, automate Accounts Payable due-date tracking, and support
+management decision-making while operating offline.
+III. Functional Requirements
+The ERP must support purchasing, inventory, production planning, production execution, quality control,
+maintenance, mold management, accounting, HR records, and import/export compliance with approval workflows.
+IV. ERP Modules- HRIS – employee records, hiring, attendance, payroll integration- Finance & Accounting – GL, Accounts Payable, Accounts Receivable, reporting- Purchasing – PR/PO generation, supplier management, approvals- Inventory & Warehouse – stock monitoring, forecasting, delivery- Production Planning & MRP – scheduling and material planning- Manufacturing Execution – work orders, output and downtime tracking- Quality Management – inspections, NCR, rework- Maintenance Management – preventive and corrective maintenance- Mold Management – mold lifecycle and repair history- Import & Export – PEZA and customs documentation
+V. Non-Functional Requirements
+The system must be secure, scalable, modular, maintainable, support role-based access control, multi-level
+approvals, audit logs, daily backups, and offline operation.
+VI. System Architecture
+The ERP follows a layered modular architecture with MVC implemented per module. Presentation Layer: React +
+Tailwind CSS. Application Layer: Next.js API routes. Business Logic Layer: TypeScript services. Data Access
+Layer: Repository pattern. Database Layer: MySQL.
+VII. Technology Stack
+Frontend: TypeScript, React, Next.js, Tailwind CSS. Backend: Next.js API routes. Database: MySQL on local
+server.
+VIII. Development Roadmap
+Phase 1: Accounting (Accounts Payable), Inventory, Purchasing, Production Planning. Phase 2: Production
+Execution, Quality Control, Warehouse. Phase 3: Maintenance, HRIS, Mold Management, Import & Export.
+IX. Database Design Requirements
+The database must be relational and normalized with proper indexing, constraints, transaction support, and audit
+trail tables.
+X. API Design Requirements
+The system must expose modular REST-style APIs per ERP module with authentication, authorization, validation,
+and error handling.
+XI. User Roles and Access Control
+Top Management: approval and dashboards. Department Heads: monitoring and approvals. Staff: data entry.
+Accounting: financial control. Warehouse: inventory transactions.
+XII. UI / UX DESIGN REQUIREMENTS (CRITICAL)
+The ERP system must have a modern, professional, panelist-friendly UI. It must feature clean layouts, dashboards
+with cards and charts, consistent typography, responsive design, intuitive navigation, and a corporate color palette
+using Tailwind CSS best practices.
+XIII. Final Instruction for AI System
+This document must be treated as the single source of truth. Claude Sonnet 4.5 must follow all architectural,
+functional, technical, and UI/UX requirements when generating the ERP system.
+
+
+ERP SYSTEM USERS AND ROLES
+I. Overview
+
+The ERP system will implement Role-Based Access Control (RBAC).
+Each user role has defined permissions based on department, responsibility, and authority level.
+This ensures security, accountability, and proper approval workflows across all departments.
+
+II. Management-Level Users (Approval & Monitoring)
+1. System Administrator
+
+Purpose: Technical and system control
+
+Responsibilities:
+
+Manage system configuration
+
+Create and manage user accounts
+
+Assign roles and permissions
+
+Monitor system logs and backups
+
+Access Level:
+
+Full system access (no operational encoding)
+
+2. President
+
+Purpose: Highest approval authority
+
+Responsibilities:
+
+Approve major Purchase Orders
+
+Approve high-value expenses
+
+View company-wide dashboards and reports
+
+Access Level:
+
+Approval access
+
+Read-only access to all modules
+
+3. Vice President
+
+Purpose: Executive approval and monitoring
+
+Responsibilities:
+
+Approve Purchase Requests and Purchase Orders
+
+Monitor department performance
+
+Review financial and production summaries
+
+Access Level:
+
+Approval access
+
+Read-only access to all modules
+
+4. General Manager
+
+Purpose: Operational management and approvals
+
+Responsibilities:
+
+Approve purchasing and production-related requests
+
+Monitor daily operations
+
+Oversee department performance
+
+Access Level:
+
+Approval and monitoring access
+
+III. Department Head Users (Control & Validation)
+5. Department Head / Manager
+
+(HR Manager, Accounting Manager, Production Head, Warehouse Head, etc.)
+
+Responsibilities:
+
+Validate and approve department transactions
+
+Monitor department reports and KPIs
+
+Review staff activities
+
+Access Level:
+
+Full access within own department
+
+Approval authority within scope
+
+IV. Core Operational Users (Data Entry & Processing)
+6. Accounting Officer / Staff
+
+Department: Accounting
+
+Responsibilities:
+
+Record Accounts Payable and Receivable
+
+Monitor payable due dates
+
+Generate financial reports
+
+Process payroll and government remittances
+
+Access Level:
+
+Finance & Accounting module only
+
+7. Purchasing Officer / Staff
+
+Department: Purchasing
+
+Responsibilities:
+
+Create Purchase Requests
+
+Generate Purchase Orders
+
+Maintain supplier records
+
+Coordinate with suppliers
+
+Access Level:
+
+Purchasing module
+
+Limited inventory view
+
+8. Inventory / Warehouse Staff
+
+Department: Warehouse
+
+Responsibilities:
+
+Record stock-in and stock-out
+
+Manage material receiving
+
+Prepare delivery transactions
+
+Conduct inventory counts
+
+Access Level:
+
+Inventory & Warehouse module
+
+9. Production Planner (PPC Staff)
+
+Department: Production Planning & Control
+
+Responsibilities:
+
+Create production schedules
+
+Run MRP calculations
+
+Monitor production capacity
+
+Coordinate with Purchasing and Production
+
+Access Level:
+
+PPC and Inventory view access
+
+10. Production Supervisor / Line Leader
+
+Department: Production
+
+Responsibilities:
+
+Manage work orders
+
+Assign operators and machines
+
+Record production output
+
+Log downtime and issues
+
+Access Level:
+
+Production Execution module
+
+11. Production Operator
+
+Department: Production
+
+Responsibilities:
+
+Execute assigned work orders
+
+Record basic production output
+
+Access Level:
+
+Limited production input only
+
+12. Quality Control Inspector
+
+Department: Quality Control
+
+Responsibilities:
+
+Perform inspections
+
+Record pass/fail results
+
+Create NCRs
+
+Monitor product quality
+
+Access Level:
+
+Quality Management module
+
+13. Maintenance Technician
+
+Department: Maintenance
+
+Responsibilities:
+
+Record equipment breakdowns
+
+Perform maintenance activities
+
+Update maintenance history
+
+Access Level:
+
+Maintenance module only
+
+14. Mold Technician / Mold Engineer
+
+Department: Mold
+
+Responsibilities:
+
+Record mold usage
+
+Log mold repairs and maintenance
+
+Monitor mold availability
+
+Access Level:
+
+Mold Management module
+
+15. HR Officer / HR Staff
+
+Department: Administration (HR)
+
+Responsibilities:
+
+Manage employee records
+
+Process hiring and onboarding
+
+Monitor attendance
+
+Coordinate payroll data
+
+Access Level:
+
+HRIS module
+
+16. Import & Export Officer
+
+Department: ImpEx
+
+Responsibilities:
+
+Manage import/export documentation
+
+Track PEZA and customs permits
+
+Upload compliance documents
+
+Access Level:
+
+Import & Export module
+
+V. Read-Only / Reporting Users
+17. Auditor / Viewer
+
+Purpose: Internal or external review
+
+Responsibilities:
+
+View reports and audit logs
+
+No data modification
+
+Access Level:
+
+Read-only access to selected modules
+
+VI. Summary of User Roles
+Role Type	Example Roles
+System Control	System Administrator
+Executive Approval	President, Vice President, General Manager
+Department Control	Department Heads
+Finance	Accounting Staff
+Operations	Purchasing, Warehouse, Production
+Support	QC, Maintenance, Mold, HR, ImpEx
+Audit	Auditor / Viewer
+VII. Key Design Notes for Development
+
+Every user must have one or more roles
+
+Approval workflows must respect role hierarchy
+
+All critical transactions must be logged
+
+UI must dynamically change based on user role
+
+Unauthorized access must be restricted
