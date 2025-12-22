@@ -38,7 +38,31 @@ A comprehensive, offline-capable ERP system for a plastic automotive parts manuf
    cd erp-system
    npm install
    ```
-3. Set up the database (see database/README.md)
+3. Set up the database (see database/README.md):
+.env {
+   # Database
+DB_HOST="localhost"
+DB_PORT="3306"
+DB_USER="root"
+DB_PASSWORD=""
+DB_NAME="erp_system"
+
+# NextAuth
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-secret-key-here-change-in-production"
+
+# Application
+NODE_ENV="development"
+APP_NAME="Manufacturing ERP"
+APP_VERSION="1.0.0"
+# Email (optional)
+SMTP_HOST="smtp.example.com"
+SMTP_PORT="587"
+SMTP_USER="your-email@example.com"
+SMTP_PASSWORD="your-password"
+SMTP_FROM="noreply@example.com"
+
+}
 4. Configure environment variables (copy .env.example to .env)
 5. Run the development server:
    ```bash
