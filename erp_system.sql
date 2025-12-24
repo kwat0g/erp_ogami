@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 23, 2025 at 05:09 PM
+-- Generation Time: Dec 24, 2025 at 09:58 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -46,16 +46,6 @@ CREATE TABLE `applicants` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `applicants`
---
-
-INSERT INTO `applicants` (`id`, `job_posting_id`, `first_name`, `last_name`, `email`, `phone`, `address`, `resume_path`, `cover_letter`, `application_date`, `status`, `interview_date`, `interview_notes`, `rejection_reason`, `created_by`, `created_at`, `updated_at`) VALUES
-('6463e3a4-dff8-11f0-93ac-74d435ebdbb2', '4db58e4e-dff8-11f0-93ac-74d435ebdbb2', 'Gnehm Ryien', 'Rane', 'gnehm@gmail.com', '09852662052', 'Paliparan', NULL, 'Ewan ano to', '2025-12-23', 'HIRED', NULL, NULL, NULL, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', '2025-12-23 12:10:37', '2025-12-23 12:10:55'),
-('76c34894-ddc9-11f0-83eb-74d435ebdbb2', '52119934-ddc1-11f0-83eb-74d435ebdbb2', 'dsad', 'dsad', 'kwato1g@gmail.com', '09123456789', 'dsa', NULL, 'dsa', '2025-12-20', 'REJECTED', NULL, NULL, 'panget', '763c22d2-ddba-11f0-83eb-74d435ebdbb2', '2025-12-20 17:29:39', '2025-12-20 17:58:39'),
-('aa7ad5c5-ddc3-11f0-83eb-74d435ebdbb2', '52119934-ddc1-11f0-83eb-74d435ebdbb2', 'dasd', 'asd', 'bungubung.ehdrian@ncst.edu.ph', '3232', 'das', NULL, 'das', '2025-12-20', 'HIRED', NULL, NULL, NULL, '763c22d2-ddba-11f0-83eb-74d435ebdbb2', '2025-12-20 16:48:08', '2025-12-20 16:48:12'),
-('bb757a17-ddc3-11f0-83eb-74d435ebdbb2', '52119934-ddc1-11f0-83eb-74d435ebdbb2', 'Jarmaine', 'Diegas', 'diegas.jarmaine@ncst.edu.ph', '3213123', 'dsadas', NULL, 'das', '2025-12-20', 'HIRED', NULL, NULL, NULL, '763c22d2-ddba-11f0-83eb-74d435ebdbb2', '2025-12-20 16:48:37', '2025-12-20 16:48:45');
 
 -- --------------------------------------------------------
 
@@ -112,17 +102,6 @@ CREATE TABLE `approval_workflows` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `approval_workflows`
---
-
-INSERT INTO `approval_workflows` (`id`, `workflow_name`, `module_name`, `document_type`, `approval_levels`, `is_active`, `description`, `created_at`, `updated_at`) VALUES
-('a53abc25-dd9f-11f0-83eb-74d435ebdbb2', 'Purchase Requisition Approval', 'Purchasing', 'PURCHASE_REQUISITION', 2, 1, 'Two-level approval for purchase requisitions', '2025-12-20 20:30:18', '2025-12-20 20:30:18'),
-('a53ac7c6-dd9f-11f0-83eb-74d435ebdbb2', 'Purchase Order Approval', 'Purchasing', 'PURCHASE_ORDER', 3, 1, 'Three-level approval for purchase orders', '2025-12-20 20:30:18', '2025-12-20 20:30:18'),
-('a53ac867-dd9f-11f0-83eb-74d435ebdbb2', 'Work Order Approval', 'Production', 'WORK_ORDER', 1, 1, 'Single-level approval for work orders', '2025-12-20 20:30:18', '2025-12-20 20:30:18'),
-('a53ac91d-dd9f-11f0-83eb-74d435ebdbb2', 'Payment Approval', 'Accounting', 'PAYMENT', 2, 1, 'Two-level approval for payments', '2025-12-20 20:30:18', '2025-12-20 20:30:18'),
-('a53ac962-dd9f-11f0-83eb-74d435ebdbb2', 'Invoice Approval', 'Accounting', 'INVOICE', 1, 1, 'Single-level approval for invoices', '2025-12-20 20:30:18', '2025-12-20 20:30:18');
-
 -- --------------------------------------------------------
 
 --
@@ -162,14 +141,6 @@ CREATE TABLE `attendance_logs` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `attendance_logs`
---
-
-INSERT INTO `attendance_logs` (`id`, `employee_id`, `attendance_date`, `time_in`, `time_out`, `status`, `hours_worked`, `overtime_hours`, `is_validated`, `validated_by`, `validated_at`, `notes`, `created_at`, `updated_at`) VALUES
-('2c6bb43c-dffd-11f0-93ac-74d435ebdbb2', '6f12b49a-dff8-11f0-93ac-74d435ebdbb2', '2025-12-23', '07:00:00', '19:00:00', 'PRESENT', 12.00, 0.00, 1, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', '2025-12-23 12:44:56', NULL, '2025-12-23 12:44:51', '2025-12-23 12:44:56'),
-('ac2b7f32-e001-11f0-93ac-74d435ebdbb2', '21e774d3-dff8-11f0-93ac-74d435ebdbb2', '2025-12-16', '07:00:00', '17:00:00', 'PRESENT', 10.00, 0.00, 0, NULL, NULL, NULL, '2025-12-23 13:17:03', '2025-12-23 13:44:15');
-
 -- --------------------------------------------------------
 
 --
@@ -197,192 +168,102 @@ CREATE TABLE `audit_logs` (
 --
 
 INSERT INTO `audit_logs` (`id`, `user_id`, `action`, `module`, `record_id`, `record_type`, `old_value`, `new_value`, `ip_address`, `user_agent`, `status`, `error_message`, `created_at`) VALUES
-(1, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-22 11:05:48'),
-(2, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-22 11:07:46'),
-(3, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"purchasing.purchasing\",\"role\":\"PURCHASING_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 06:38:14'),
-(4, '2025d81d-df0d-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"dhead.dhead\",\"role\":\"DEPARTMENT_HEAD\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 06:38:23'),
-(5, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"hruser\",\"role\":\"HR_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 06:42:45'),
-(6, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 06:49:31'),
-(7, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"hruser\",\"role\":\"HR_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 06:50:37'),
-(8, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"purchasing.purchasing\",\"role\":\"PURCHASING_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 06:51:20'),
-(9, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'CREATE', 'purchase_requisitions', 'a2946e1e-dfce-11f0-9857-74d435ebdbb2', 'purchase_requisitions', NULL, '{\"prNumber\":\"PR-0002\",\"prDate\":\"2025-12-23\",\"department\":\"Quality Control\",\"items\":[{\"itemId\":\"78b2d7d4-df17-11f0-9861-74d435ebdbb2\",\"quantity\":100,\"estimatedUnitPrice\":100,\"estimatedTotalPrice\":10000,\"requiredDate\":\"2026-01-01\",\"purpose\":\"\"}]}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 07:11:43'),
-(10, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'CREATE', 'purchase_orders', 'ac2bfcc5-dfce-11f0-9857-74d435ebdbb2', 'purchase_orders', NULL, '{\"poNumber\":\"PO-0002\",\"poDate\":\"2025-12-23\",\"supplierId\":\"2146da91-df0e-11f0-9861-74d435ebdbb2\",\"totalAmount\":4480}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 07:11:59'),
-(11, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'UPDATE', 'purchase_orders', 'ac2bfcc5-dfce-11f0-9857-74d435ebdbb2', 'purchase_orders', '{\"status\":\"DRAFT\"}', '{\"status\":\"PENDING\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 07:12:12'),
-(12, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:12:31'),
-(13, '2025d81d-df0d-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"dhead.dhead\",\"role\":\"DEPARTMENT_HEAD\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:19:52'),
-(14, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gmanager.gmanager\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:20:12'),
-(15, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"hruser\",\"role\":\"HR_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:20:42'),
-(16, 'd82c689c-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"president.president\",\"role\":\"PRESIDENT\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:20:58'),
-(17, 'dd92f398-df1f-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"proplanner.proplanner\",\"role\":\"PRODUCTION_PLANNER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:21:41'),
-(18, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"purchasing.purchasing\",\"role\":\"PURCHASING_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:21:52'),
-(19, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"purchasing.purchasing\",\"role\":\"PURCHASING_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:21:53'),
-(20, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"purchasing.purchasing\",\"role\":\"PURCHASING_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:23:31'),
-(21, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:23:39'),
-(22, '2025d81d-df0d-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"dhead.dhead\",\"role\":\"DEPARTMENT_HEAD\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:23:43'),
-(23, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gmanager.gmanager\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:23:47'),
-(24, 'd82c689c-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"president.president\",\"role\":\"PRESIDENT\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:23:50'),
-(25, 'dd92f398-df1f-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"proplanner.proplanner\",\"role\":\"PRODUCTION_PLANNER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:23:54'),
-(26, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"purchasing.purchasing\",\"role\":\"PURCHASING_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:23:57'),
-(27, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"hruser\",\"role\":\"HR_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:24:00'),
-(28, 'dd92f398-df1f-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"proplanner.proplanner\",\"role\":\"PRODUCTION_PLANNER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:24:12'),
-(29, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:26:08'),
-(30, '2025d81d-df0d-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"dhead.dhead\",\"role\":\"DEPARTMENT_HEAD\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:26:15'),
-(31, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gmanager.gmanager\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:26:18'),
-(32, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"hruser\",\"role\":\"HR_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:26:21'),
-(33, 'd82c689c-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"president.president\",\"role\":\"PRESIDENT\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:26:25'),
-(34, 'dd92f398-df1f-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"proplanner.proplanner\",\"role\":\"PRODUCTION_PLANNER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:26:36'),
-(35, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"purchasing.purchasing\",\"role\":\"PURCHASING_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:26:38'),
-(36, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:28:39'),
-(37, '2025d81d-df0d-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"dhead.dhead\",\"role\":\"DEPARTMENT_HEAD\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:31:12'),
-(38, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gmanager.gmanager\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:31:57'),
-(39, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"hruser\",\"role\":\"HR_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:32:55'),
-(40, 'd82c689c-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"president.president\",\"role\":\"PRESIDENT\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:33:38'),
-(41, 'd82c689c-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"president.president\",\"role\":\"PRESIDENT\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:33:49'),
-(42, 'dd92f398-df1f-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"proplanner.proplanner\",\"role\":\"PRODUCTION_PLANNER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:34:26'),
-(43, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"purchasing.purchasing\",\"role\":\"PURCHASING_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:35:37'),
-(44, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:40:22'),
-(45, '2025d81d-df0d-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"dhead.dhead\",\"role\":\"DEPARTMENT_HEAD\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:40:49'),
-(46, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gmanager.gmanager\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:41:22'),
-(47, 'd82c689c-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"president.president\",\"role\":\"PRESIDENT\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:42:13'),
-(48, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"purchasing.purchasing\",\"role\":\"PURCHASING_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:42:25'),
-(49, 'dd92f398-df1f-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"proplanner.proplanner\",\"role\":\"PRODUCTION_PLANNER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:42:45'),
-(50, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"purchasing.purchasing\",\"role\":\"PURCHASING_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:43:08'),
-(51, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'CREATE', 'purchase_orders', '0f8c53ee-dfd3-11f0-9857-74d435ebdbb2', 'purchase_orders', NULL, '{\"poNumber\":\"PO-0003\",\"poDate\":\"2025-12-23\",\"supplierId\":\"df6d81ef-df00-11f0-9861-74d435ebdbb2\",\"totalAmount\":2240}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 07:43:24'),
-(52, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'UPDATE', 'purchase_orders', '0f8c53ee-dfd3-11f0-9857-74d435ebdbb2', 'purchase_orders', '{\"status\":\"DRAFT\"}', '{\"status\":\"PENDING\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 07:43:30'),
-(53, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gmanager.gmanager\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:43:34'),
-(54, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"purchasing.purchasing\",\"role\":\"PURCHASING_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:54:30'),
-(55, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'SUBMIT', 'purchase_requisitions', 'a2946e1e-dfce-11f0-9857-74d435ebdbb2', 'purchase_requisitions', '{\"status\":\"DRAFT\"}', '{\"status\":\"PENDING\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 07:54:42'),
-(56, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'SUBMIT', 'purchase_requisitions', '89f22b14-df18-11f0-9861-74d435ebdbb2', 'purchase_requisitions', '{\"status\":\"DRAFT\"}', '{\"status\":\"PENDING\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 07:55:03'),
-(57, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'CREATE', 'purchase_requisitions', 'c25f2127-dfd4-11f0-9857-74d435ebdbb2', 'purchase_requisitions', NULL, '{\"prNumber\":\"PR-0003\",\"prDate\":\"2025-12-23\",\"department\":\"Sales\",\"items\":[{\"itemId\":\"78b2d7d4-df17-11f0-9861-74d435ebdbb2\",\"quantity\":1,\"estimatedUnitPrice\":100,\"estimatedTotalPrice\":100,\"requiredDate\":\"2025-12-30\",\"purpose\":\"\"}]}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 07:55:33'),
-(58, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'SUBMIT', 'purchase_requisitions', 'c25f2127-dfd4-11f0-9857-74d435ebdbb2', 'purchase_requisitions', '{\"status\":\"DRAFT\"}', '{\"status\":\"PENDING\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 07:55:44'),
-(59, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gmanager.gmanager\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 07:55:52'),
-(60, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"purchasing.purchasing\",\"role\":\"PURCHASING_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 08:02:33'),
-(61, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'CREATE', 'purchase_requisitions', 'cb43e719-dfd5-11f0-9857-74d435ebdbb2', 'purchase_requisitions', NULL, '{\"prNumber\":\"PR-0004\",\"prDate\":\"2025-12-23\",\"department\":\"IT\",\"items\":[{\"itemId\":\"d6bd1f4a-df17-11f0-9861-74d435ebdbb2\",\"quantity\":10,\"estimatedUnitPrice\":40,\"estimatedTotalPrice\":400,\"requiredDate\":\"2025-12-30\",\"purpose\":\"\"}]}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 08:02:58'),
-(62, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'UPDATE', 'purchase_requisitions', 'cb43e719-dfd5-11f0-9857-74d435ebdbb2', 'purchase_requisitions', NULL, '{\"prDate\":\"2025-12-22\",\"department\":\"IT\",\"items\":1}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 08:03:09'),
-(63, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'SUBMIT', 'purchase_requisitions', 'cb43e719-dfd5-11f0-9857-74d435ebdbb2', 'purchase_requisitions', '{\"status\":\"DRAFT\"}', '{\"status\":\"PENDING\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 08:03:17'),
-(64, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gmanager.gmanager\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 08:03:22'),
-(65, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gmanager.gmanager\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 08:07:26'),
-(66, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"purchasing.purchasing\",\"role\":\"PURCHASING_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 08:21:03'),
-(67, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'CREATE', 'purchase_requisitions', '5e03886e-dfd8-11f0-9857-74d435ebdbb2', 'purchase_requisitions', NULL, '{\"prNumber\":\"PR-0005\",\"prDate\":\"2025-12-23\",\"department\":\"IT\",\"items\":[{\"itemId\":\"d6bd1f4a-df17-11f0-9861-74d435ebdbb2\",\"quantity\":6,\"estimatedUnitPrice\":40,\"estimatedTotalPrice\":240,\"requiredDate\":\"2025-12-29\",\"purpose\":\"das\"}]}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 08:21:23'),
-(68, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'SUBMIT', 'purchase_requisitions', '5e03886e-dfd8-11f0-9857-74d435ebdbb2', 'purchase_requisitions', '{\"status\":\"DRAFT\"}', '{\"status\":\"PENDING\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 08:21:32'),
-(69, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gmanager.gmanager\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 08:21:37'),
-(70, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'APPROVE', 'purchase_requisitions', '5e03886e-dfd8-11f0-9857-74d435ebdbb2', 'purchase_requisitions', '{\"status\":\"PENDING\"}', '{\"status\":\"APPROVED\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 08:22:38'),
-(71, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'REJECT', 'purchase_requisitions', 'c25f2127-dfd4-11f0-9857-74d435ebdbb2', 'purchase_requisitions', '{\"status\":\"PENDING\"}', '{\"status\":\"REJECTED\",\"rejectionReason\":\"dsadas\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 08:22:53'),
-(72, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'APPROVE', 'purchase_requisitions', '89f22b14-df18-11f0-9861-74d435ebdbb2', 'purchase_requisitions', '{\"status\":\"PENDING\"}', '{\"status\":\"APPROVED\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 08:24:31'),
-(73, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'APPROVE', 'purchase_requisitions', 'cb43e719-dfd5-11f0-9857-74d435ebdbb2', 'purchase_requisitions', '{\"status\":\"PENDING\"}', '{\"status\":\"APPROVED\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 08:24:36'),
-(74, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'REJECT', 'purchase_requisitions', 'a2946e1e-dfce-11f0-9857-74d435ebdbb2', 'purchase_requisitions', '{\"status\":\"PENDING\"}', '{\"status\":\"REJECTED\",\"rejectionReason\":\"DD\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 08:31:07'),
-(75, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"purchasing.purchasing\",\"role\":\"PURCHASING_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 08:31:39'),
-(76, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gmanager.gmanager\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 08:32:58'),
-(77, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"purchasing.purchasing\",\"role\":\"PURCHASING_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 08:33:58'),
-(78, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gmanager.gmanager\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 08:36:22'),
-(79, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'APPROVE', 'purchase_orders', '0f8c53ee-dfd3-11f0-9857-74d435ebdbb2', 'purchase_orders', '{\"status\":\"PENDING\"}', '{\"status\":\"APPROVED\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 08:36:26'),
-(80, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gmanager.gmanager\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 08:42:42'),
-(81, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gmanager.gmanager\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 08:47:10'),
-(82, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'SEND', 'purchase_orders', '0f8c53ee-dfd3-11f0-9857-74d435ebdbb2', 'purchase_orders', '{\"status\":\"APPROVED\"}', '{\"status\":\"SENT\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 08:56:28'),
-(83, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'APPROVE', 'purchase_orders', 'ac2bfcc5-dfce-11f0-9857-74d435ebdbb2', 'purchase_orders', '{\"status\":\"PENDING\"}', '{\"status\":\"APPROVED\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 08:56:35'),
-(84, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'APPROVE', 'purchase_orders', 'c6dfcc5f-df18-11f0-9861-74d435ebdbb2', 'purchase_orders', '{\"status\":\"PENDING\"}', '{\"status\":\"APPROVED\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 08:56:36'),
-(85, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 12:03:58'),
-(86, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 12:04:10'),
-(87, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 12:05:03'),
-(88, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"hruser\",\"role\":\"HR_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 12:08:04'),
-(89, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'CREATE', 'employees', '0', 'employees', NULL, '{\"employeeNumber\":\"EMP007\",\"firstName\":\"Ehdrian\",\"lastName\":\"Bungubung\",\"email\":\"ehdrian@gmail.com\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 12:08:46'),
-(90, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'UPDATE', 'employees', '21e774d3-dff8-11f0-93ac-74d435ebdbb2', 'employees', NULL, '{\"firstName\":\"Ehdrian\",\"lastName\":\"Bungubung\",\"email\":\"ehdrian@gmail.com\",\"position\":\"Software Engineer\",\"status\":\"ACTIVE\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 12:09:05'),
-(91, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'CREATE', 'job_postings', '0', 'job_postings', NULL, '{\"jobTitle\":\"HR Admin\",\"departmentId\":\"a52dfc7b-dd9f-11f0-83eb-74d435ebdbb2\",\"status\":\"OPEN\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 12:09:59'),
-(92, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'CREATE', 'applicants', '0', 'applicants', NULL, '{\"jobPostingId\":\"4db58e4e-dff8-11f0-93ac-74d435ebdbb2\",\"firstName\":\"Gnehm Ryien\",\"lastName\":\"Rane\",\"email\":\"gnehm@gmail.com\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 12:10:37'),
-(93, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'UPDATE', 'applicants', '6463e3a4-dff8-11f0-93ac-74d435ebdbb2', 'applicants', NULL, '{\"status\":\"SCREENING\",\"interviewDate\":null,\"interviewNotes\":null,\"rejectionReason\":null}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 12:10:45'),
-(94, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'UPDATE', 'applicants', '6463e3a4-dff8-11f0-93ac-74d435ebdbb2', 'applicants', NULL, '{\"status\":\"INTERVIEWED\",\"interviewDate\":null,\"interviewNotes\":null,\"rejectionReason\":null}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 12:10:47'),
-(95, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'UPDATE', 'applicants', '6463e3a4-dff8-11f0-93ac-74d435ebdbb2', 'applicants', NULL, '{\"status\":\"OFFERED\",\"interviewDate\":null,\"interviewNotes\":null,\"rejectionReason\":null}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 12:10:50'),
-(96, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'CREATE', 'employees', '0', 'employees', NULL, '{\"employeeNumber\":\"EMP008\",\"firstName\":\"Gnehm Ryien\",\"lastName\":\"Rane\",\"email\":\"gnehm@gmail.com\",\"convertedFromApplicant\":\"6463e3a4-dff8-11f0-93ac-74d435ebdbb2\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 12:10:55'),
-(97, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'UPDATE', 'applicants', '6463e3a4-dff8-11f0-93ac-74d435ebdbb2', 'applicants', NULL, '{\"status\":\"HIRED\",\"convertedToEmployee\":0}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 12:10:55'),
-(98, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'CREATE', 'attendance_logs', '0', 'attendance_logs', NULL, '{\"employeeId\":\"6f12b49a-dff8-11f0-93ac-74d435ebdbb2\",\"attendanceDate\":\"2025-12-21\",\"status\":\"PRESENT\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 12:11:19'),
-(99, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'CREATE', 'payroll_inputs', '0', 'payroll_inputs', NULL, '{\"employeeId\":\"6f12b49a-dff8-11f0-93ac-74d435ebdbb2\",\"periodStart\":\"2025-12-01\",\"periodEnd\":\"2025-12-14\",\"inputType\":\"BONUS\",\"description\":\"Allowance\",\"amount\":1500}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 12:12:14'),
-(100, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 12:12:56'),
-(101, 'd82c689c-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"president.president\",\"role\":\"PRESIDENT\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 12:15:18'),
-(102, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"hruser\",\"role\":\"HR_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 12:41:11'),
-(103, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"hruser\",\"role\":\"HR_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 12:42:03'),
-(104, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'UPDATE', 'employees', '6f12b49a-dff8-11f0-93ac-74d435ebdbb2', 'employees', NULL, '{\"firstName\":\"Gnehm Ryien\",\"lastName\":\"Rane\",\"email\":\"gnehm@gmail.com\",\"position\":\"HR Admin\",\"status\":\"ON_LEAVE\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 12:43:23'),
-(105, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'CREATE', 'attendance_logs', '0', 'attendance_logs', NULL, '{\"employeeId\":\"6f12b49a-dff8-11f0-93ac-74d435ebdbb2\",\"attendanceDate\":\"2025-12-23\",\"status\":\"PRESENT\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 12:44:51'),
-(106, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'UPDATE', 'attendance_logs', '2c6bb43c-dffd-11f0-93ac-74d435ebdbb2', 'attendance_logs', NULL, '{\"isValidated\":true}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 12:44:56'),
-(107, '2025d81d-df0d-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"dhead.dhead\",\"role\":\"DEPARTMENT_HEAD\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 12:45:31'),
-(108, 'dd92f398-df1f-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"proplanner.proplanner\",\"role\":\"PRODUCTION_PLANNER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 12:45:59'),
-(109, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 12:52:57'),
-(110, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"hruser\",\"role\":\"HR_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:02:49'),
-(111, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"hruser\",\"role\":\"HR_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:05:06'),
-(112, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'UPDATE', 'employees', '6f12b49a-dff8-11f0-93ac-74d435ebdbb2', 'employees', NULL, '{\"firstName\":\"Gnehm Ryien\",\"lastName\":\"Rane\",\"email\":\"gnehm@gmail.com\",\"position\":\"HR Admin\",\"status\":\"ACTIVE\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 13:05:14'),
-(113, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:05:18'),
-(114, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'CREATE', 'users', '0', 'users', NULL, '{\"email\":\"gnehm@gmail.com\",\"username\":\"rane.gnehm ryien\",\"role\":\"WAREHOUSE_STAFF\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 13:05:43'),
-(115, '16c73a64-e000-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"rane.gnehm ryien\",\"role\":\"WAREHOUSE_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:05:56'),
-(116, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:06:08'),
-(117, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'UPDATE', 'users', '16c73a64-e000-11f0-93ac-74d435ebdbb2', 'users', '{\"email\":\"gnehm@gmail.com\",\"role\":\"WAREHOUSE_STAFF\",\"isActive\":1}', '{\"role\":\"WAREHOUSE_STAFF\",\"isActive\":1}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 13:06:16'),
-(118, '16c73a64-e000-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"rane.gnehm\",\"role\":\"WAREHOUSE_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:06:28'),
-(119, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:06:34'),
-(120, 'dd92f398-df1f-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"proplanner.proplanner\",\"role\":\"PRODUCTION_PLANNER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:07:04'),
-(121, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:08:15'),
-(122, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'CREATE', 'users', '0', 'users', NULL, '{\"email\":\"ehdrian@gmail.com\",\"username\":\"bungubung.ehdrian\",\"role\":\"EMPLOYEE\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 13:08:25'),
-(123, '771b4f6c-e000-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"bungubung.ehdrian\",\"role\":\"EMPLOYEE\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:08:30'),
-(124, '771b4f6c-e000-11f0-93ac-74d435ebdbb2', 'CREATE', 'leave_requests', '0', 'leave_requests', NULL, '{\"employeeId\":\"21e774d3-dff8-11f0-93ac-74d435ebdbb2\",\"leaveTypeId\":\"300b006a-ddb4-11f0-83eb-74d435ebdbb2\",\"startDate\":\"2025-12-25\",\"endDate\":\"2025-12-27\",\"daysRequested\":1}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 13:09:00'),
-(125, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"hruser\",\"role\":\"HR_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:09:11'),
-(126, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'UPDATE', 'leave_requests', '8c3bfdf7-e000-11f0-93ac-74d435ebdbb2', 'leave_requests', NULL, '{\"approvalStage\":\"DEPARTMENT_HEAD\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 13:09:20'),
-(127, '2025d81d-df0d-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"dhead.dhead\",\"role\":\"DEPARTMENT_HEAD\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:09:26'),
-(128, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gmanager.gmanager\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:09:40'),
-(129, '2025d81d-df0d-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"dhead.dhead\",\"role\":\"DEPARTMENT_HEAD\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:12:05'),
-(130, '2025d81d-df0d-11f0-9861-74d435ebdbb2', 'SEND', 'purchase_orders', 'ac2bfcc5-dfce-11f0-9857-74d435ebdbb2', 'purchase_orders', '{\"status\":\"APPROVED\"}', '{\"status\":\"SENT\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 13:13:16'),
-(131, '2025d81d-df0d-11f0-9861-74d435ebdbb2', 'SEND', 'purchase_orders', 'c6dfcc5f-df18-11f0-9861-74d435ebdbb2', 'purchase_orders', '{\"status\":\"APPROVED\"}', '{\"status\":\"SENT\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 13:13:18'),
-(132, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"hruser\",\"role\":\"HR_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:14:06'),
-(133, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'CREATE', 'attendance_logs', '0', 'attendance_logs', NULL, '{\"employeeId\":\"21e774d3-dff8-11f0-93ac-74d435ebdbb2\",\"attendanceDate\":\"2025-12-11\",\"status\":\"PRESENT\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 13:16:26'),
-(134, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'CREATE', 'attendance_logs', '0', 'attendance_logs', NULL, '{\"employeeId\":\"21e774d3-dff8-11f0-93ac-74d435ebdbb2\",\"attendanceDate\":\"2025-12-23\",\"status\":\"PRESENT\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 13:17:03'),
-(135, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'UPDATE', 'attendance_logs', 'ac2b7f32-e001-11f0-93ac-74d435ebdbb2', 'attendance_logs', NULL, '{\"employeeId\":\"21e774d3-dff8-11f0-93ac-74d435ebdbb2\",\"attendanceDate\":\"2025-12-23\",\"status\":\"PRESENT\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 13:44:08'),
-(136, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'UPDATE', 'attendance_logs', 'ac2b7f32-e001-11f0-93ac-74d435ebdbb2', 'attendance_logs', NULL, '{\"employeeId\":\"21e774d3-dff8-11f0-93ac-74d435ebdbb2\",\"attendanceDate\":\"2025-12-16\",\"status\":\"PRESENT\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 13:44:15'),
-(137, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"hruser\",\"role\":\"HR_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:49:27'),
-(138, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'CREATE', 'employees', '0', 'employees', NULL, '{\"employeeNumber\":\"EMP009\",\"firstName\":\"maintenance\",\"lastName\":\"maintenance\",\"email\":\"maintenance@gmail.com\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 13:49:59'),
-(139, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'CREATE', 'employees', '0', 'employees', NULL, '{\"employeeNumber\":\"EMP010\",\"firstName\":\"production\",\"lastName\":\"operator\",\"email\":\"prooperator@gmail.com\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 13:50:31'),
-(140, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'CREATE', 'employees', '0', 'employees', NULL, '{\"employeeNumber\":\"EMP011\",\"firstName\":\"quality\",\"lastName\":\"operator\",\"email\":\"quality@gmail.com\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 13:50:56'),
-(141, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'CREATE', 'employees', '0', 'employees', NULL, '{\"employeeNumber\":\"EMP012\",\"firstName\":\"import\",\"lastName\":\"export\",\"email\":\"import@gmail.com\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 13:51:27'),
-(142, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:51:43'),
-(143, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'CREATE', 'users', '0', 'users', NULL, '{\"email\":\"maintenance@gmail.com\",\"username\":\"maintenance.maintenance\",\"role\":\"MAINTENANCE_TECHNICIAN\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 13:51:57'),
-(144, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'CREATE', 'users', '0', 'users', NULL, '{\"email\":\"prooperator@gmail.com\",\"username\":\"operator.production\",\"role\":\"PRODUCTION_OPERATOR\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 13:52:11'),
-(145, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'CREATE', 'users', '0', 'users', NULL, '{\"email\":\"quality@gmail.com\",\"username\":\"operator.quality\",\"role\":\"QC_INSPECTOR\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 13:52:29'),
-(146, '42e84e62-df0b-11f0-9861-74d435ebdbb2', 'CREATE', 'users', '0', 'users', NULL, '{\"email\":\"import@gmail.com\",\"username\":\"export.import\",\"role\":\"IMPEX_OFFICER\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 13:52:39'),
-(147, 'a5033208-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"export.import\",\"role\":\"IMPEX_OFFICER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:53:14'),
-(148, '8c146c1a-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"maintenance.maintenance\",\"role\":\"MAINTENANCE_TECHNICIAN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:53:42'),
-(149, '944ddfc2-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"operator.production\",\"role\":\"PRODUCTION_OPERATOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:54:52'),
-(150, 'dd92f398-df1f-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"proplanner.proplanner\",\"role\":\"PRODUCTION_PLANNER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:54:58'),
-(151, '9f16e311-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"operator.quality\",\"role\":\"QC_INSPECTOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 13:55:14'),
-(152, 'a5033208-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"export.import\",\"role\":\"IMPEX_OFFICER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 14:35:45'),
-(153, '944ddfc2-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"operator.production\",\"role\":\"PRODUCTION_OPERATOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 14:36:09'),
-(154, '944ddfc2-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"operator.production\",\"role\":\"PRODUCTION_OPERATOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 14:50:21'),
-(155, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"hruser\",\"role\":\"HR_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 14:50:29'),
-(156, 'a5033208-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"export.import\",\"role\":\"IMPEX_OFFICER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 14:50:59'),
-(157, '8c146c1a-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"maintenance.maintenance\",\"role\":\"MAINTENANCE_TECHNICIAN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 14:51:34'),
-(158, '8c146c1a-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"maintenance.maintenance\",\"role\":\"MAINTENANCE_TECHNICIAN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 14:52:46'),
-(159, '9f16e311-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"operator.quality\",\"role\":\"QC_INSPECTOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 15:12:35'),
-(160, 'a5033208-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"export.import\",\"role\":\"IMPEX_OFFICER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 15:13:04'),
-(161, '8c146c1a-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"maintenance.maintenance\",\"role\":\"MAINTENANCE_TECHNICIAN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 15:15:09'),
-(162, '8c146c1a-e006-11f0-93ac-74d435ebdbb2', 'CREATE', 'equipment', '0', 'equipment', NULL, '{\"equipmentCode\":\"111\",\"equipmentName\":\"MARTILYO MOLDER\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 15:17:53');
-INSERT INTO `audit_logs` (`id`, `user_id`, `action`, `module`, `record_id`, `record_type`, `old_value`, `new_value`, `ip_address`, `user_agent`, `status`, `error_message`, `created_at`) VALUES
-(163, '8c146c1a-e006-11f0-93ac-74d435ebdbb2', 'CREATE', 'maintenance_schedules', '0', 'maintenance_schedules', NULL, '{\"equipmentId\":\"8da3b4db-e012-11f0-93ac-74d435ebdbb2\",\"scheduleType\":\"PREVENTIVE\",\"frequency\":\"weej\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 15:18:24'),
-(164, '8c146c1a-e006-11f0-93ac-74d435ebdbb2', 'UPDATE', 'maintenance_schedules', '9fee7bb8-e012-11f0-93ac-74d435ebdbb2', 'maintenance_schedules', NULL, '{\"equipmentId\":\"8da3b4db-e012-11f0-93ac-74d435ebdbb2\",\"scheduleType\":\"PREVENTIVE\",\"nextDueDate\":\"2025-12-31\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 15:18:49'),
-(165, '8c146c1a-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"maintenance.maintenance\",\"role\":\"MAINTENANCE_TECHNICIAN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 15:28:26'),
-(166, '8c146c1a-e006-11f0-93ac-74d435ebdbb2', 'DELETE', 'maintenance_schedules', '9fee7bb8-e012-11f0-93ac-74d435ebdbb2', 'maintenance_schedules', NULL, '{}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 15:38:50'),
-(167, '8c146c1a-e006-11f0-93ac-74d435ebdbb2', 'MAINTENANCE_WO_CREATE', 'MAINTENANCE', '0', 'maintenance_work_orders', NULL, '\"{\\\"woNumber\\\":\\\"MWO-1766504425296\\\",\\\"equipmentId\\\":\\\"8da3b4db-e012-11f0-93ac-74d435ebdbb2\\\",\\\"maintenanceType\\\":\\\"PREDICTIVE\\\",\\\"priority\\\":\\\"URGENT\\\"}\"', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 15:40:25'),
-(168, '9f16e311-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"operator.quality\",\"role\":\"QC_INSPECTOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 15:42:16'),
-(169, 'a5033208-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"export.import\",\"role\":\"IMPEX_OFFICER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 15:42:36'),
-(170, '944ddfc2-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"operator.production\",\"role\":\"PRODUCTION_OPERATOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 15:42:51'),
-(171, '8c146c1a-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"maintenance.maintenance\",\"role\":\"MAINTENANCE_TECHNICIAN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 15:43:03'),
-(172, 'a5033208-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"export.import\",\"role\":\"IMPEX_OFFICER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 15:43:11'),
-(173, '9f16e311-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"operator.quality\",\"role\":\"QC_INSPECTOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 15:43:46'),
-(174, '8c146c1a-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"maintenance.maintenance\",\"role\":\"MAINTENANCE_TECHNICIAN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 15:44:58'),
-(175, '8c146c1a-e006-11f0-93ac-74d435ebdbb2', 'UPDATE', 'equipment', '8da3b4db-e012-11f0-93ac-74d435ebdbb2', 'equipment', NULL, '{\"equipmentCode\":\"111\",\"equipmentName\":\"MARTILYO MOLDER\",\"status\":\"MAINTENANCE\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 15:46:39'),
-(176, '9f16e311-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"operator.quality\",\"role\":\"QC_INSPECTOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 15:48:36'),
-(177, 'a5033208-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"export.import\",\"role\":\"IMPEX_OFFICER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 15:48:56'),
-(178, '9f16e311-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"operator.quality\",\"role\":\"QC_INSPECTOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 15:50:31'),
-(179, 'a5033208-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"export.import\",\"role\":\"IMPEX_OFFICER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 15:50:44'),
-(180, 'a5033208-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"export.import\",\"role\":\"IMPEX_OFFICER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 15:52:19'),
-(181, '944ddfc2-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"operator.production\",\"role\":\"PRODUCTION_OPERATOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 15:52:32'),
-(182, 'dd92f398-df1f-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"proplanner.proplanner\",\"role\":\"PRODUCTION_PLANNER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 15:52:39'),
-(183, '8c146c1a-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"maintenance.maintenance\",\"role\":\"MAINTENANCE_TECHNICIAN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 15:52:50'),
-(184, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gmanager.gmanager\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 15:53:09'),
-(185, '8c146c1a-e006-11f0-93ac-74d435ebdbb2', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"maintenance.maintenance\",\"role\":\"MAINTENANCE_TECHNICIAN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 15:53:51');
+(1, 'admin-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'FAILED', 'Invalid password', '2025-12-23 16:28:27'),
+(2, 'admin-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'FAILED', 'Invalid password', '2025-12-23 16:29:01'),
+(3, 'admin-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'FAILED', 'Invalid password', '2025-12-23 16:29:04'),
+(4, 'admin-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'FAILED', 'Invalid password', '2025-12-23 16:29:33'),
+(5, 'admin-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'FAILED', 'Invalid password', '2025-12-23 16:29:43'),
+(6, 'admin-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 16:30:03'),
+(7, 'hr-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"hr\",\"role\":\"HR_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 16:35:28'),
+(8, 'admin-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 16:38:29'),
+(9, 'admin-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 17:04:45'),
+(10, 'purch-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"purchasing\",\"role\":\"PURCHASING_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 17:05:02'),
+(11, 'purch-001', 'CREATE', 'purchase_requisitions', '9b317566-e021-11f0-93ac-74d435ebdbb2', 'purchase_requisitions', NULL, '{\"prNumber\":\"PR-0001\",\"prDate\":\"2025-12-23\",\"department\":\"Maintenance\",\"items\":[{\"itemId\":\"357b14c5-e01c-11f0-93ac-74d435ebdbb2\",\"quantity\":500,\"estimatedUnitPrice\":5.5,\"estimatedTotalPrice\":2750,\"requiredDate\":\"2025-12-29\",\"purpose\":\"\"}]}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:05:38'),
+(12, 'purch-001', 'SUBMIT', 'purchase_requisitions', '9b317566-e021-11f0-93ac-74d435ebdbb2', 'purchase_requisitions', '{\"status\":\"DRAFT\"}', '{\"status\":\"PENDING\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:05:46'),
+(13, 'dh-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"depthead\",\"role\":\"DEPARTMENT_HEAD\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 17:06:27'),
+(14, 'dh-001', 'APPROVE', 'purchase_requisitions', '9b317566-e021-11f0-93ac-74d435ebdbb2', 'purchase_requisitions', '{\"status\":\"PENDING\"}', '{\"status\":\"APPROVED\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:06:35'),
+(15, 'gm-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gm\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 17:06:57'),
+(16, 'dh-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"depthead\",\"role\":\"DEPARTMENT_HEAD\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 17:08:51'),
+(17, 'gm-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gm\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 17:08:57'),
+(18, 'purch-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"purchasing\",\"role\":\"PURCHASING_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 17:09:02'),
+(19, 'gm-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gm\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 17:09:12'),
+(20, 'purch-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"purchasing\",\"role\":\"PURCHASING_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 17:09:51'),
+(21, 'gm-001', 'CREATE', 'purchase_orders', 'cd2fe33e-e022-11f0-93ac-74d435ebdbb2', 'purchase_orders', NULL, '{\"poNumber\":\"PO-0001\",\"prId\":\"9b317566-e021-11f0-93ac-74d435ebdbb2\",\"supplierId\":\"357c7771-e01c-11f0-93ac-74d435ebdbb2\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:14:12'),
+(22, 'gm-001', 'CREATE', 'purchase_orders', 'd633254f-e022-11f0-93ac-74d435ebdbb2', 'purchase_orders', NULL, '{\"poNumber\":\"PO-0002\",\"poDate\":\"2025-12-23\",\"supplierId\":\"357c7771-e01c-11f0-93ac-74d435ebdbb2\",\"totalAmount\":2750}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:14:27'),
+(23, 'gm-001', 'CREATE', 'purchase_orders', 'df90785c-e022-11f0-93ac-74d435ebdbb2', 'purchase_orders', NULL, '{\"poNumber\":\"PO-0003\",\"poDate\":\"2025-12-22\",\"supplierId\":\"357c7771-e01c-11f0-93ac-74d435ebdbb2\",\"totalAmount\":2750}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:14:42'),
+(24, 'purch-001', 'CREATE', 'purchase_orders', 'f85c2c2c-e022-11f0-93ac-74d435ebdbb2', 'purchase_orders', NULL, '{\"poNumber\":\"PO-0004\",\"poDate\":\"2025-12-23\",\"supplierId\":\"357c7771-e01c-11f0-93ac-74d435ebdbb2\",\"totalAmount\":2750}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:15:24'),
+(25, 'purch-001', 'CREATE', 'purchase_requisitions', 'a2aa5d41-e023-11f0-93ac-74d435ebdbb2', 'purchase_requisitions', NULL, '{\"prNumber\":\"PR-0001\",\"prDate\":\"2025-12-23\",\"department\":\"Maintenance\",\"items\":[{\"itemId\":\"357b14c5-e01c-11f0-93ac-74d435ebdbb2\",\"quantity\":500,\"estimatedUnitPrice\":5.5,\"estimatedTotalPrice\":2750,\"requiredDate\":\"2025-12-28\",\"purpose\":\"\"}]}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:20:10'),
+(26, 'purch-001', 'DELETE', 'purchase_requisitions', 'a2aa5d41-e023-11f0-93ac-74d435ebdbb2', 'purchase_requisitions', '{\"status\":\"DRAFT\"}', NULL, NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:21:19'),
+(27, 'purch-001', 'CREATE', 'purchase_requisitions', '2cbd5568-e024-11f0-93ac-74d435ebdbb2', 'purchase_requisitions', NULL, '{\"prNumber\":\"PR-0001\",\"prDate\":\"2025-12-23\",\"department\":\"Maintenance\",\"items\":[{\"itemId\":\"357b14c5-e01c-11f0-93ac-74d435ebdbb2\",\"quantity\":50,\"estimatedUnitPrice\":5.5,\"estimatedTotalPrice\":275,\"requiredDate\":\"2025-12-31\",\"purpose\":\"\"}]}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:24:01'),
+(28, 'purch-001', 'DELETE', 'purchase_requisitions', '2cbd5568-e024-11f0-93ac-74d435ebdbb2', 'purchase_requisitions', '{\"status\":\"DRAFT\"}', NULL, NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:25:39'),
+(29, 'purch-001', 'CREATE', 'purchase_requisitions', '7b9f2c37-e024-11f0-93ac-74d435ebdbb2', 'purchase_requisitions', NULL, '{\"prNumber\":\"PR-0001\",\"prDate\":\"2025-12-23\",\"department\":\"Maintenance\",\"items\":[{\"itemId\":\"357b5381-e01c-11f0-93ac-74d435ebdbb2\",\"quantity\":50,\"estimatedUnitPrice\":45,\"estimatedTotalPrice\":2250,\"requiredDate\":\"2025-12-30\",\"purpose\":\"\"}]}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:26:14'),
+(30, 'purch-001', 'UPDATE', 'purchase_requisitions', '7b9f2c37-e024-11f0-93ac-74d435ebdbb2', 'purchase_requisitions', NULL, '{\"prDate\":\"2025-12-22\",\"department\":\"Maintenance\",\"items\":1}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:28:00'),
+(31, 'purch-001', 'UPDATE', 'purchase_requisitions', '7b9f2c37-e024-11f0-93ac-74d435ebdbb2', 'purchase_requisitions', NULL, '{\"prDate\":\"2025-12-22\",\"department\":\"Maintenance\",\"items\":1}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:28:00'),
+(32, 'purch-001', 'UPDATE', 'purchase_requisitions', '7b9f2c37-e024-11f0-93ac-74d435ebdbb2', 'purchase_requisitions', NULL, '{\"prDate\":\"2025-12-21\",\"department\":\"Maintenance\",\"items\":1}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:31:53'),
+(33, 'purch-001', 'SUBMIT', 'purchase_requisitions', '7b9f2c37-e024-11f0-93ac-74d435ebdbb2', 'purchase_requisitions', '{\"status\":\"DRAFT\"}', '{\"status\":\"PENDING\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:32:12'),
+(34, 'gm-001', 'APPROVE', 'purchase_requisitions', '7b9f2c37-e024-11f0-93ac-74d435ebdbb2', 'purchase_requisitions', '{\"status\":\"PENDING\"}', '{\"status\":\"APPROVED\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:32:21'),
+(35, 'gm-001', 'CREATE', 'purchase_orders', '5c4ea8c5-e025-11f0-93ac-74d435ebdbb2', 'purchase_orders', NULL, '{\"poNumber\":\"PO-0001\",\"prId\":\"7b9f2c37-e024-11f0-93ac-74d435ebdbb2\",\"supplierId\":\"357c7771-e01c-11f0-93ac-74d435ebdbb2\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:32:31'),
+(36, 'gm-001', 'UPDATE', 'purchase_orders', '5c4ea8c5-e025-11f0-93ac-74d435ebdbb2', 'purchase_orders', '{\"status\":\"DRAFT\"}', '{\"status\":\"PENDING\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:32:51'),
+(37, 'gm-001', 'APPROVE', 'purchase_orders', '5c4ea8c5-e025-11f0-93ac-74d435ebdbb2', 'purchase_orders', '{\"status\":\"PENDING\"}', '{\"status\":\"APPROVED\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:32:57'),
+(38, 'gm-001', 'CREATE', 'purchase_requisitions', '7b686fd2-e025-11f0-93ac-74d435ebdbb2', 'purchase_requisitions', NULL, '{\"prNumber\":\"PR-0002\",\"prDate\":\"2025-12-23\",\"department\":\"Executive\",\"items\":[{\"itemId\":\"357b560d-e01c-11f0-93ac-74d435ebdbb2\",\"quantity\":50,\"estimatedUnitPrice\":12.5,\"estimatedTotalPrice\":625,\"requiredDate\":\"2025-12-31\",\"purpose\":\"\"}]}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:33:23'),
+(39, 'gm-001', 'SUBMIT', 'purchase_requisitions', '7b686fd2-e025-11f0-93ac-74d435ebdbb2', 'purchase_requisitions', '{\"status\":\"DRAFT\"}', '{\"status\":\"PENDING\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:33:26'),
+(40, 'gm-001', 'APPROVE', 'purchase_requisitions', '7b686fd2-e025-11f0-93ac-74d435ebdbb2', 'purchase_requisitions', '{\"status\":\"PENDING\"}', '{\"status\":\"APPROVED\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:33:36'),
+(41, 'gm-001', 'CREATE', 'purchase_orders', '8d122fdd-e025-11f0-93ac-74d435ebdbb2', 'purchase_orders', NULL, '{\"poNumber\":\"PO-0002\",\"prId\":\"7b686fd2-e025-11f0-93ac-74d435ebdbb2\",\"supplierId\":\"357c9d3f-e01c-11f0-93ac-74d435ebdbb2\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:33:52'),
+(42, 'gm-001', 'UPDATE', 'purchase_orders', '8d122fdd-e025-11f0-93ac-74d435ebdbb2', 'purchase_orders', NULL, '{\"poDate\":\"2025-12-23\",\"supplierId\":\"357c9d3f-e01c-11f0-93ac-74d435ebdbb2\",\"items\":1}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:34:09'),
+(43, 'gm-001', 'UPDATE', 'purchase_orders', '8d122fdd-e025-11f0-93ac-74d435ebdbb2', 'purchase_orders', '{\"status\":\"DRAFT\"}', '{\"status\":\"PENDING\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:34:18'),
+(44, 'gm-001', 'APPROVE', 'purchase_orders', '8d122fdd-e025-11f0-93ac-74d435ebdbb2', 'purchase_orders', '{\"status\":\"PENDING\"}', '{\"status\":\"APPROVED\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:34:21'),
+(45, 'purch-001', 'SEND', 'purchase_orders', '5c4ea8c5-e025-11f0-93ac-74d435ebdbb2', 'purchase_orders', '{\"status\":\"APPROVED\"}', '{\"status\":\"SENT\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:35:13'),
+(46, 'purch-001', 'SEND', 'purchase_orders', '8d122fdd-e025-11f0-93ac-74d435ebdbb2', 'purchase_orders', '{\"status\":\"APPROVED\"}', '{\"status\":\"SENT\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 17:35:14'),
+(47, 'ware-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"warehouse\",\"role\":\"WAREHOUSE_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 17:35:56'),
+(48, 'hr-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"hr\",\"role\":\"HR_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 17:45:41'),
+(49, 'purch-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"purchasing\",\"role\":\"PURCHASING_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 17:45:58'),
+(50, 'ware-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'FAILED', 'Invalid password', '2025-12-23 17:46:09'),
+(51, 'ware-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"warehouse\",\"role\":\"WAREHOUSE_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 17:46:12'),
+(52, 'purch-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"purchasing\",\"role\":\"PURCHASING_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 17:46:16'),
+(53, 'ware-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"warehouse\",\"role\":\"WAREHOUSE_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 17:46:29'),
+(54, 'ware-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"warehouse\",\"role\":\"WAREHOUSE_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 17:57:10'),
+(55, 'ware-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"warehouse\",\"role\":\"WAREHOUSE_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 18:09:56'),
+(56, 'purch-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"purchasing\",\"role\":\"PURCHASING_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 18:12:32'),
+(57, 'ware-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"warehouse\",\"role\":\"WAREHOUSE_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 18:28:24'),
+(58, 'ware-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"warehouse\",\"role\":\"WAREHOUSE_STAFF\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 18:30:43'),
+(59, 'gm-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gm\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 18:32:54'),
+(60, 'gm-001', 'APPROVE', 'stock_issues', '2', 'stock_issues', NULL, '{\"status\":\"APPROVED\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 18:34:22'),
+(61, 'gm-001', 'APPROVE', 'stock_issues', '1', 'stock_issues', NULL, '{\"status\":\"APPROVED\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 18:34:23'),
+(62, 'ware-001', 'COMPLETE', 'stock_issues', '2', 'stock_issues', NULL, '{\"stock_issued\":true}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 18:39:07'),
+(63, 'ware-001', 'COMPLETE', 'stock_issues', '1', 'stock_issues', NULL, '{\"stock_issued\":true}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 18:39:09'),
+(64, 'admin-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 18:41:52'),
+(65, 'admin-001', 'UPDATE', 'users', 'plan-001', 'users', '{\"email\":\"planner@erp.com\",\"role\":\"\",\"isActive\":1}', '{\"role\":\"PRODUCTION_PLANNER\",\"isActive\":1}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 18:42:15'),
+(66, 'plan-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"planner\",\"role\":\"PRODUCTION_PLANNER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 18:42:48'),
+(67, 'plan-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"planner\",\"role\":\"PRODUCTION_PLANNER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 18:43:02'),
+(68, 'plan-001', 'CREATE', 'work_orders', '0', 'work_orders', NULL, '{\"woNumber\":\"WO-0001\",\"itemId\":\"357b5381-e01c-11f0-93ac-74d435ebdbb2\",\"plannedQuantity\":10}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 18:54:29'),
+(69, 'gm-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gm\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 18:55:45'),
+(70, 'admin-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 18:57:40'),
+(71, 'super-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"supervisor\",\"role\":\"PRODUCTION_SUPERVISOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 18:58:15'),
+(72, 'gm-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gm\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 18:58:24'),
+(73, 'super-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"supervisor\",\"role\":\"PRODUCTION_SUPERVISOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 19:00:22'),
+(74, 'admin-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"admin\",\"role\":\"SYSTEM_ADMIN\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 19:00:39'),
+(75, 'oper-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"operator\",\"role\":\"PRODUCTION_OPERATOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 19:00:51'),
+(76, 'gm-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gm\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 19:02:04'),
+(77, 'gm-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gm\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-23 19:07:17'),
+(78, 'gm-001', 'APPROVE', 'work_orders', 'd03c7d2a-e030-11f0-93ac-74d435ebdbb2', 'work_orders', '{\"status\":\"DRAFT\"}', '{\"status\":\"APPROVED\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-23 19:09:06'),
+(79, 'super-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"supervisor\",\"role\":\"PRODUCTION_SUPERVISOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-24 07:14:30'),
+(80, 'super-001', 'RELEASE', 'work_orders', 'd03c7d2a-e030-11f0-93ac-74d435ebdbb2', 'work_orders', '{\"status\":\"APPROVED\"}', '{\"status\":\"RELEASED\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-24 07:14:42'),
+(81, 'oper-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"operator\",\"role\":\"PRODUCTION_OPERATOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-24 07:14:55'),
+(82, 'plan-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"planner\",\"role\":\"PRODUCTION_PLANNER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-24 07:28:10'),
+(83, 'oper-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"operator\",\"role\":\"PRODUCTION_OPERATOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-24 07:36:18'),
+(84, 'plan-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"planner\",\"role\":\"PRODUCTION_PLANNER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-24 07:42:51'),
+(85, 'plan-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"planner\",\"role\":\"PRODUCTION_PLANNER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-24 07:58:03'),
+(86, 'plan-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"planner\",\"role\":\"PRODUCTION_PLANNER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-24 08:19:16'),
+(87, 'plan-001', 'CREATE', 'work_orders', '0', 'work_orders', NULL, '{\"woNumber\":\"WO-0001\",\"itemId\":\"357b5381-e01c-11f0-93ac-74d435ebdbb2\",\"plannedQuantity\":100}', NULL, NULL, 'SUCCESS', NULL, '2025-12-24 08:40:06'),
+(88, 'oper-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"operator\",\"role\":\"PRODUCTION_OPERATOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-24 08:40:34'),
+(89, 'plan-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"planner\",\"role\":\"PRODUCTION_PLANNER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-24 08:41:06'),
+(90, 'oper-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"operator\",\"role\":\"PRODUCTION_OPERATOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-24 08:41:43'),
+(91, 'super-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"supervisor\",\"role\":\"PRODUCTION_SUPERVISOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-24 08:42:05'),
+(92, 'gm-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"gm\",\"role\":\"GENERAL_MANAGER\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-24 08:42:35'),
+(93, 'gm-001', 'APPROVE', 'work_orders', '262b97c2-e0a4-11f0-80db-74d435ebdbb2', 'work_orders', '{\"status\":\"DRAFT\"}', '{\"status\":\"APPROVED\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-24 08:42:44'),
+(94, 'super-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"supervisor\",\"role\":\"PRODUCTION_SUPERVISOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-24 08:42:55'),
+(95, 'super-001', 'RELEASE', 'work_orders', '262b97c2-e0a4-11f0-80db-74d435ebdbb2', 'work_orders', '{\"status\":\"APPROVED\"}', '{\"status\":\"RELEASED\"}', NULL, NULL, 'SUCCESS', NULL, '2025-12-24 08:43:15'),
+(96, 'oper-001', 'USER_LOGIN', 'AUTHENTICATION', NULL, NULL, NULL, '{\"username\":\"operator\",\"role\":\"PRODUCTION_OPERATOR\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'SUCCESS', NULL, '2025-12-24 08:43:30');
 
 -- --------------------------------------------------------
 
@@ -395,14 +276,49 @@ CREATE TABLE `bill_of_materials` (
   `bom_number` varchar(50) NOT NULL,
   `item_id` varchar(36) NOT NULL,
   `version` varchar(20) DEFAULT '1.0',
+  `description` text DEFAULT NULL,
+  `base_quantity` decimal(15,3) DEFAULT 1.000,
+  `uom_id` varchar(36) DEFAULT NULL,
   `effective_date` date NOT NULL,
   `expiry_date` date DEFAULT NULL,
   `quantity` decimal(15,3) DEFAULT 1.000,
   `is_active` tinyint(1) DEFAULT 1,
+  `status` enum('DRAFT','ACTIVE','OBSOLETE') DEFAULT 'DRAFT',
   `notes` text DEFAULT NULL,
+  `created_by` varchar(36) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `bill_of_materials`
+--
+
+INSERT INTO `bill_of_materials` (`id`, `bom_number`, `item_id`, `version`, `description`, `base_quantity`, `uom_id`, `effective_date`, `expiry_date`, `quantity`, `is_active`, `status`, `notes`, `created_by`, `created_at`, `updated_at`) VALUES
+('f149f9e6-e0a1-11f0-80db-74d435ebdbb2', 'BOM2025-00001', '357b5381-e01c-11f0-93ac-74d435ebdbb2', '1.0', NULL, 1.000, NULL, '2025-12-16', NULL, 1.000, 1, 'OBSOLETE', 'test', 'plan-001', '2025-12-24 16:24:19', '2025-12-24 16:39:42');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bom`
+--
+
+CREATE TABLE `bom` (
+  `id` varchar(36) NOT NULL DEFAULT uuid(),
+  `bom_number` varchar(50) NOT NULL,
+  `item_id` varchar(36) NOT NULL,
+  `version` varchar(20) DEFAULT '1.0',
+  `description` text DEFAULT NULL,
+  `base_quantity` decimal(15,3) DEFAULT 1.000,
+  `uom_id` varchar(36) DEFAULT NULL,
+  `status` enum('DRAFT','ACTIVE','INACTIVE') DEFAULT 'DRAFT',
+  `effective_date` date DEFAULT NULL,
+  `expiry_date` date DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `created_by` varchar(36) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -443,6 +359,14 @@ CREATE TABLE `bom_items` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `bom_items`
+--
+
+INSERT INTO `bom_items` (`id`, `bom_id`, `component_item_id`, `quantity`, `scrap_percentage`, `sequence_number`, `notes`, `created_at`, `updated_at`) VALUES
+('0a7a278b-e0a4-11f0-80db-74d435ebdbb2', 'f149f9e6-e0a1-11f0-80db-74d435ebdbb2', '357b560d-e01c-11f0-93ac-74d435ebdbb2', 10.000, 0.00, 1, NULL, '2025-12-24 16:39:20', '2025-12-24 16:39:20'),
+('0a7a6962-e0a4-11f0-80db-74d435ebdbb2', 'f149f9e6-e0a1-11f0-80db-74d435ebdbb2', '357b14c5-e01c-11f0-93ac-74d435ebdbb2', 5.000, 0.00, 2, NULL, '2025-12-24 16:39:20', '2025-12-24 16:39:20');
 
 -- --------------------------------------------------------
 
@@ -485,6 +409,16 @@ CREATE TABLE `chart_of_accounts` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `chart_of_accounts`
+--
+
+INSERT INTO `chart_of_accounts` (`id`, `account_code`, `account_name`, `account_type`, `account_category`, `parent_account_id`, `is_header`, `normal_balance`, `opening_balance`, `current_balance`, `is_active`, `description`, `created_at`, `updated_at`) VALUES
+('357f5be3-e01c-11f0-93ac-74d435ebdbb2', '1000', 'Assets', 'ASSET', NULL, NULL, 0, 'DEBIT', 0.00, 0.00, 1, NULL, '2025-12-23 16:27:00', '2025-12-23 16:27:00'),
+('357f63ec-e01c-11f0-93ac-74d435ebdbb2', '1110', 'Cash', 'ASSET', NULL, NULL, 0, 'DEBIT', 0.00, 0.00, 1, NULL, '2025-12-23 16:27:00', '2025-12-23 16:27:00'),
+('357f6471-e01c-11f0-93ac-74d435ebdbb2', '4000', 'Revenue', 'REVENUE', NULL, NULL, 0, 'DEBIT', 0.00, 0.00, 1, NULL, '2025-12-23 16:27:00', '2025-12-23 16:27:00'),
+('357f64b7-e01c-11f0-93ac-74d435ebdbb2', '5000', 'Cost of Goods Sold', 'EXPENSE', NULL, NULL, 0, 'DEBIT', 0.00, 0.00, 1, NULL, '2025-12-23 16:27:00', '2025-12-23 16:27:00');
 
 -- --------------------------------------------------------
 
@@ -582,19 +516,14 @@ CREATE TABLE `departments` (
 --
 
 INSERT INTO `departments` (`id`, `code`, `name`, `description`, `manager_id`, `is_active`, `created_at`, `updated_at`) VALUES
-('a52dce54-dd9f-11f0-83eb-74d435ebdbb2', 'PROD', 'Production', 'Manufacturing and production operations', NULL, 1, '2025-12-20 20:30:18', '2025-12-20 20:30:18'),
-('a52dfa93-dd9f-11f0-83eb-74d435ebdbb2', 'QC', 'Quality Control', 'Quality assurance and inspection', NULL, 1, '2025-12-20 20:30:18', '2025-12-20 20:30:18'),
-('a52dfb50-dd9f-11f0-83eb-74d435ebdbb2', 'WARE', 'Warehouse', 'Inventory and warehouse management', NULL, 1, '2025-12-20 20:30:18', '2025-12-20 20:30:18'),
-('a52dfbfc-dd9f-11f0-83eb-74d435ebdbb2', 'PURCH', 'Purchasing', 'Procurement and supplier management', NULL, 1, '2025-12-20 20:30:18', '2025-12-20 20:30:18'),
-('a52dfc3d-dd9f-11f0-83eb-74d435ebdbb2', 'ACCT', 'Accounting', 'Financial accounting and reporting', NULL, 1, '2025-12-20 20:30:18', '2025-12-20 20:30:18'),
-('a52dfc7b-dd9f-11f0-83eb-74d435ebdbb2', 'HR', 'Human Resources', 'Employee management and payroll', NULL, 1, '2025-12-20 20:30:18', '2025-12-20 20:30:18'),
-('a52e0561-dd9f-11f0-83eb-74d435ebdbb2', 'MAINT', 'Maintenance', 'Equipment maintenance and repair', NULL, 1, '2025-12-20 20:30:18', '2025-12-20 20:30:18'),
-('a52e05b0-dd9f-11f0-83eb-74d435ebdbb2', 'PLAN', 'Planning', 'Production planning and scheduling', NULL, 1, '2025-12-20 20:30:18', '2025-12-20 20:30:18'),
-('a52e05f4-dd9f-11f0-83eb-74d435ebdbb2', 'SALES', 'Sales', 'Sales and customer relations', NULL, 1, '2025-12-20 20:30:18', '2025-12-20 20:30:18'),
-('a52e0639-dd9f-11f0-83eb-74d435ebdbb2', 'IT', 'IT', 'Information technology support', NULL, 1, '2025-12-20 20:30:18', '2025-12-20 20:30:18'),
-('a52e067c-dd9f-11f0-83eb-74d435ebdbb2', 'MGMT', 'Management', 'Executive management', NULL, 1, '2025-12-20 20:30:18', '2025-12-20 20:30:18'),
-('a52e06bc-dd9f-11f0-83eb-74d435ebdbb2', 'MOLD', 'Mold', 'Mold management and maintenance', NULL, 1, '2025-12-20 20:30:18', '2025-12-20 20:30:18'),
-('a52e06fe-dd9f-11f0-83eb-74d435ebdbb2', 'IMPEX', 'Import/Export', 'Import and export documentation', NULL, 1, '2025-12-20 20:30:18', '2025-12-20 20:30:18');
+('35754cc6-e01c-11f0-93ac-74d435ebdbb2', 'EXEC', 'Executive', 'Executive Management', NULL, 1, '2025-12-24 00:27:00', '2025-12-24 00:27:00'),
+('357574e6-e01c-11f0-93ac-74d435ebdbb2', 'HR', 'Human Resources', 'HR Department', NULL, 1, '2025-12-24 00:27:00', '2025-12-24 00:27:00'),
+('357575b2-e01c-11f0-93ac-74d435ebdbb2', 'FIN', 'Finance', 'Finance Department', NULL, 1, '2025-12-24 00:27:00', '2025-12-24 00:27:00'),
+('3575760f-e01c-11f0-93ac-74d435ebdbb2', 'PURCH', 'Purchasing', 'Procurement', NULL, 1, '2025-12-24 00:27:00', '2025-12-24 00:27:00'),
+('35757d12-e01c-11f0-93ac-74d435ebdbb2', 'PROD', 'Production', 'Manufacturing', NULL, 1, '2025-12-24 00:27:00', '2025-12-24 00:27:00'),
+('3576301c-e01c-11f0-93ac-74d435ebdbb2', 'QC', 'Quality Control', 'Quality Assurance', NULL, 1, '2025-12-24 00:27:00', '2025-12-24 00:27:00'),
+('35763269-e01c-11f0-93ac-74d435ebdbb2', 'MAINT', 'Maintenance', 'Equipment Maintenance', NULL, 1, '2025-12-24 00:27:00', '2025-12-24 00:27:00'),
+('357632d1-e01c-11f0-93ac-74d435ebdbb2', 'WARE', 'Warehouse', 'Inventory Management', NULL, 1, '2025-12-24 00:27:00', '2025-12-24 00:27:00');
 
 -- --------------------------------------------------------
 
@@ -648,18 +577,12 @@ CREATE TABLE `employees` (
 --
 
 INSERT INTO `employees` (`id`, `employee_number`, `first_name`, `last_name`, `email`, `phone`, `address`, `department_id`, `position`, `hire_date`, `employment_type`, `status`, `date_of_birth`, `gender`, `emergency_contact_name`, `emergency_contact_phone`, `basic_salary`, `created_at`, `updated_at`) VALUES
-('19627bd6-df0d-11f0-9861-74d435ebdbb2', 'EMP005', 'dhead', 'dhead', 'dhead@gmail.com', '09123456998', NULL, 'a52e067c-dd9f-11f0-83eb-74d435ebdbb2', 'department head', '2025-12-22', 'FULL_TIME', 'ACTIVE', NULL, NULL, NULL, NULL, NULL, '2025-12-22 08:06:19', '2025-12-22 08:12:35'),
-('21e774d3-dff8-11f0-93ac-74d435ebdbb2', 'EMP007', 'Ehdrian', 'Bungubung', 'ehdrian@gmail.com', '09852662051', NULL, 'a52e0639-dd9f-11f0-83eb-74d435ebdbb2', 'Software Engineer', '2025-12-22', 'FULL_TIME', 'ACTIVE', NULL, NULL, NULL, NULL, NULL, '2025-12-23 12:08:46', '2025-12-23 12:09:05'),
-('45fe7f2a-e006-11f0-93ac-74d435ebdbb2', 'EMP009', 'maintenance', 'maintenance', 'maintenance@gmail.com', '09123456330', NULL, 'a52e0561-dd9f-11f0-83eb-74d435ebdbb2', 'maintenance admin', '2025-12-23', 'FULL_TIME', 'ACTIVE', NULL, NULL, NULL, NULL, NULL, '2025-12-23 13:49:59', '2025-12-23 13:49:59'),
-('592c494d-e006-11f0-93ac-74d435ebdbb2', 'EMP010', 'production', 'operator', 'prooperator@gmail.com', '09123456225', NULL, 'a52dce54-dd9f-11f0-83eb-74d435ebdbb2', 'production ope admin', '2025-12-23', 'FULL_TIME', 'ACTIVE', NULL, NULL, NULL, NULL, NULL, '2025-12-23 13:50:31', '2025-12-23 13:50:31'),
-('67b9f9bc-e006-11f0-93ac-74d435ebdbb2', 'EMP011', 'quality', 'operator', 'quality@gmail.com', '09123456551', NULL, 'a52dfa93-dd9f-11f0-83eb-74d435ebdbb2', 'quality admin', '2025-12-23', 'FULL_TIME', 'ACTIVE', NULL, NULL, NULL, NULL, NULL, '2025-12-23 13:50:56', '2025-12-23 13:50:56'),
-('6f12b49a-dff8-11f0-93ac-74d435ebdbb2', 'EMP008', 'Gnehm Ryien', 'Rane', 'gnehm@gmail.com', '09852662052', NULL, 'a52dfc7b-dd9f-11f0-83eb-74d435ebdbb2', 'HR Admin', '2025-12-21', 'FULL_TIME', 'ACTIVE', NULL, NULL, NULL, NULL, NULL, '2025-12-23 12:10:55', '2025-12-23 13:05:14'),
-('7a68e49a-e006-11f0-93ac-74d435ebdbb2', 'EMP012', 'import', 'export', 'import@gmail.com', '09123456227', NULL, 'a52e067c-dd9f-11f0-83eb-74d435ebdbb2', 'dsa', '2025-12-23', 'FULL_TIME', 'ACTIVE', NULL, NULL, NULL, NULL, NULL, '2025-12-23 13:51:27', '2025-12-23 13:51:27'),
-('8d5a2edd-df0b-11f0-9861-74d435ebdbb2', 'EMP001', 'hr', 'hr', 'hr@gmail.com', '09123456789', 'ds', 'a52dfc7b-dd9f-11f0-83eb-74d435ebdbb2', 'HR Admin', '2025-12-21', 'FULL_TIME', 'ACTIVE', NULL, NULL, NULL, NULL, NULL, '2025-12-22 07:55:15', '2025-12-22 08:01:54'),
-('a0345c28-df0c-11f0-9861-74d435ebdbb2', 'EMP002', 'purchasing', 'purchasing', 'purchasing@gmail.com', '09123123222', NULL, 'a52dfbfc-dd9f-11f0-83eb-74d435ebdbb2', 'purchasing admin', '2025-12-20', 'FULL_TIME', 'ACTIVE', NULL, NULL, NULL, NULL, NULL, '2025-12-22 08:02:56', '2025-12-22 08:11:27'),
-('d17e08e1-df1f-11f0-9861-74d435ebdbb2', 'EMP006', 'proplanner', 'proplanner', 'proplanner@gmail.com', '09123456437', NULL, 'a52dce54-dd9f-11f0-83eb-74d435ebdbb2', 'Production Admin', '2025-12-22', 'FULL_TIME', 'ACTIVE', NULL, NULL, NULL, NULL, NULL, '2025-12-22 10:20:19', '2025-12-22 10:20:19'),
-('d1be27c6-df0c-11f0-9861-74d435ebdbb2', 'EMP003', 'president', 'president', 'president@gmail.com', '09123456444', NULL, 'a52e067c-dd9f-11f0-83eb-74d435ebdbb2', 'president', '2025-12-22', 'FULL_TIME', 'ACTIVE', NULL, NULL, NULL, NULL, NULL, '2025-12-22 08:04:19', '2025-12-22 08:04:19'),
-('ed53515a-df0c-11f0-9861-74d435ebdbb2', 'EMP004', 'gmanager', 'gmanager', 'gmanager@gmail.com', '09123126664', NULL, 'a52e067c-dd9f-11f0-83eb-74d435ebdbb2', 'general manager', '2025-12-22', 'FULL_TIME', 'ACTIVE', NULL, NULL, NULL, NULL, NULL, '2025-12-22 08:05:05', '2025-12-22 08:05:05');
+('emp-hr-001', 'EMP-001', 'Mary', 'Allen', 'hr@erp.com', '555-0101', NULL, '357574e6-e01c-11f0-93ac-74d435ebdbb2', 'HR Manager', '2020-01-15', 'FULL_TIME', 'ACTIVE', NULL, NULL, NULL, NULL, 65000.00, '2025-12-23 16:27:00', '2025-12-23 16:27:00'),
+('emp-hr-002', 'EMP-002', 'David', 'Wilson', 'purchasing@erp.com', '555-0102', NULL, '3575760f-e01c-11f0-93ac-74d435ebdbb2', 'Purchasing Officer', '2020-03-20', 'FULL_TIME', 'ACTIVE', NULL, NULL, NULL, NULL, 55000.00, '2025-12-23 16:27:00', '2025-12-23 16:27:00'),
+('emp-hr-003', 'EMP-003', 'James', 'Martinez', 'warehouse@erp.com', '555-0103', NULL, '357632d1-e01c-11f0-93ac-74d435ebdbb2', 'Warehouse Supervisor', '2020-05-10', 'FULL_TIME', 'ACTIVE', NULL, NULL, NULL, NULL, 50000.00, '2025-12-23 16:27:00', '2025-12-23 16:27:00'),
+('emp-hr-004', 'EMP-004', 'Robert', 'Garcia', 'planner@erp.com', '555-0104', NULL, '35757d12-e01c-11f0-93ac-74d435ebdbb2', 'Production Planner', '2020-07-01', 'FULL_TIME', 'ACTIVE', NULL, NULL, NULL, NULL, 60000.00, '2025-12-23 16:27:00', '2025-12-23 16:27:00'),
+('emp-hr-005', 'EMP-005', 'Linda', 'Rodriguez', 'supervisor@erp.com', '555-0105', NULL, '35757d12-e01c-11f0-93ac-74d435ebdbb2', 'Production Supervisor', '2020-08-15', 'FULL_TIME', 'ACTIVE', NULL, NULL, NULL, NULL, 58000.00, '2025-12-23 16:27:00', '2025-12-23 16:27:00'),
+('emp-hr-006', 'EMP-006', 'William', 'Lopez', 'operator@erp.com', '555-0106', NULL, '35757d12-e01c-11f0-93ac-74d435ebdbb2', 'Production Operator', '2021-01-10', 'FULL_TIME', 'ACTIVE', NULL, NULL, NULL, NULL, 45000.00, '2025-12-23 16:27:00', '2025-12-23 16:27:00');
 
 -- --------------------------------------------------------
 
@@ -678,13 +601,6 @@ CREATE TABLE `employee_documents` (
   `notes` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `employee_documents`
---
-
-INSERT INTO `employee_documents` (`id`, `employee_id`, `document_type`, `document_name`, `file_path`, `upload_date`, `uploaded_by`, `notes`, `created_at`) VALUES
-('da4e6b55-ddd0-11f0-83eb-74d435ebdbb2', '06b3c304-ddb8-11f0-83eb-74d435ebdbb2', 'CONTRACT', 'a.PNG', '/uploads/employee-documents/06b3c304-ddb8-11f0-83eb-74d435ebdbb2_1766254952434.PNG', '2025-12-21', '763c22d2-ddba-11f0-83eb-74d435ebdbb2', NULL, '2025-12-20 18:22:32');
 
 -- --------------------------------------------------------
 
@@ -735,7 +651,9 @@ CREATE TABLE `equipment` (
 --
 
 INSERT INTO `equipment` (`id`, `equipment_code`, `equipment_name`, `equipment_type`, `manufacturer`, `model_number`, `serial_number`, `purchase_date`, `installation_date`, `warranty_expiry_date`, `location`, `department`, `status`, `specifications`, `notes`, `created_at`, `updated_at`) VALUES
-('8da3b4db-e012-11f0-93ac-74d435ebdbb2', '111', 'MARTILYO MOLDER', 'ewan', 'ewan', 'dsad', '3232', NULL, '2025-12-30', NULL, 'cavite', NULL, 'MAINTENANCE', NULL, NULL, '2025-12-23 23:17:53', '2025-12-23 23:46:39');
+('357d3a19-e01c-11f0-93ac-74d435ebdbb2', 'EQ-001', 'CNC Milling Machine', 'MACHINING', 'Haas Automation', 'VF-2', 'SN-12345', NULL, '2020-06-15', NULL, 'Production Floor A', NULL, 'OPERATIONAL', NULL, NULL, '2025-12-24 00:27:00', '2025-12-24 00:27:00'),
+('357d76d0-e01c-11f0-93ac-74d435ebdbb2', 'EQ-002', 'Welding Robot', 'WELDING', 'FANUC', 'ARC Mate 120iC', 'SN-67890', NULL, '2021-03-20', NULL, 'Production Floor B', NULL, 'OPERATIONAL', NULL, NULL, '2025-12-24 00:27:00', '2025-12-24 00:27:00'),
+('357d7861-e01c-11f0-93ac-74d435ebdbb2', 'EQ-003', 'Paint Booth', 'FINISHING', 'Spray Systems', 'PB-500', 'SN-11223', NULL, '2019-11-10', NULL, 'Finishing Area', NULL, 'OPERATIONAL', NULL, NULL, '2025-12-24 00:27:00', '2025-12-24 00:27:00');
 
 -- --------------------------------------------------------
 
@@ -878,8 +796,9 @@ CREATE TABLE `inventory_stock` (
 --
 
 INSERT INTO `inventory_stock` (`id`, `item_id`, `warehouse_id`, `quantity`, `reserved_quantity`, `last_transaction_date`, `created_at`, `updated_at`) VALUES
-('78b37cd2-df17-11f0-9861-74d435ebdbb2', '78b2d7d4-df17-11f0-9861-74d435ebdbb2', '74c741c5-defa-11f0-9861-74d435ebdbb2', 50.000, 0.000, '2025-12-22 17:20:34', '2025-12-22 17:20:34', '2025-12-22 17:20:34'),
-('d6be7c21-df17-11f0-9861-74d435ebdbb2', 'd6bd1f4a-df17-11f0-9861-74d435ebdbb2', '74c741c5-defa-11f0-9861-74d435ebdbb2', 100.000, 0.000, '2025-12-22 17:24:41', '2025-12-22 17:23:12', '2025-12-22 17:24:41');
+('357babf2-e01c-11f0-93ac-74d435ebdbb2', '357b14c5-e01c-11f0-93ac-74d435ebdbb2', '357a36ed-e01c-11f0-93ac-74d435ebdbb2', 1450.000, 0.000, NULL, '2025-12-24 00:27:00', '2025-12-24 02:39:09'),
+('357bd035-e01c-11f0-93ac-74d435ebdbb2', '357b5381-e01c-11f0-93ac-74d435ebdbb2', '357a37a8-e01c-11f0-93ac-74d435ebdbb2', 130.000, 0.000, NULL, '2025-12-24 00:27:00', '2025-12-24 02:39:07'),
+('357bd17f-e01c-11f0-93ac-74d435ebdbb2', '357b560d-e01c-11f0-93ac-74d435ebdbb2', '357a111a-e01c-11f0-93ac-74d435ebdbb2', 200.000, 0.000, NULL, '2025-12-24 00:27:00', '2025-12-24 00:27:00');
 
 -- --------------------------------------------------------
 
@@ -904,15 +823,6 @@ CREATE TABLE `inventory_transactions` (
   `created_by` varchar(36) NOT NULL,
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `inventory_transactions`
---
-
-INSERT INTO `inventory_transactions` (`id`, `transaction_number`, `transaction_date`, `transaction_type`, `item_id`, `warehouse_id`, `quantity`, `unit_cost`, `total_cost`, `reference_type`, `reference_id`, `reference_number`, `notes`, `created_by`, `created_at`) VALUES
-('0bf23117-df18-11f0-9861-74d435ebdbb2', 'TXN2025-000003', '2025-12-22 17:24:41', 'ADJUSTMENT', 'd6bd1f4a-df17-11f0-9861-74d435ebdbb2', '74c741c5-defa-11f0-9861-74d435ebdbb2', 100.000, NULL, NULL, 'ITEM_EDIT', NULL, NULL, 'Stock adjusted via item edit', 'a7668bec-df0c-11f0-9861-74d435ebdbb2', '2025-12-22 17:24:41'),
-('78b44016-df17-11f0-9861-74d435ebdbb2', 'TXN2025-000001', '2025-12-22 17:20:34', 'ADJUSTMENT', '78b2d7d4-df17-11f0-9861-74d435ebdbb2', '74c741c5-defa-11f0-9861-74d435ebdbb2', 50.000, NULL, NULL, 'INITIAL_STOCK', NULL, NULL, 'Initial stock entry', 'a7668bec-df0c-11f0-9861-74d435ebdbb2', '2025-12-22 17:20:34'),
-('d6bf5b77-df17-11f0-9861-74d435ebdbb2', 'TXN2025-000002', '2025-12-22 17:23:12', 'ADJUSTMENT', 'd6bd1f4a-df17-11f0-9861-74d435ebdbb2', '74c741c5-defa-11f0-9861-74d435ebdbb2', 0.000, NULL, NULL, 'INITIAL_STOCK', NULL, NULL, 'Initial stock entry', 'a7668bec-df0c-11f0-9861-74d435ebdbb2', '2025-12-22 17:23:12');
 
 -- --------------------------------------------------------
 
@@ -997,8 +907,9 @@ CREATE TABLE `items` (
 --
 
 INSERT INTO `items` (`id`, `code`, `name`, `description`, `category_id`, `uom_id`, `item_type`, `reorder_level`, `reorder_quantity`, `min_stock_level`, `max_stock_level`, `standard_cost`, `selling_price`, `is_active`, `notes`, `created_at`, `updated_at`) VALUES
-('78b2d7d4-df17-11f0-9861-74d435ebdbb2', '242', 'Dos Por Dos', NULL, NULL, '78b25893-df17-11f0-9861-74d435ebdbb2', 'FINISHED_GOODS', 0.000, 0.000, 0.000, 0.000, 100.00, 150.00, 1, NULL, '2025-12-22 17:20:34', '2025-12-22 17:20:34'),
-('d6bd1f4a-df17-11f0-9861-74d435ebdbb2', '001', 'Nut', NULL, NULL, '78b25893-df17-11f0-9861-74d435ebdbb2', 'FINISHED_GOODS', 0.000, 0.000, 0.000, 0.000, 40.00, 50.00, 1, NULL, '2025-12-22 17:23:12', '2025-12-22 17:24:41');
+('357b14c5-e01c-11f0-93ac-74d435ebdbb2', 'RM-001', 'Steel Sheet 1mm', 'Cold rolled steel sheet', '3578e1b5-e01c-11f0-93ac-74d435ebdbb2', '35796271-e01c-11f0-93ac-74d435ebdbb2', 'RAW_MATERIAL', 500.000, 1000.000, 0.000, 0.000, 5.50, 0.00, 1, NULL, '2025-12-24 00:27:00', '2025-12-24 00:27:00'),
+('357b5381-e01c-11f0-93ac-74d435ebdbb2', 'FG-001', 'Product A - Standard', 'Standard model', '357907b7-e01c-11f0-93ac-74d435ebdbb2', '35793ed4-e01c-11f0-93ac-74d435ebdbb2', 'FINISHED_GOODS', 50.000, 100.000, 0.000, 0.000, 45.00, 89.99, 1, NULL, '2025-12-24 00:27:00', '2025-12-24 00:27:00'),
+('357b560d-e01c-11f0-93ac-74d435ebdbb2', 'CONS-001', 'Cutting Oil', 'Industrial cutting oil', '3579086f-e01c-11f0-93ac-74d435ebdbb2', '357962f7-e01c-11f0-93ac-74d435ebdbb2', 'CONSUMABLE', 50.000, 100.000, 0.000, 0.000, 12.50, 0.00, 1, NULL, '2025-12-24 00:27:00', '2025-12-24 00:27:00');
 
 -- --------------------------------------------------------
 
@@ -1016,6 +927,15 @@ CREATE TABLE `item_categories` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `item_categories`
+--
+
+INSERT INTO `item_categories` (`id`, `code`, `name`, `description`, `parent_id`, `is_active`, `created_at`, `updated_at`) VALUES
+('3578e1b5-e01c-11f0-93ac-74d435ebdbb2', 'RM', 'Raw Materials', 'Raw materials for production', NULL, 1, '2025-12-24 00:27:00', '2025-12-24 00:27:00'),
+('357907b7-e01c-11f0-93ac-74d435ebdbb2', 'FG', 'Finished Goods', 'Completed products', NULL, 1, '2025-12-24 00:27:00', '2025-12-24 00:27:00'),
+('3579086f-e01c-11f0-93ac-74d435ebdbb2', 'CONS', 'Consumables', 'Consumable supplies', NULL, 1, '2025-12-24 00:27:00', '2025-12-24 00:27:00');
 
 -- --------------------------------------------------------
 
@@ -1039,14 +959,6 @@ CREATE TABLE `job_postings` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `job_postings`
---
-
-INSERT INTO `job_postings` (`id`, `job_title`, `department_id`, `position_level`, `job_description`, `requirements`, `salary_range`, `employment_type`, `status`, `posted_date`, `closing_date`, `created_by`, `created_at`, `updated_at`) VALUES
-('4db58e4e-dff8-11f0-93ac-74d435ebdbb2', 'HR Admin', 'a52dfc7b-dd9f-11f0-83eb-74d435ebdbb2', 'Admin', 'HR ADMIN', 'College Graduate', '11,000 - 15,000', 'FULL_TIME', 'OPEN', '2025-12-23', '2025-12-30', '9b489fe0-df0b-11f0-9861-74d435ebdbb2', '2025-12-23 12:09:59', '2025-12-23 12:09:59'),
-('52119934-ddc1-11f0-83eb-74d435ebdbb2', 'IT Support', 'a52e0639-dd9f-11f0-83eb-74d435ebdbb2', '1', 'r', 'r', '8000-11,000', 'PART_TIME', 'OPEN', '2025-12-20', '2025-12-29', '763c22d2-ddba-11f0-83eb-74d435ebdbb2', '2025-12-20 16:31:21', '2025-12-20 17:19:15');
 
 -- --------------------------------------------------------
 
@@ -1140,14 +1052,6 @@ CREATE TABLE `leave_requests` (
   `hr_rejection_reason` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `leave_requests`
---
-
-INSERT INTO `leave_requests` (`id`, `employee_id`, `leave_type_id`, `start_date`, `end_date`, `days_requested`, `reason`, `status`, `approved_by`, `approved_at`, `rejection_reason`, `created_at`, `updated_at`, `approval_stage`, `dept_head_approved_by`, `dept_head_approved_at`, `gm_approved_by`, `gm_approved_at`, `dept_head_rejection_reason`, `gm_rejection_reason`, `hr_reviewed_by`, `hr_reviewed_at`, `hr_rejection_reason`) VALUES
-('8c3bfdf7-e000-11f0-93ac-74d435ebdbb2', '21e774d3-dff8-11f0-93ac-74d435ebdbb2', '300b006a-ddb4-11f0-83eb-74d435ebdbb2', '2025-12-25', '2025-12-27', 1.00, NULL, 'PENDING', NULL, '2025-12-23 13:09:20', NULL, '2025-12-23 13:09:00', '2025-12-23 13:09:20', 'DEPARTMENT_HEAD', NULL, NULL, NULL, NULL, NULL, NULL, '9b489fe0-df0b-11f0-9861-74d435ebdbb2', '2025-12-23 13:09:20', NULL),
-('c49bd385-ddbc-11f0-83eb-74d435ebdbb2', '79ba8ef3-ddbc-11f0-83eb-74d435ebdbb2', '300b0112-ddb4-11f0-83eb-74d435ebdbb2', '2025-12-21', '2025-12-22', 1.00, NULL, 'CANCELLED', NULL, '2025-12-20 16:10:34', NULL, '2025-12-20 15:58:46', '2025-12-20 16:10:34', 'DEPARTMENT_HEAD', NULL, NULL, NULL, NULL, NULL, NULL, '763c22d2-ddba-11f0-83eb-74d435ebdbb2', '2025-12-20 16:09:56', NULL);
-
 -- --------------------------------------------------------
 
 --
@@ -1165,18 +1069,6 @@ CREATE TABLE `leave_types` (
   `is_active` tinyint(1) DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `leave_types`
---
-
-INSERT INTO `leave_types` (`id`, `leave_name`, `leave_code`, `default_credits`, `is_paid`, `requires_approval`, `description`, `is_active`, `created_at`) VALUES
-('300ae94b-ddb4-11f0-83eb-74d435ebdbb2', 'Vacation Leave', 'VL', 15.00, 1, 1, 'Annual vacation leave', 1, '2025-12-20 14:57:21'),
-('300b006a-ddb4-11f0-83eb-74d435ebdbb2', 'Sick Leave', 'SL', 15.00, 1, 1, 'Sick leave with medical certificate', 1, '2025-12-20 14:57:21'),
-('300b0112-ddb4-11f0-83eb-74d435ebdbb2', 'Emergency Leave', 'EL', 5.00, 1, 1, 'Emergency or urgent personal matters', 1, '2025-12-20 14:57:21'),
-('300b01b3-ddb4-11f0-83eb-74d435ebdbb2', 'Maternity Leave', 'ML', 105.00, 1, 1, 'Maternity leave for female employees', 1, '2025-12-20 14:57:21'),
-('300b01eb-ddb4-11f0-83eb-74d435ebdbb2', 'Paternity Leave', 'PL', 7.00, 1, 1, 'Paternity leave for male employees', 1, '2025-12-20 14:57:21'),
-('300b021e-ddb4-11f0-83eb-74d435ebdbb2', 'Unpaid Leave', 'UL', 0.00, 0, 1, 'Leave without pay', 1, '2025-12-20 14:57:21');
 
 -- --------------------------------------------------------
 
@@ -1222,6 +1114,14 @@ CREATE TABLE `maintenance_schedules` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `maintenance_schedules`
+--
+
+INSERT INTO `maintenance_schedules` (`id`, `schedule_code`, `equipment_id`, `maintenance_type`, `frequency_type`, `frequency_value`, `last_maintenance_date`, `next_maintenance_date`, `estimated_duration_hours`, `is_active`, `description`, `checklist`, `created_at`, `updated_at`) VALUES
+('357e341e-e01c-11f0-93ac-74d435ebdbb2', 'MS-001', '357d3a19-e01c-11f0-93ac-74d435ebdbb2', 'PREVENTIVE', 'MONTHLY', 1, NULL, '2026-01-08', NULL, 1, 'Monthly lubrication', NULL, '2025-12-24 00:27:00', '2025-12-24 00:27:00'),
+('357e5bad-e01c-11f0-93ac-74d435ebdbb2', 'MS-002', '357d76d0-e01c-11f0-93ac-74d435ebdbb2', 'PREVENTIVE', 'QUARTERLY', 3, NULL, '2026-01-23', NULL, 1, 'Quarterly calibration', NULL, '2025-12-24 00:27:00', '2025-12-24 00:27:00');
 
 -- --------------------------------------------------------
 
@@ -1278,9 +1178,8 @@ CREATE TABLE `maintenance_work_orders` (
 --
 
 INSERT INTO `maintenance_work_orders` (`id`, `wo_number`, `wo_date`, `equipment_id`, `request_id`, `schedule_id`, `maintenance_type`, `priority`, `description`, `scheduled_start_date`, `scheduled_end_date`, `actual_start_date`, `actual_end_date`, `status`, `assigned_to`, `completed_by`, `downtime_hours`, `labor_cost`, `parts_cost`, `total_cost`, `work_performed`, `notes`, `created_at`, `updated_at`) VALUES
-('18a1776f-e015-11f0-93ac-74d435ebdbb2', 'MWO-1766504166124', '2025-12-23', '8da3b4db-e012-11f0-93ac-74d435ebdbb2', NULL, NULL, 'PREDICTIVE', 'NORMAL', 'dsadas', '2025-12-30 00:00:00', NULL, NULL, NULL, '', '8c146c1a-e006-11f0-93ac-74d435ebdbb2', NULL, NULL, 0.00, 0.00, 0.00, NULL, NULL, '2025-12-23 23:36:06', '2025-12-23 23:36:06'),
-('4d00a7fd-e015-11f0-93ac-74d435ebdbb2', 'MWO-1766504253988', '2025-12-23', '8da3b4db-e012-11f0-93ac-74d435ebdbb2', NULL, NULL, 'PREDICTIVE', 'HIGH', '', '2025-12-28 00:00:00', NULL, NULL, NULL, '', '8c146c1a-e006-11f0-93ac-74d435ebdbb2', NULL, NULL, 0.00, 0.00, 0.00, NULL, NULL, '2025-12-23 23:37:33', '2025-12-23 23:37:33'),
-('b31c0a9f-e015-11f0-93ac-74d435ebdbb2', 'MWO-1766504425296', '2025-12-23', '8da3b4db-e012-11f0-93ac-74d435ebdbb2', NULL, NULL, 'PREDICTIVE', 'URGENT', '', '2025-12-25 00:00:00', NULL, NULL, NULL, '', '8c146c1a-e006-11f0-93ac-74d435ebdbb2', NULL, NULL, 0.00, 0.00, 0.00, NULL, NULL, '2025-12-23 23:40:25', '2025-12-23 23:40:25');
+('357e9a5d-e01c-11f0-93ac-74d435ebdbb2', 'MWO-2025-001', '2025-12-24', '357d3a19-e01c-11f0-93ac-74d435ebdbb2', NULL, NULL, 'PREVENTIVE', 'NORMAL', 'Scheduled monthly maintenance', '2025-12-26 00:00:00', NULL, NULL, NULL, '', 'maint-001', NULL, NULL, 0.00, 0.00, 0.00, NULL, NULL, '2025-12-24 00:27:00', '2025-12-24 00:27:00'),
+('357ea894-e01c-11f0-93ac-74d435ebdbb2', 'MWO-2025-002', '2025-12-24', '357d76d0-e01c-11f0-93ac-74d435ebdbb2', NULL, NULL, 'CORRECTIVE', 'HIGH', 'Fix welding arm alignment', '2025-12-24 00:00:00', NULL, NULL, NULL, 'IN_PROGRESS', 'maint-001', NULL, NULL, 0.00, 0.00, 0.00, NULL, NULL, '2025-12-24 00:27:00', '2025-12-24 00:27:00');
 
 -- --------------------------------------------------------
 
@@ -1392,12 +1291,31 @@ CREATE TABLE `notifications` (
 --
 
 INSERT INTO `notifications` (`id`, `user_id`, `title`, `message`, `type`, `category`, `reference_type`, `reference_id`, `is_read`, `read_at`, `created_at`) VALUES
-(1, '2025d81d-df0d-11f0-9861-74d435ebdbb2', 'New PR Awaiting Approval', 'Purchase Requisition PR-0004 has been submitted and requires your approval', 'INFO', 'APPROVAL', 'purchase_requisition', 'cb43e719-dfd5-11f0-9857-74d435ebdbb2', 1, '2025-12-23 12:45:44', '2025-12-23 08:03:17'),
-(2, 'd82c689c-df0c-11f0-9861-74d435ebdbb2', 'New PR Awaiting Approval', 'Purchase Requisition PR-0004 has been submitted and requires your approval', 'INFO', 'APPROVAL', 'purchase_requisition', 'cb43e719-dfd5-11f0-9857-74d435ebdbb2', 1, '2025-12-23 12:15:52', '2025-12-23 08:03:17'),
-(3, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'New PR Awaiting Approval', 'Purchase Requisition PR-0004 has been submitted and requires your approval', 'INFO', 'APPROVAL', 'purchase_requisition', 'cb43e719-dfd5-11f0-9857-74d435ebdbb2', 1, '2025-12-23 08:03:27', '2025-12-23 08:03:17'),
-(4, '2025d81d-df0d-11f0-9861-74d435ebdbb2', 'New PR Awaiting Approval', 'Purchase Requisition PR-0005 has been submitted and requires your approval', 'INFO', 'APPROVAL', 'purchase_requisition', '5e03886e-dfd8-11f0-9857-74d435ebdbb2', 1, '2025-12-23 12:45:39', '2025-12-23 08:21:32'),
-(5, 'd82c689c-df0c-11f0-9861-74d435ebdbb2', 'New PR Awaiting Approval', 'Purchase Requisition PR-0005 has been submitted and requires your approval', 'INFO', 'APPROVAL', 'purchase_requisition', '5e03886e-dfd8-11f0-9857-74d435ebdbb2', 1, '2025-12-23 12:15:33', '2025-12-23 08:21:32'),
-(6, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'New PR Awaiting Approval', 'Purchase Requisition PR-0005 has been submitted and requires your approval', 'INFO', 'APPROVAL', 'purchase_requisition', '5e03886e-dfd8-11f0-9857-74d435ebdbb2', 1, '2025-12-23 08:21:51', '2025-12-23 08:21:32');
+(1, 'dh-001', 'New PR Awaiting Approval', 'Purchase Requisition PR-0001 has been submitted and requires your approval', 'INFO', 'APPROVAL', 'purchase_requisition', '9b317566-e021-11f0-93ac-74d435ebdbb2', 1, '2025-12-23 17:06:30', '2025-12-23 17:05:46'),
+(3, 'pres-001', 'New PR Awaiting Approval', 'Purchase Requisition PR-0001 has been submitted and requires your approval', 'INFO', 'APPROVAL', 'purchase_requisition', '9b317566-e021-11f0-93ac-74d435ebdbb2', 0, NULL, '2025-12-23 17:05:46'),
+(4, 'vp-001', 'New PR Awaiting Approval', 'Purchase Requisition PR-0001 has been submitted and requires your approval', 'INFO', 'APPROVAL', 'purchase_requisition', '9b317566-e021-11f0-93ac-74d435ebdbb2', 0, NULL, '2025-12-23 17:05:46'),
+(6, 'pres-001', 'New PO Awaiting Approval', 'Purchase Order PO-0002 has been created and requires your approval', 'INFO', 'APPROVAL', 'purchase_order', 'd633254f-e022-11f0-93ac-74d435ebdbb2', 0, NULL, '2025-12-23 17:14:27'),
+(7, 'vp-001', 'New PO Awaiting Approval', 'Purchase Order PO-0002 has been created and requires your approval', 'INFO', 'APPROVAL', 'purchase_order', 'd633254f-e022-11f0-93ac-74d435ebdbb2', 0, NULL, '2025-12-23 17:14:27'),
+(9, 'pres-001', 'New PO Awaiting Approval', 'Purchase Order PO-0003 has been created and requires your approval', 'INFO', 'APPROVAL', 'purchase_order', 'df90785c-e022-11f0-93ac-74d435ebdbb2', 0, NULL, '2025-12-23 17:14:42'),
+(10, 'vp-001', 'New PO Awaiting Approval', 'Purchase Order PO-0003 has been created and requires your approval', 'INFO', 'APPROVAL', 'purchase_order', 'df90785c-e022-11f0-93ac-74d435ebdbb2', 0, NULL, '2025-12-23 17:14:42'),
+(12, 'pres-001', 'New PO Awaiting Approval', 'Purchase Order PO-0004 has been created and requires your approval', 'INFO', 'APPROVAL', 'purchase_order', 'f85c2c2c-e022-11f0-93ac-74d435ebdbb2', 0, NULL, '2025-12-23 17:15:24'),
+(13, 'vp-001', 'New PO Awaiting Approval', 'Purchase Order PO-0004 has been created and requires your approval', 'INFO', 'APPROVAL', 'purchase_order', 'f85c2c2c-e022-11f0-93ac-74d435ebdbb2', 0, NULL, '2025-12-23 17:15:24'),
+(14, 'dh-001', 'New PR Awaiting Approval', 'Purchase Requisition PR-0001 has been submitted and requires your approval', 'INFO', 'APPROVAL', 'purchase_requisition', '7b9f2c37-e024-11f0-93ac-74d435ebdbb2', 0, NULL, '2025-12-23 17:32:12'),
+(15, 'gm-001', 'New PR Awaiting Approval', 'Purchase Requisition PR-0001 has been submitted and requires your approval', 'INFO', 'APPROVAL', 'purchase_requisition', '7b9f2c37-e024-11f0-93ac-74d435ebdbb2', 1, '2025-12-23 17:32:18', '2025-12-23 17:32:12'),
+(16, 'pres-001', 'New PR Awaiting Approval', 'Purchase Requisition PR-0001 has been submitted and requires your approval', 'INFO', 'APPROVAL', 'purchase_requisition', '7b9f2c37-e024-11f0-93ac-74d435ebdbb2', 0, NULL, '2025-12-23 17:32:12'),
+(17, 'vp-001', 'New PR Awaiting Approval', 'Purchase Requisition PR-0001 has been submitted and requires your approval', 'INFO', 'APPROVAL', 'purchase_requisition', '7b9f2c37-e024-11f0-93ac-74d435ebdbb2', 0, NULL, '2025-12-23 17:32:12'),
+(18, 'dh-001', 'New PR Awaiting Approval', 'Purchase Requisition PR-0002 has been submitted and requires your approval', 'INFO', 'APPROVAL', 'purchase_requisition', '7b686fd2-e025-11f0-93ac-74d435ebdbb2', 0, NULL, '2025-12-23 17:33:26'),
+(19, 'gm-001', 'New PR Awaiting Approval', 'Purchase Requisition PR-0002 has been submitted and requires your approval', 'INFO', 'APPROVAL', 'purchase_requisition', '7b686fd2-e025-11f0-93ac-74d435ebdbb2', 1, '2025-12-23 17:33:33', '2025-12-23 17:33:26'),
+(20, 'pres-001', 'New PR Awaiting Approval', 'Purchase Requisition PR-0002 has been submitted and requires your approval', 'INFO', 'APPROVAL', 'purchase_requisition', '7b686fd2-e025-11f0-93ac-74d435ebdbb2', 0, NULL, '2025-12-23 17:33:26'),
+(21, 'vp-001', 'New PR Awaiting Approval', 'Purchase Requisition PR-0002 has been submitted and requires your approval', 'INFO', 'APPROVAL', 'purchase_requisition', '7b686fd2-e025-11f0-93ac-74d435ebdbb2', 0, NULL, '2025-12-23 17:33:26'),
+(22, 'ware-001', 'Stock Issue Approved', 'Stock Issue SI2025-00002 for dsad has been approved and is ready to be completed', '', 'INVENTORY', 'STOCK_ISSUE', '2', 1, '2025-12-23 18:35:07', '2025-12-23 18:34:22'),
+(23, 'ware-001', 'Stock Issue Approved', 'Stock Issue SI2025-00001 for dsad has been approved and is ready to be completed', '', 'INVENTORY', 'STOCK_ISSUE', '1', 1, '2025-12-23 18:35:05', '2025-12-23 18:34:23'),
+(24, 'gm-001', 'Work Order Approval Required', 'Work Order WO-0001 for Product A - Standard (Qty: 10) requires your approval', '', 'PRODUCTION', 'WORK_ORDER', '0', 1, '2025-12-23 18:55:49', '2025-12-23 18:54:30'),
+(25, 'super-001', 'Work Order Ready to Release', 'Work Order WO-0001 has been approved and is ready to be released to production', '', 'PRODUCTION', 'WORK_ORDER', 'd03c7d2a-e030-11f0-93ac-74d435ebdbb2', 1, '2025-12-24 07:14:33', '2025-12-23 19:09:06'),
+(26, 'oper-001', 'Work Order Released', 'Work Order WO-0001 has been released and is ready for production', '', 'PRODUCTION', 'WORK_ORDER', 'd03c7d2a-e030-11f0-93ac-74d435ebdbb2', 1, '2025-12-24 07:14:57', '2025-12-24 07:14:42'),
+(27, 'gm-001', 'Work Order Approval Required', 'Work Order WO-0001 for Product A - Standard (Qty: 100) requires your approval', '', 'PRODUCTION', 'WORK_ORDER', '0', 1, '2025-12-24 08:42:40', '2025-12-24 08:40:06'),
+(28, 'super-001', 'Work Order Ready to Release', 'Work Order WO-0001 has been approved and is ready to be released to production', '', 'PRODUCTION', 'WORK_ORDER', '262b97c2-e0a4-11f0-80db-74d435ebdbb2', 1, '2025-12-24 08:43:18', '2025-12-24 08:42:44'),
+(29, 'oper-001', 'Work Order Released', 'Work Order WO-0001 has been released and is ready for production', '', 'PRODUCTION', 'WORK_ORDER', '262b97c2-e0a4-11f0-80db-74d435ebdbb2', 1, '2025-12-24 08:43:33', '2025-12-24 08:43:15');
 
 -- --------------------------------------------------------
 
@@ -1607,9 +1525,8 @@ CREATE TABLE `purchase_orders` (
 --
 
 INSERT INTO `purchase_orders` (`id`, `po_number`, `po_date`, `supplier_id`, `delivery_date`, `expected_delivery_date`, `actual_delivery_date`, `supplier_confirmation_date`, `supplier_confirmation_notes`, `delivery_address`, `payment_terms`, `status`, `subtotal`, `tax_amount`, `discount_amount`, `total_amount`, `approved_by`, `approved_date`, `notes`, `created_by`, `created_at`, `updated_at`) VALUES
-('0f8c53ee-dfd3-11f0-9857-74d435ebdbb2', 'PO-0003', '2025-12-23', 'df6d81ef-df00-11f0-9861-74d435ebdbb2', '2025-12-24', NULL, NULL, NULL, NULL, 'Blk 5 lot 10', 'ewan', 'SENT', 2000.00, 240.00, 0.00, 2240.00, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', '2025-12-23 16:36:26', NULL, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', '2025-12-23 15:43:24', '2025-12-23 16:56:28'),
-('ac2bfcc5-dfce-11f0-9857-74d435ebdbb2', 'PO-0002', '2025-12-23', '2146da91-df0e-11f0-9861-74d435ebdbb2', '2025-12-27', NULL, NULL, NULL, NULL, 'Blk 5 lot 5', NULL, 'SENT', 4000.00, 480.00, 0.00, 4480.00, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', '2025-12-23 16:56:35', NULL, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', '2025-12-23 15:11:59', '2025-12-23 21:13:16'),
-('c6dfcc5f-df18-11f0-9861-74d435ebdbb2', 'PO-0001', '2025-12-22', 'df6d81ef-df00-11f0-9861-74d435ebdbb2', '2025-12-31', NULL, NULL, NULL, NULL, 'Blk 5 lot 10', 'ewan', 'SENT', 400.00, 48.00, 0.00, 448.00, 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', '2025-12-23 16:56:36', NULL, 'a7668bec-df0c-11f0-9861-74d435ebdbb2', '2025-12-22 17:29:55', '2025-12-23 21:13:18');
+('5c4ea8c5-e025-11f0-93ac-74d435ebdbb2', 'PO-0001', '2025-12-24', '357c7771-e01c-11f0-93ac-74d435ebdbb2', '2026-01-02', NULL, NULL, NULL, NULL, '123 Industrial Ave', NULL, 'SENT', 55.00, 0.00, 0.00, 55.00, 'gm-001', '2025-12-24 01:32:57', NULL, 'gm-001', '2025-12-24 01:32:31', '2025-12-24 01:35:13'),
+('8d122fdd-e025-11f0-93ac-74d435ebdbb2', 'PO-0002', '2025-12-23', '357c9d3f-e01c-11f0-93ac-74d435ebdbb2', '2026-01-09', NULL, NULL, NULL, NULL, '456 Metal Road', NULL, 'SENT', 1800.00, 216.00, 0.00, 2016.00, 'gm-001', '2025-12-24 01:34:21', NULL, 'gm-001', '2025-12-24 01:33:52', '2025-12-24 01:35:14');
 
 -- --------------------------------------------------------
 
@@ -1655,9 +1572,8 @@ CREATE TABLE `purchase_order_items` (
 --
 
 INSERT INTO `purchase_order_items` (`id`, `po_id`, `pr_item_id`, `item_id`, `quantity`, `received_quantity`, `unit_price`, `total_price`, `tax_rate`, `discount_rate`, `notes`, `created_at`, `updated_at`) VALUES
-('0f8ce5b1-dfd3-11f0-9857-74d435ebdbb2', '0f8c53ee-dfd3-11f0-9857-74d435ebdbb2', NULL, 'd6bd1f4a-df17-11f0-9861-74d435ebdbb2', 50.000, 0.000, 40.00, 2240.00, 12.00, 0.00, NULL, '2025-12-23 15:43:24', '2025-12-23 15:43:24'),
-('ac2c719f-dfce-11f0-9857-74d435ebdbb2', 'ac2bfcc5-dfce-11f0-9857-74d435ebdbb2', NULL, 'd6bd1f4a-df17-11f0-9861-74d435ebdbb2', 100.000, 0.000, 40.00, 4480.00, 12.00, 0.00, NULL, '2025-12-23 15:11:59', '2025-12-23 15:11:59'),
-('c6e0410c-df18-11f0-9861-74d435ebdbb2', 'c6dfcc5f-df18-11f0-9861-74d435ebdbb2', NULL, 'd6bd1f4a-df17-11f0-9861-74d435ebdbb2', 10.000, 0.000, 40.00, 448.00, 12.00, 0.00, NULL, '2025-12-22 17:29:55', '2025-12-22 17:29:55');
+('5c4f2a99-e025-11f0-93ac-74d435ebdbb2', '5c4ea8c5-e025-11f0-93ac-74d435ebdbb2', '4611db0c-e025-11f0-93ac-74d435ebdbb2', '357b14c5-e01c-11f0-93ac-74d435ebdbb2', 10.000, 0.000, 5.50, 55.00, 0.00, 0.00, NULL, '2025-12-24 01:32:31', '2025-12-24 01:32:31'),
+('973c0c2b-e025-11f0-93ac-74d435ebdbb2', '8d122fdd-e025-11f0-93ac-74d435ebdbb2', NULL, '357b5381-e01c-11f0-93ac-74d435ebdbb2', 40.000, 0.000, 45.00, 2016.00, 12.00, 0.00, NULL, '2025-12-24 01:34:09', '2025-12-24 01:34:09');
 
 -- --------------------------------------------------------
 
@@ -1688,11 +1604,8 @@ CREATE TABLE `purchase_requisitions` (
 --
 
 INSERT INTO `purchase_requisitions` (`id`, `pr_number`, `pr_date`, `requested_by`, `department`, `source_type`, `source_reference`, `required_date`, `status`, `approved_by`, `approved_date`, `rejection_reason`, `notes`, `created_at`, `updated_at`) VALUES
-('5e03886e-dfd8-11f0-9857-74d435ebdbb2', 'PR-0005', '2025-12-23', 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'IT', 'MANUAL', NULL, '2025-12-25', 'APPROVED', 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', '2025-12-23 16:22:38', NULL, 'das', '2025-12-23 16:21:23', '2025-12-23 16:22:38'),
-('89f22b14-df18-11f0-9861-74d435ebdbb2', 'PR-0001', '2025-12-22', 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'Maintenance', 'DEPARTMENTAL', NULL, '2025-12-30', 'APPROVED', 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', '2025-12-23 16:24:31', NULL, NULL, '2025-12-22 17:28:12', '2025-12-23 16:24:31'),
-('a2946e1e-dfce-11f0-9857-74d435ebdbb2', 'PR-0002', '2025-12-23', 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'Quality Control', 'LOW_STOCK', NULL, '2025-12-25', 'REJECTED', 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', '2025-12-23 16:31:07', 'DD', NULL, '2025-12-23 15:11:43', '2025-12-23 16:31:07'),
-('c25f2127-dfd4-11f0-9857-74d435ebdbb2', 'PR-0003', '2025-12-23', 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'Sales', 'LOW_STOCK', NULL, '2025-12-30', 'REJECTED', 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', '2025-12-23 16:22:53', 'dsadas', NULL, '2025-12-23 15:55:33', '2025-12-23 16:22:53'),
-('cb43e719-dfd5-11f0-9857-74d435ebdbb2', 'PR-0004', '2025-12-22', 'a7668bec-df0c-11f0-9861-74d435ebdbb2', 'IT', 'LOW_STOCK', NULL, '2025-12-31', 'APPROVED', 'f4de36c7-df0c-11f0-9861-74d435ebdbb2', '2025-12-23 16:24:36', NULL, NULL, '2025-12-23 16:02:58', '2025-12-23 16:24:36');
+('7b686fd2-e025-11f0-93ac-74d435ebdbb2', 'PR-0002', '2025-12-23', 'gm-001', 'Executive', 'DEPARTMENTAL', NULL, '2025-12-25', 'CONVERTED', 'gm-001', '2025-12-24 01:33:36', NULL, NULL, '2025-12-24 01:33:23', '2025-12-24 01:33:52'),
+('7b9f2c37-e024-11f0-93ac-74d435ebdbb2', 'PR-0001', '2025-12-21', 'purch-001', 'Maintenance', 'LOW_STOCK', NULL, '2025-12-29', 'CONVERTED', 'gm-001', '2025-12-24 01:32:21', NULL, NULL, '2025-12-24 01:26:14', '2025-12-24 01:32:31');
 
 -- --------------------------------------------------------
 
@@ -1736,11 +1649,8 @@ CREATE TABLE `purchase_requisition_items` (
 --
 
 INSERT INTO `purchase_requisition_items` (`id`, `pr_id`, `item_id`, `quantity`, `estimated_unit_price`, `estimated_total_price`, `required_date`, `purpose`, `notes`, `created_at`, `updated_at`) VALUES
-('5e03c0c7-dfd8-11f0-9857-74d435ebdbb2', '5e03886e-dfd8-11f0-9857-74d435ebdbb2', 'd6bd1f4a-df17-11f0-9861-74d435ebdbb2', 6.000, 40.00, 240.00, '2025-12-29', 'das', NULL, '2025-12-23 16:21:23', '2025-12-23 16:21:23'),
-('89f2a7e0-df18-11f0-9861-74d435ebdbb2', '89f22b14-df18-11f0-9861-74d435ebdbb2', 'd6bd1f4a-df17-11f0-9861-74d435ebdbb2', 50.000, 40.00, 2000.00, '2025-12-30', NULL, NULL, '2025-12-22 17:28:12', '2025-12-22 17:28:12'),
-('a294a3c0-dfce-11f0-9857-74d435ebdbb2', 'a2946e1e-dfce-11f0-9857-74d435ebdbb2', '78b2d7d4-df17-11f0-9861-74d435ebdbb2', 100.000, 100.00, 10000.00, '2026-01-01', NULL, NULL, '2025-12-23 15:11:43', '2025-12-23 15:11:43'),
-('c25ff249-dfd4-11f0-9857-74d435ebdbb2', 'c25f2127-dfd4-11f0-9857-74d435ebdbb2', '78b2d7d4-df17-11f0-9861-74d435ebdbb2', 1.000, 100.00, 100.00, '2025-12-30', NULL, NULL, '2025-12-23 15:55:33', '2025-12-23 15:55:33'),
-('d1e955a1-dfd5-11f0-9857-74d435ebdbb2', 'cb43e719-dfd5-11f0-9857-74d435ebdbb2', 'd6bd1f4a-df17-11f0-9861-74d435ebdbb2', 10.000, 40.00, 400.00, '2025-12-29', NULL, NULL, '2025-12-23 16:03:09', '2025-12-23 16:03:09');
+('4611db0c-e025-11f0-93ac-74d435ebdbb2', '7b9f2c37-e024-11f0-93ac-74d435ebdbb2', '357b14c5-e01c-11f0-93ac-74d435ebdbb2', 10.000, 5.50, 55.00, '2025-12-30', NULL, NULL, '2025-12-24 01:31:53', '2025-12-24 01:31:53'),
+('7b688a21-e025-11f0-93ac-74d435ebdbb2', '7b686fd2-e025-11f0-93ac-74d435ebdbb2', '357b560d-e01c-11f0-93ac-74d435ebdbb2', 50.000, 12.50, 625.00, '2025-12-31', NULL, NULL, '2025-12-24 01:33:23', '2025-12-24 01:33:23');
 
 -- --------------------------------------------------------
 
@@ -1768,6 +1678,13 @@ CREATE TABLE `quality_inspections` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `quality_inspections`
+--
+
+INSERT INTO `quality_inspections` (`id`, `inspection_number`, `inspection_date`, `plan_id`, `reference_type`, `reference_id`, `reference_number`, `item_id`, `batch_number`, `quantity_inspected`, `quantity_accepted`, `quantity_rejected`, `status`, `inspector_id`, `notes`, `created_at`, `updated_at`) VALUES
+('35811757-e01c-11f0-93ac-74d435ebdbb2', 'QI-2025-001', '2025-12-24 00:27:00', '35805a7a-e01c-11f0-93ac-74d435ebdbb2', NULL, NULL, NULL, '357b5381-e01c-11f0-93ac-74d435ebdbb2', NULL, 50.000, 48.000, 2.000, 'PASSED', 'qc-001', NULL, '2025-12-24 00:27:00', '2025-12-24 00:27:00');
+
 -- --------------------------------------------------------
 
 --
@@ -1787,6 +1704,14 @@ CREATE TABLE `quality_inspection_plans` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `quality_inspection_plans`
+--
+
+INSERT INTO `quality_inspection_plans` (`id`, `plan_code`, `plan_name`, `item_id`, `inspection_type`, `sampling_method`, `sample_size`, `is_active`, `description`, `created_at`, `updated_at`) VALUES
+('3580499a-e01c-11f0-93ac-74d435ebdbb2', 'QIP-001', 'Incoming Raw Material Inspection', '357b14c5-e01c-11f0-93ac-74d435ebdbb2', 'INCOMING', NULL, NULL, 1, NULL, '2025-12-24 00:27:00', '2025-12-24 00:27:00'),
+('35805a7a-e01c-11f0-93ac-74d435ebdbb2', 'QIP-002', 'Final Product Inspection', '357b5381-e01c-11f0-93ac-74d435ebdbb2', 'FINAL', NULL, NULL, 1, NULL, '2025-12-24 00:27:00', '2025-12-24 00:27:00');
 
 -- --------------------------------------------------------
 
@@ -1894,6 +1819,14 @@ CREATE TABLE `sales_invoices` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `sales_invoices`
+--
+
+INSERT INTO `sales_invoices` (`id`, `invoice_number`, `invoice_date`, `customer_id`, `due_date`, `payment_terms_days`, `subtotal`, `tax_amount`, `discount_amount`, `total_amount`, `amount_paid`, `balance_due`, `status`, `reference_number`, `notes`, `created_by`, `created_at`, `updated_at`) VALUES
+('b0c7aa7c-e01b-11f0-93ac-74d435ebdbb2', 'INV-2025-001', '2025-01-15', '', '2025-02-14', 30, 4499.50, 449.95, 0.00, 4949.45, 0.00, 4949.45, 'SENT', NULL, NULL, 'acct-001', '2025-12-23 16:23:18', '2025-12-23 16:23:18'),
+('b0c7c870-e01b-11f0-93ac-74d435ebdbb2', 'INV-2025-002', '2025-01-20', '', '2025-03-06', 30, 6499.50, 649.95, 0.00, 7149.45, 0.00, 7149.45, 'SENT', NULL, NULL, 'acct-001', '2025-12-23 16:23:18', '2025-12-23 16:23:18');
+
 -- --------------------------------------------------------
 
 --
@@ -1933,7 +1866,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `token`, `expires_at`, `created_at`) VALUES
-('93bc5ade-e017-11f0-93ac-74d435ebdbb2', '8c146c1a-e006-11f0-93ac-74d435ebdbb2', '7ac125f1-5a5b-49d7-a1fe-fee25ec1cb46', '2025-12-30 23:53:51', '2025-12-23 23:53:51');
+('9f61605c-e0a4-11f0-80db-74d435ebdbb2', 'oper-001', '12927665-0333-4b58-922d-eee9c2c5e47a', '2025-12-31 16:43:30', '2025-12-24 16:43:30');
 
 -- --------------------------------------------------------
 
@@ -1948,13 +1881,21 @@ CREATE TABLE `stock_issues` (
   `warehouse_id` char(36) NOT NULL,
   `department` varchar(100) DEFAULT NULL,
   `requested_by` varchar(36) NOT NULL,
-  `status` enum('PENDING','APPROVED','REJECTED') DEFAULT 'PENDING',
+  `status` enum('PENDING','APPROVED','COMPLETED','REJECTED') DEFAULT 'PENDING',
   `approved_by` varchar(36) DEFAULT NULL,
   `approved_date` datetime DEFAULT NULL,
   `notes` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `stock_issues`
+--
+
+INSERT INTO `stock_issues` (`id`, `issue_number`, `issue_date`, `warehouse_id`, `department`, `requested_by`, `status`, `approved_by`, `approved_date`, `notes`, `created_at`, `updated_at`) VALUES
+(1, 'SI2025-00001', '2025-12-23', '357a36ed-e01c-11f0-93ac-74d435ebdbb2', 'dsad', 'ware-001', 'COMPLETED', 'gm-001', '2025-12-24 02:34:23', '', '2025-12-23 18:16:04', '2025-12-23 18:41:09'),
+(2, 'SI2025-00002', '2025-12-23', '357a37a8-e01c-11f0-93ac-74d435ebdbb2', 'dsad', 'ware-001', 'COMPLETED', 'gm-001', '2025-12-24 02:34:22', 'dsad', '2025-12-23 18:23:52', '2025-12-23 18:41:12');
 
 -- --------------------------------------------------------
 
@@ -1970,6 +1911,14 @@ CREATE TABLE `stock_issue_items` (
   `purpose` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `stock_issue_items`
+--
+
+INSERT INTO `stock_issue_items` (`id`, `issue_id`, `item_id`, `quantity`, `purpose`, `created_at`) VALUES
+(1, 1, '357b14c5-e01c-11f0-93ac-74d435ebdbb2', 50.000, 'gdf', '2025-12-23 18:16:04'),
+(2, 2, '357b5381-e01c-11f0-93ac-74d435ebdbb2', 20.000, 'dsa', '2025-12-23 18:23:52');
 
 -- --------------------------------------------------------
 
@@ -2000,9 +1949,8 @@ CREATE TABLE `suppliers` (
 --
 
 INSERT INTO `suppliers` (`id`, `code`, `name`, `contact_person`, `email`, `phone`, `address`, `city`, `country`, `payment_terms`, `credit_limit`, `is_active`, `notes`, `created_at`, `updated_at`) VALUES
-('2146da91-df0e-11f0-9861-74d435ebdbb2', '002', 'MISUBIBI', 'dsada', 'dsad@gmail.com', '09123456789', 'Blk 5 lot 5', 'Imus', 'Philippines', NULL, 5.00, 1, NULL, '2025-12-22 16:13:42', '2025-12-22 16:13:42'),
-('639feda2-df0e-11f0-9861-74d435ebdbb2', '003', 'HONDA', 'HONDA', 'HONDA@GMAIL.COM', '0912312321', 'Blk 5 lot 10', 'QC', 'PH', NULL, 0.00, 1, NULL, '2025-12-22 16:15:33', '2025-12-22 16:15:33'),
-('df6d81ef-df00-11f0-9861-74d435ebdbb2', '001', 'TOYOTO', 'EWAN', 'EWAN@GMAIL.COM', '0912312322', 'Blk 5 lot 10', 'CAVITE', 'PH', 'ewan', 3.99, 1, NULL, '2025-12-22 14:38:48', '2025-12-22 14:38:48');
+('357c7771-e01c-11f0-93ac-74d435ebdbb2', 'SUP-001', 'ABC Steel Corporation', 'John Supplier', 'sales@abcsteel.com', '555-1001', '123 Industrial Ave', NULL, NULL, NULL, 0.00, 1, NULL, '2025-12-24 00:27:00', '2025-12-24 00:27:00'),
+('357c9d3f-e01c-11f0-93ac-74d435ebdbb2', 'SUP-002', 'XYZ Aluminum Ltd', 'Jane Vendor', 'orders@xyzaluminum.com', '555-1002', '456 Metal Road', NULL, NULL, NULL, 0.00, 1, NULL, '2025-12-24 00:27:00', '2025-12-24 00:27:00');
 
 -- --------------------------------------------------------
 
@@ -2083,7 +2031,9 @@ CREATE TABLE `units_of_measure` (
 --
 
 INSERT INTO `units_of_measure` (`id`, `code`, `name`, `description`, `is_active`, `created_at`, `updated_at`) VALUES
-('78b25893-df17-11f0-9861-74d435ebdbb2', 'PCS', 'Pieces', 'Default unit of measure', 1, '2025-12-22 17:20:34', '2025-12-22 17:20:34');
+('35793ed4-e01c-11f0-93ac-74d435ebdbb2', 'PC', 'Piece', NULL, 1, '2025-12-24 00:27:00', '2025-12-24 00:27:00'),
+('35796271-e01c-11f0-93ac-74d435ebdbb2', 'KG', 'Kilogram', NULL, 1, '2025-12-24 00:27:00', '2025-12-24 00:27:00'),
+('357962f7-e01c-11f0-93ac-74d435ebdbb2', 'L', 'Liter', NULL, 1, '2025-12-24 00:27:00', '2025-12-24 00:27:00');
 
 -- --------------------------------------------------------
 
@@ -2112,19 +2062,22 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `email`, `username`, `password`, `first_name`, `last_name`, `role`, `department`, `is_active`, `last_login`, `created_at`, `updated_at`, `employee_id`) VALUES
-('16c73a64-e000-11f0-93ac-74d435ebdbb2', 'gnehm@gmail.com', 'rane.gnehm', '$2a$10$PtqfmNDT94eIioo6k6V6GenZ5nq3w5chLIZBwrbA9ojcY1j52zfN.', 'Gnehm Ryien', 'Rane', 'WAREHOUSE_STAFF', 'a52dfc7b-dd9f-11f0-83eb-74d435ebdbb2', 1, '2025-12-23 21:06:28', '2025-12-23 21:05:43', '2025-12-23 21:06:28', '6f12b49a-dff8-11f0-93ac-74d435ebdbb2'),
-('2025d81d-df0d-11f0-9861-74d435ebdbb2', 'dhead@gmail.com', 'dhead.dhead', '$2a$10$7EZ/oKvMv/ycBTvN7alZJ.LBq/v7EphENIxm6Y.ifu4owWPY3eDlS', 'dhead', 'dhead', 'DEPARTMENT_HEAD', 'a52e067c-dd9f-11f0-83eb-74d435ebdbb2', 1, '2025-12-23 21:12:05', '2025-12-22 16:06:30', '2025-12-23 21:12:05', '19627bd6-df0d-11f0-9861-74d435ebdbb2'),
-('42e84e62-df0b-11f0-9861-74d435ebdbb2', 'admin@gmail.com', 'admin', '$2a$10$LEw5Ec8D.f5gl6YUiHuau./C.laOXWqdHVvxfG//zOLNg0p5v1niW', 'admin', 'admin', 'SYSTEM_ADMIN', NULL, 1, '2025-12-23 21:51:43', '2025-12-22 15:53:10', '2025-12-23 21:51:43', NULL),
-('771b4f6c-e000-11f0-93ac-74d435ebdbb2', 'ehdrian@gmail.com', 'bungubung.ehdrian', '$2a$10$h/N/TgSjmgxu/ZxawAAdNeTXKWNRkBMdro4lvJDhh.nlVjwlU70uS', 'Ehdrian', 'Bungubung', 'EMPLOYEE', 'a52e0639-dd9f-11f0-83eb-74d435ebdbb2', 1, '2025-12-23 21:08:30', '2025-12-23 21:08:25', '2025-12-23 21:08:30', '21e774d3-dff8-11f0-93ac-74d435ebdbb2'),
-('8c146c1a-e006-11f0-93ac-74d435ebdbb2', 'maintenance@gmail.com', 'maintenance.maintenance', '$2a$10$viqKs99f.TtPOV9p7B0Buu0a8PDoDdC2TQbVKkfqZ36l8vwe7gwri', 'maintenance', 'maintenance', 'MAINTENANCE_TECHNICIAN', 'a52e0561-dd9f-11f0-83eb-74d435ebdbb2', 1, '2025-12-23 23:53:51', '2025-12-23 21:51:57', '2025-12-23 23:53:51', '45fe7f2a-e006-11f0-93ac-74d435ebdbb2'),
-('944ddfc2-e006-11f0-93ac-74d435ebdbb2', 'prooperator@gmail.com', 'operator.production', '$2a$10$ZfDSTxdhL7TGNxA1feYWSOGbDFszu0fcbHUhEJz2M1.6swoqUBgI2', 'production', 'operator', 'PRODUCTION_OPERATOR', 'a52dce54-dd9f-11f0-83eb-74d435ebdbb2', 1, '2025-12-23 23:52:32', '2025-12-23 21:52:11', '2025-12-23 23:52:32', '592c494d-e006-11f0-93ac-74d435ebdbb2'),
-('9b489fe0-df0b-11f0-9861-74d435ebdbb2', 'hr@gmail.com', 'hruser', '$2a$10$DGjQhfoCoaiH90wU0HF8GOHKB0IxTaCAKR330MXMS.iXXpkX1wSpG', 'hr', 'hr', 'HR_STAFF', 'a52dfc7b-dd9f-11f0-83eb-74d435ebdbb2', 1, '2025-12-23 22:50:29', '2025-12-22 15:55:38', '2025-12-23 22:50:29', '8d5a2edd-df0b-11f0-9861-74d435ebdbb2'),
-('9f16e311-e006-11f0-93ac-74d435ebdbb2', 'quality@gmail.com', 'operator.quality', '$2a$10$CnnCcSOKr8JEGHP/oe9rAOHRDBDG7LgWBGN4cDkm730kGnzUEleNK', 'quality', 'operator', 'QC_INSPECTOR', 'a52dfa93-dd9f-11f0-83eb-74d435ebdbb2', 1, '2025-12-23 23:50:31', '2025-12-23 21:52:29', '2025-12-23 23:50:31', '67b9f9bc-e006-11f0-93ac-74d435ebdbb2'),
-('a5033208-e006-11f0-93ac-74d435ebdbb2', 'import@gmail.com', 'export.import', '$2a$10$RNjQROVWd/opBs7SSBMlReRoVsZJcUNMt/qDOx4CrWPNKGuOOpCpK', 'import', 'export', 'IMPEX_OFFICER', 'a52e067c-dd9f-11f0-83eb-74d435ebdbb2', 1, '2025-12-23 23:52:19', '2025-12-23 21:52:39', '2025-12-23 23:52:19', '7a68e49a-e006-11f0-93ac-74d435ebdbb2'),
-('a7668bec-df0c-11f0-9861-74d435ebdbb2', 'purchasing@gmail.com', 'purchasing.purchasing', '$2a$10$aiekMn4tnH1/JpU7nmMjT.rVAAPa7K425ye3CQPeVerAeD3ts51k6', 'purchasing', 'purchasing', 'PURCHASING_STAFF', 'a52dfbfc-dd9f-11f0-83eb-74d435ebdbb2', 1, '2025-12-23 16:33:58', '2025-12-22 16:03:08', '2025-12-23 16:33:58', 'a0345c28-df0c-11f0-9861-74d435ebdbb2'),
-('d82c689c-df0c-11f0-9861-74d435ebdbb2', 'president@gmail.com', 'president.president', '$2a$10$a.Cxwmy7btTYqRfWN8reYOAqVdOOzNOpLkGzCmc7StHLpsNxxrxAu', 'president', 'president', 'PRESIDENT', 'a52e067c-dd9f-11f0-83eb-74d435ebdbb2', 1, '2025-12-23 20:15:18', '2025-12-22 16:04:30', '2025-12-23 20:15:18', 'd1be27c6-df0c-11f0-9861-74d435ebdbb2'),
-('dd92f398-df1f-11f0-9861-74d435ebdbb2', 'proplanner@gmail.com', 'proplanner.proplanner', '$2a$10$8s1CO0kX3NkkDsi24x9z4.yWM5nsMjLC046dcz4yL2k6OBXfYcCVm', 'proplanner', 'proplanner', 'PRODUCTION_PLANNER', 'a52dce54-dd9f-11f0-83eb-74d435ebdbb2', 1, '2025-12-23 23:52:39', '2025-12-22 18:20:39', '2025-12-23 23:52:39', 'd17e08e1-df1f-11f0-9861-74d435ebdbb2'),
-('f4de36c7-df0c-11f0-9861-74d435ebdbb2', 'gmanager@gmail.com', 'gmanager.gmanager', '$2a$10$aio0mV0CdaBPzPGDI1mg4.hDcHpibxZ65yKw975Am0b2y2l/8vMo2', 'gmanager', 'gmanager', 'GENERAL_MANAGER', 'a52e067c-dd9f-11f0-83eb-74d435ebdbb2', 1, '2025-12-23 23:53:09', '2025-12-22 16:05:18', '2025-12-23 23:53:09', 'ed53515a-df0c-11f0-9861-74d435ebdbb2');
+('acct-001', 'accounting@erp.com', 'accounting', '$2a$10$LEw5Ec8D.f5gl6YUiHuau./C.laOXWqdHVvxfG//zOLNg0p5v1niW', 'Thomas', 'Young', 'ACCOUNTING_STAFF', NULL, 1, NULL, '2025-12-24 00:27:00', '2025-12-24 00:31:23', NULL),
+('admin-001', 'admin@erp.com', 'admin', '$2a$10$LEw5Ec8D.f5gl6YUiHuau./C.laOXWqdHVvxfG//zOLNg0p5v1niW', 'System', 'Administrator', 'SYSTEM_ADMIN', NULL, 1, '2025-12-24 03:00:39', '2025-12-24 00:27:00', '2025-12-24 03:00:39', NULL),
+('dh-001', 'depthead@erp.com', 'depthead', '$2a$10$LEw5Ec8D.f5gl6YUiHuau./C.laOXWqdHVvxfG//zOLNg0p5v1niW', 'Emily', 'Davis', 'DEPARTMENT_HEAD', NULL, 1, '2025-12-24 01:08:51', '2025-12-24 00:27:00', '2025-12-24 01:08:51', NULL),
+('emp-001', 'employee@erp.com', 'employee', '$2a$10$LEw5Ec8D.f5gl6YUiHuau./C.laOXWqdHVvxfG//zOLNg0p5v1niW', 'Jessica', 'King', 'EMPLOYEE', NULL, 1, NULL, '2025-12-24 00:27:00', '2025-12-24 00:31:23', NULL),
+('gm-001', 'gm@erp.com', 'gm', '$2a$10$LEw5Ec8D.f5gl6YUiHuau./C.laOXWqdHVvxfG//zOLNg0p5v1niW', 'Michael', 'Brown', 'GENERAL_MANAGER', NULL, 1, '2025-12-24 16:42:35', '2025-12-24 00:27:00', '2025-12-24 16:42:35', NULL),
+('hr-001', 'hr@erp.com', 'hr', '$2a$10$LEw5Ec8D.f5gl6YUiHuau./C.laOXWqdHVvxfG//zOLNg0p5v1niW', 'Mary', 'Allen', 'HR_STAFF', NULL, 1, '2025-12-24 01:45:41', '2025-12-24 00:27:00', '2025-12-24 01:45:41', NULL),
+('impex-001', 'impex@erp.com', 'impex', '$2a$10$LEw5Ec8D.f5gl6YUiHuau./C.laOXWqdHVvxfG//zOLNg0p5v1niW', 'Patricia', 'Hall', 'IMPEX_OFFICER', NULL, 1, NULL, '2025-12-24 00:27:00', '2025-12-24 00:31:23', NULL),
+('maint-001', 'maintenance@erp.com', 'maintenance', '$2a$10$LEw5Ec8D.f5gl6YUiHuau./C.laOXWqdHVvxfG//zOLNg0p5v1niW', 'Richard', 'Walker', 'MAINTENANCE_TECHNICIAN', NULL, 1, NULL, '2025-12-24 00:27:00', '2025-12-24 00:31:23', NULL),
+('oper-001', 'operator@erp.com', 'operator', '$2a$10$LEw5Ec8D.f5gl6YUiHuau./C.laOXWqdHVvxfG//zOLNg0p5v1niW', 'William', 'Lopez', 'PRODUCTION_OPERATOR', NULL, 1, '2025-12-24 16:43:30', '2025-12-24 00:27:00', '2025-12-24 16:43:30', NULL),
+('plan-001', 'planner@erp.com', 'planner', '$2a$10$LEw5Ec8D.f5gl6YUiHuau./C.laOXWqdHVvxfG//zOLNg0p5v1niW', 'Robert', 'Garcia', 'PRODUCTION_PLANNER', NULL, 1, '2025-12-24 16:41:06', '2025-12-24 00:27:00', '2025-12-24 16:41:06', NULL),
+('pres-001', 'president@erp.com', 'president', '$2a$10$LEw5Ec8D.f5gl6YUiHuau./C.laOXWqdHVvxfG//zOLNg0p5v1niW', 'John', 'Smith', 'PRESIDENT', NULL, 1, NULL, '2025-12-24 00:27:00', '2025-12-24 00:31:23', NULL),
+('purch-001', 'purchasing@erp.com', 'purchasing', '$2a$10$LEw5Ec8D.f5gl6YUiHuau./C.laOXWqdHVvxfG//zOLNg0p5v1niW', 'David', 'Wilson', 'PURCHASING_STAFF', NULL, 1, '2025-12-24 02:12:32', '2025-12-24 00:27:00', '2025-12-24 02:12:32', NULL),
+('qc-001', 'qc@erp.com', 'qcinspector', '$2a$10$LEw5Ec8D.f5gl6YUiHuau./C.laOXWqdHVvxfG//zOLNg0p5v1niW', 'Jennifer', 'Lee', 'QC_INSPECTOR', NULL, 1, NULL, '2025-12-24 00:27:00', '2025-12-24 00:31:23', NULL),
+('super-001', 'supervisor@erp.com', 'supervisor', '$2a$10$LEw5Ec8D.f5gl6YUiHuau./C.laOXWqdHVvxfG//zOLNg0p5v1niW', 'Linda', 'Rodriguez', 'PRODUCTION_SUPERVISOR', NULL, 1, '2025-12-24 16:42:55', '2025-12-24 00:27:00', '2025-12-24 16:42:55', NULL),
+('vp-001', 'vp@erp.com', 'vicepresident', '$2a$10$LEw5Ec8D.f5gl6YUiHuau./C.laOXWqdHVvxfG//zOLNg0p5v1niW', 'Sarah', 'Johnson', 'VICE_PRESIDENT', NULL, 1, NULL, '2025-12-24 00:27:00', '2025-12-24 00:31:23', NULL),
+('ware-001', 'warehouse@erp.com', 'warehouse', '$2a$10$LEw5Ec8D.f5gl6YUiHuau./C.laOXWqdHVvxfG//zOLNg0p5v1niW', 'James', 'Martinez', 'WAREHOUSE_STAFF', NULL, 1, '2025-12-24 02:30:43', '2025-12-24 00:27:00', '2025-12-24 02:30:43', NULL);
 
 -- --------------------------------------------------------
 
@@ -2149,10 +2102,9 @@ CREATE TABLE `warehouses` (
 --
 
 INSERT INTO `warehouses` (`id`, `code`, `name`, `location`, `address`, `manager_id`, `is_active`, `created_at`, `updated_at`) VALUES
-('74c7181a-defa-11f0-9861-74d435ebdbb2', 'WH-MAIN', 'Main Warehouse', 'Building A', 'Main facility warehouse for general storage', NULL, 1, '2025-12-22 13:52:52', '2025-12-22 13:52:52'),
-('74c740bc-defa-11f0-9861-74d435ebdbb2', 'WH-RAW', 'Raw Materials Warehouse', 'Building B', 'Storage for raw materials and components', NULL, 1, '2025-12-22 13:52:52', '2025-12-22 13:52:52'),
-('74c741c5-defa-11f0-9861-74d435ebdbb2', 'WH-FG', 'Finished Goods Warehouse', 'Building C', 'Storage for finished products ready for shipment', NULL, 1, '2025-12-22 13:52:52', '2025-12-22 13:52:52'),
-('74c7422c-defa-11f0-9861-74d435ebdbb2', 'WH-PROD', 'Production Warehouse', 'Production Floor', 'In-process inventory storage', NULL, 1, '2025-12-22 13:52:52', '2025-12-22 13:52:52');
+('357a111a-e01c-11f0-93ac-74d435ebdbb2', 'WH-MAIN', 'Main Warehouse', 'Building A', NULL, NULL, 1, '2025-12-24 00:27:00', '2025-12-24 00:27:00'),
+('357a36ed-e01c-11f0-93ac-74d435ebdbb2', 'WH-RM', 'Raw Materials Warehouse', 'Building B', NULL, NULL, 1, '2025-12-24 00:27:00', '2025-12-24 00:27:00'),
+('357a37a8-e01c-11f0-93ac-74d435ebdbb2', 'WH-FG', 'Finished Goods Warehouse', 'Building C', NULL, NULL, 1, '2025-12-24 00:27:00', '2025-12-24 00:27:00');
 
 -- --------------------------------------------------------
 
@@ -2205,6 +2157,13 @@ CREATE TABLE `work_orders` (
   `mrp_requirement_id` int(11) DEFAULT NULL,
   `work_center_id` varchar(36) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `work_orders`
+--
+
+INSERT INTO `work_orders` (`id`, `wo_number`, `wo_date`, `item_id`, `bom_id`, `planned_quantity`, `produced_quantity`, `rejected_quantity`, `scheduled_start_date`, `scheduled_end_date`, `actual_start_date`, `actual_end_date`, `status`, `priority`, `warehouse_id`, `approved_by`, `approved_date`, `notes`, `created_by`, `created_at`, `updated_at`, `mrp_requirement_id`, `work_center_id`) VALUES
+('262b97c2-e0a4-11f0-80db-74d435ebdbb2', 'WO-0001', '2025-12-24', '357b5381-e01c-11f0-93ac-74d435ebdbb2', NULL, 100.000, 0.000, 0.000, '2025-12-27 00:00:00', '2025-12-30 00:00:00', '2025-12-24 16:43:15', NULL, 'RELEASED', 'NORMAL', '357a37a8-e01c-11f0-93ac-74d435ebdbb2', 'gm-001', '2025-12-24 16:42:44', NULL, 'plan-001', '2025-12-24 16:40:06', '2025-12-24 16:43:15', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -2298,6 +2257,16 @@ ALTER TABLE `bill_of_materials`
   ADD UNIQUE KEY `bom_number` (`bom_number`),
   ADD KEY `idx_bom_number` (`bom_number`),
   ADD KEY `idx_item_id` (`item_id`);
+
+--
+-- Indexes for table `bom`
+--
+ALTER TABLE `bom`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `bom_number` (`bom_number`),
+  ADD KEY `idx_item` (`item_id`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_created_by` (`created_by`);
 
 --
 -- Indexes for table `bom_headers`
@@ -3022,7 +2991,7 @@ ALTER TABLE `work_order_materials`
 -- AUTO_INCREMENT for table `audit_logs`
 --
 ALTER TABLE `audit_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=186;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=97;
 
 --
 -- AUTO_INCREMENT for table `bom_lines`
@@ -3052,7 +3021,7 @@ ALTER TABLE `mrp_requirements`
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `payment_allocations`
@@ -3076,13 +3045,13 @@ ALTER TABLE `sales_invoice_items`
 -- AUTO_INCREMENT for table `stock_issues`
 --
 ALTER TABLE `stock_issues`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `stock_issue_items`
 --
 ALTER TABLE `stock_issue_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables
@@ -3118,7 +3087,6 @@ ALTER TABLE `bill_of_materials`
 -- Constraints for table `bom_items`
 --
 ALTER TABLE `bom_items`
-  ADD CONSTRAINT `bom_items_ibfk_1` FOREIGN KEY (`bom_id`) REFERENCES `bill_of_materials` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `bom_items_ibfk_2` FOREIGN KEY (`component_item_id`) REFERENCES `items` (`id`);
 
 --
