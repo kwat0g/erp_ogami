@@ -378,7 +378,7 @@ function UsersPage() {
                   <Label htmlFor="isActive">Active</Label>
                 </div>
                 <div className="flex gap-2">
-                  <Button type="submit" disabled={editingUser && !hasChanges()}>
+                  <Button type="submit" disabled={editingUser ? !hasChanges() : false}>
                     {editingUser ? 'Update' : 'Create'} User
                   </Button>
                   <Button type="button" variant="outline" onClick={resetForm}>

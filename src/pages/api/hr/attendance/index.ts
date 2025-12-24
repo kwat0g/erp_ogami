@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { query, execute } from '@/lib/db';
 import { findSessionByToken } from '@/lib/auth';
 import { createAuditLog } from '@/lib/audit';
+import { hasWritePermission } from '@/lib/permissions';
 import { assertEnum, assertNumber, isValidISODate, sanitizeOptionalText, sanitizeText } from '@/utils/validation';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -68,6 +69,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === 'POST') {
+    // Check write permission - SYSTEM_ADMIN is read-only
+    if (!hasWritePermission(session.role as any, 'hr_attendance')) {
+      return res.status(403).json({ 
+        message: 'Access Denied: SYSTEM_ADMIN has read-only access. Only HR_STAFF can log attendance.' 
+      });
+    }
+
     try {
       const { 
         employeeId, 

@@ -3,6 +3,7 @@ import { query, execute } from '@/lib/db';
 import { findSessionByToken } from '@/lib/auth';
 import { createAuditLog } from '@/lib/audit';
 import { sanitizeText } from '@/utils/validation';
+import { createNotification } from '@/lib/notification-helper';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const token = req.headers.authorization?.replace('Bearer ', '');
@@ -62,6 +63,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         newValues: { approvalStage: 'GENERAL_MANAGER' },
       });
 
+      // Notify General Manager
+      const gms = await query(
+        `SELECT id FROM users WHERE role = 'GENERAL_MANAGER' AND is_active = 1`
+      );
+
+      const [leaveDetails] = await query(
+        `SELECT lr.start_date, lr.end_date, lr.days_requested,
+                CONCAT(e.first_name, ' ', e.last_name) as employeeName,
+                lt.leave_name as leaveType
+         FROM leave_requests lr
+         JOIN employees e ON lr.employee_id = e.id
+         JOIN leave_types lt ON lr.leave_type_id = lt.id
+         WHERE lr.id = ?`,
+        [idStr]
+      );
+
+      for (const gm of gms as any[]) {
+        await createNotification({
+          userId: gm.id,
+          title: 'Leave Request Final Approval',
+          message: `${leaveDetails.employeeName} - ${leaveDetails.leaveType} from ${new Date(leaveDetails.start_date).toLocaleDateString()} to ${new Date(leaveDetails.end_date).toLocaleDateString()} requires final approval`,
+          type: 'ACTION_REQUIRED',
+          category: 'HR',
+          referenceType: 'LEAVE_REQUEST',
+          referenceId: idStr,
+        });
+      }
+
       return res.status(200).json({ message: 'Approved by Department Head. Pending General Manager approval.' });
     }
 
@@ -88,6 +117,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         recordId: idStr,
         newValues: { status: 'APPROVED' },
       });
+
+      // Notify employee that leave is approved
+      const [employeeDetails] = await query(
+        `SELECT lr.employee_id, lr.start_date, lr.end_date,
+                CONCAT(e.first_name, ' ', e.last_name) as employeeName,
+                lt.leave_name as leaveType,
+                u.id as userId
+         FROM leave_requests lr
+         JOIN employees e ON lr.employee_id = e.id
+         JOIN leave_types lt ON lr.leave_type_id = lt.id
+         JOIN users u ON u.email = e.email
+         WHERE lr.id = ?`,
+        [idStr]
+      );
+
+      if (employeeDetails && employeeDetails.userId) {
+        await createNotification({
+          userId: employeeDetails.userId,
+          title: 'Leave Request Approved',
+          message: `Your ${employeeDetails.leaveType} from ${new Date(employeeDetails.start_date).toLocaleDateString()} to ${new Date(employeeDetails.end_date).toLocaleDateString()} has been approved`,
+          type: 'SUCCESS',
+          category: 'HR',
+          referenceType: 'LEAVE_REQUEST',
+          referenceId: idStr,
+        });
+      }
 
       return res.status(200).json({ message: 'Approved by General Manager.' });
     }

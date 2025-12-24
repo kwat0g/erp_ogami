@@ -1,7 +1,8 @@
 import { useRouter } from 'next/router';
 import { Button } from '@/components/ui/button';
-import { Bell, User, LogOut } from 'lucide-react';
+import { User, LogOut } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 export function Header() {
   const router = useRouter();
@@ -48,9 +49,7 @@ export function Header() {
         </h2>
       </div>
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon">
-          <Bell className="h-5 w-5" />
-        </Button>
+        <NotificationBell />
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
             <User className="h-4 w-4" />

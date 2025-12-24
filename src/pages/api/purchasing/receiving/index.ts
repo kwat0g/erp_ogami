@@ -1,16 +1,21 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { query } from '@/lib/db';
-import { verifyToken } from '@/lib/auth';
+import { findSessionByToken } from '@/lib/auth';
 import { updateStockWithAutoStatus } from '@/lib/inventory-utils';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const decoded = verifyToken(req);
-    if (!decoded) {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    if (!token) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const userRole = decoded.role;
+    const session = await findSessionByToken(token);
+    if (!session) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const userRole = session.role;
     const allowedRoles = ['PURCHASING_STAFF', 'WAREHOUSE_STAFF', 'GENERAL_MANAGER'];
     
     if (!allowedRoles.includes(userRole)) {
@@ -115,7 +120,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           gr_number, gr_date, po_id, warehouse_id, 
           supplier_delivery_note, received_by, status, notes
         ) VALUES (?, ?, ?, ?, ?, ?, 'DRAFT', ?)`,
-        [grNumber, grDate, poId, warehouseId, supplierDeliveryNote, decoded.userId, notes]
+        [grNumber, grDate, poId, warehouseId, supplierDeliveryNote, session.userId, notes]
       );
 
       const grId = grResult.insertId;

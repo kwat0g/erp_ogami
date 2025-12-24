@@ -27,8 +27,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           CONCAT(u.first_name, ' ', u.last_name) as requestedByName,
           si.status, si.notes, si.created_at as createdAt
         FROM stock_issues si
-        JOIN warehouses w ON si.warehouse_id = w.id
-        JOIN users u ON si.requested_by = u.id
+        JOIN warehouses w ON si.warehouse_id COLLATE utf8mb4_unicode_ci = w.id COLLATE utf8mb4_unicode_ci
+        JOIN users u ON si.requested_by COLLATE utf8mb4_unicode_ci = u.id COLLATE utf8mb4_unicode_ci
         ORDER BY si.issue_date DESC, si.issue_number DESC
       `;
 

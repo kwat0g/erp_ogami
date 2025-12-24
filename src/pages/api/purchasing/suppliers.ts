@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { query, execute } from '@/lib/db';
 import { findSessionByToken } from '@/lib/auth';
 import { createAuditLog } from '@/lib/audit';
+import { hasWritePermission } from '@/lib/permissions';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const token = req.headers.authorization?.replace('Bearer ', '');
@@ -40,6 +41,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === 'POST') {
     if (!canManageSuppliers) {
       return res.status(403).json({ message: 'Access denied' });
+    }
+
+    // Check write permission - SYSTEM_ADMIN is read-only
+    if (!hasWritePermission(session.role as any, 'purchasing_suppliers')) {
+      return res.status(403).json({ 
+        message: 'Access Denied: SYSTEM_ADMIN has read-only access. Only PURCHASING_STAFF can create suppliers.' 
+      });
     }
 
     try {

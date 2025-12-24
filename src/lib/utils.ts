@@ -290,7 +290,7 @@ export function formatDecimalInput(value: string, decimals: number = 2): string 
   }
   
   // Limit decimal places
-  if (parts.length === 2 && parts[1].length > decimals) {
+  if (parts.length === 2 && parts[1] && parts[1].length > decimals) {
     formatted = parts[0] + '.' + parts[1].substring(0, decimals);
   }
   

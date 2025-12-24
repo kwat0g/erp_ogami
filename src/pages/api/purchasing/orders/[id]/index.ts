@@ -61,8 +61,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === 'PUT') {
-    if (!hasWritePermission(session.role as any, 'purchase_orders')) {
-      return res.status(403).json({ message: 'Access denied' });
+    const canEdit = ['PURCHASING_STAFF', 'DEPARTMENT_HEAD', 'GENERAL_MANAGER', 'VICE_PRESIDENT', 'PRESIDENT'].includes(session.role);
+    if (!canEdit) {
+      return res.status(403).json({ message: 'Access denied: Only purchasing staff and managers can edit POs' });
     }
 
     try {
@@ -158,8 +159,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === 'DELETE') {
-    if (!hasWritePermission(session.role as any, 'purchase_orders')) {
-      return res.status(403).json({ message: 'Access denied' });
+    const canDelete = ['PURCHASING_STAFF', 'DEPARTMENT_HEAD', 'GENERAL_MANAGER', 'VICE_PRESIDENT', 'PRESIDENT'].includes(session.role);
+    if (!canDelete) {
+      return res.status(403).json({ message: 'Access denied: Only purchasing staff and managers can delete POs' });
     }
 
     try {

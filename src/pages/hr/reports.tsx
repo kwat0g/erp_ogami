@@ -105,11 +105,14 @@ function HRReportsPage() {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const params = new URLSearchParams({
-        startDate: attFilters.startDate,
-        endDate: attFilters.endDate,
-        ...(attFilters.departmentId && { departmentId: attFilters.departmentId }),
-      });
+      const paramsObj: Record<string, string> = {
+        startDate: attFilters.startDate ?? '',
+        endDate: attFilters.endDate ?? '',
+      };
+      if (attFilters.departmentId) {
+        paramsObj.departmentId = attFilters.departmentId;
+      }
+      const params = new URLSearchParams(paramsObj);
       const response = await fetch(`/api/hr/reports/attendance-summary?${params}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -264,7 +267,7 @@ function HRReportsPage() {
                   </Table>
                 ) : (
                   <div className="py-8 text-center text-muted-foreground">
-                    Click "Generate Report" to view attendance summary
+                    Click &quot;Generate Report&quot; to view attendance summary
                   </div>
                 )}
               </CardContent>
@@ -343,7 +346,7 @@ function HRReportsPage() {
                   </Table>
                 ) : (
                   <div className="py-8 text-center text-muted-foreground">
-                    Click "Generate Report" to view leave balances
+                    Click &quot;Generate Report&quot; to view leave balances
                   </div>
                 )}
               </CardContent>
@@ -430,7 +433,7 @@ function HRReportsPage() {
                   </div>
                 ) : (
                   <div className="py-8 text-center text-muted-foreground">
-                    Click "Generate Report" to view headcount
+                    Click &quot;Generate Report&quot; to view headcount
                   </div>
                 )}
               </CardContent>

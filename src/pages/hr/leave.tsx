@@ -177,9 +177,9 @@ function LeaveManagementPage() {
     }
   };
 
-  const canHRReview = () => ['HR_STAFF', 'SYSTEM_ADMIN'].includes(userRole);
-  const canApproveDept = () => ['DEPARTMENT_HEAD', 'SYSTEM_ADMIN'].includes(userRole);
-  const canApproveGM = () => ['GENERAL_MANAGER', 'SYSTEM_ADMIN'].includes(userRole);
+  const canHRReview = () => ['HR_STAFF'].includes(userRole);
+  const canApproveDept = () => ['DEPARTMENT_HEAD'].includes(userRole);
+  const canApproveGM = () => ['GENERAL_MANAGER'].includes(userRole);
 
   const getStatusBadge = (r: LeaveRequest) => {
     if (r.status === 'APPROVED') return <Badge variant="success">APPROVED</Badge>;
@@ -562,18 +562,18 @@ function LeaveManagementPage() {
                               <TableCell>
                                 {canHRAction ? (
                                   <div className="flex gap-2">
-                                    <Button size="sm" variant="outline" onClick={() => hrEndorse(r.id)}>
+                                    <Button size="sm" variant="outline" onClick={() => handleHREndorse(r.id)}>
                                       <CheckCircle className="mr-2 h-4 w-4" />
                                       Endorse
                                     </Button>
-                                    <Button size="sm" variant="ghost" className="text-destructive" onClick={() => hrReject(r.id)}>
+                                    <Button size="sm" variant="ghost" className="text-destructive" onClick={() => handleHRReject(r.id)}>
                                       <XCircle className="mr-2 h-4 w-4" />
                                       Reject
                                     </Button>
                                   </div>
                                 ) : canApprove ? (
                                   <div className="flex gap-2">
-                                    <Button size="sm" variant="outline" onClick={() => approve(r.id)}>
+                                    <Button size="sm" variant="outline" onClick={() => handleGMApprove(r.id)}>
                                       <CheckCircle className="mr-2 h-4 w-4" />
                                       Approve
                                     </Button>
@@ -581,7 +581,7 @@ function LeaveManagementPage() {
                                       size="sm"
                                       variant="ghost"
                                       className="text-destructive"
-                                      onClick={() => reject(r.id)}
+                                      onClick={() => handleGMReject(r.id)}
                                     >
                                       <XCircle className="mr-2 h-4 w-4" />
                                       Reject
@@ -685,4 +685,4 @@ function LeaveManagementPage() {
   );
 }
 
-export default withAuth(LeaveManagementPage, { allowedRoles: ['HR_STAFF', 'DEPARTMENT_HEAD', 'GENERAL_MANAGER'] });
+export default withAuth(LeaveManagementPage, { allowedRoles: ['SYSTEM_ADMIN', 'HR_STAFF', 'DEPARTMENT_HEAD', 'GENERAL_MANAGER'] });

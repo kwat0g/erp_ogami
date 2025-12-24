@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Search, Plus, Edit2, Trash2 } from 'lucide-react';
 import { useToast } from '@/components/ui/toast';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 
 interface Supplier {
   id: string;
@@ -36,6 +37,8 @@ function SuppliersPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [cityFilter, setCityFilter] = useState('');
   const [originalData, setOriginalData] = useState<any>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingSupplierId, setDeletingSupplierId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     code: '',
     name: '',
@@ -127,11 +130,16 @@ function SuppliersPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this supplier?')) return;
+    setDeletingSupplierId(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deletingSupplierId) return;
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/purchasing/suppliers/${id}`, {
+      const response = await fetch(`/api/purchasing/suppliers/${deletingSupplierId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -139,6 +147,8 @@ function SuppliersPage() {
       if (response.ok) {
         showToast('success', 'Supplier deleted successfully');
         fetchSuppliers();
+        setShowDeleteConfirm(false);
+        setDeletingSupplierId(null);
       } else {
         const data = await response.json();
         showToast('error', data.message || 'Error deleting supplier');
@@ -225,53 +235,59 @@ function SuppliersPage() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="contactPerson">Contact Person</Label>
+                    <Label htmlFor="contactPerson">Contact Person *</Label>
                     <Input
                       id="contactPerson"
                       value={formData.contactPerson}
                       onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
+                      required
                     />
                   </div>
                   <div>
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">Email *</Label>
                     <Input
                       id="email"
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      required
                     />
                   </div>
                   <div>
-                    <Label htmlFor="phone">Phone</Label>
+                    <Label htmlFor="phone">Phone *</Label>
                     <Input
                       id="phone"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      required
                     />
                   </div>
                   <div>
-                    <Label htmlFor="city">City</Label>
+                    <Label htmlFor="city">City *</Label>
                     <Input
                       id="city"
                       value={formData.city}
                       onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      required
                     />
                   </div>
                   <div>
-                    <Label htmlFor="country">Country</Label>
+                    <Label htmlFor="country">Country *</Label>
                     <Input
                       id="country"
                       value={formData.country}
                       onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                      required
                     />
                   </div>
                   <div>
-                    <Label htmlFor="paymentTerms">Payment Terms</Label>
+                    <Label htmlFor="paymentTerms">Payment Terms *</Label>
                     <Input
                       id="paymentTerms"
                       placeholder="e.g., Net 30"
                       value={formData.paymentTerms}
                       onChange={(e) => setFormData({ ...formData, paymentTerms: e.target.value })}
+                      required
                     />
                   </div>
                   <div>
@@ -286,12 +302,13 @@ function SuppliersPage() {
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="address">Address</Label>
+                  <Label htmlFor="address">Address *</Label>
                   <Textarea
                     id="address"
                     value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                     rows={3}
+                    required
                   />
                 </div>
                 <div className="flex items-center space-x-2">
@@ -305,7 +322,7 @@ function SuppliersPage() {
                   <Label htmlFor="isActive">Active</Label>
                 </div>
                 <div className="flex gap-2">
-                  <Button type="submit" disabled={loading || (editingSupplier && !hasChanges())}>
+                  <Button type="submit" disabled={loading || (editingSupplier ? !hasChanges() : false)}>
                     {loading ? 'Saving...' : editingSupplier ? 'Update' : 'Create'}
                   </Button>
                   <Button type="button" variant="outline" onClick={resetForm}>
@@ -440,9 +457,23 @@ function SuppliersPage() {
             )}
           </CardContent>
         </Card>
+
+        <ConfirmationDialog
+          open={showDeleteConfirm}
+          title="Delete Supplier"
+          message="Are you sure you want to delete this supplier? This action cannot be undone."
+          confirmText="Yes, Delete"
+          cancelText="Cancel"
+          variant="destructive"
+          onConfirm={confirmDelete}
+          onCancel={() => {
+            setShowDeleteConfirm(false);
+            setDeletingSupplierId(null);
+          }}
+        />
       </div>
     </MainLayout>
   );
 }
 
-export default withAuth(SuppliersPage, { allowedRoles: ['PURCHASING_STAFF', 'GENERAL_MANAGER', 'SYSTEM_ADMIN'] });
+export default withAuth(SuppliersPage, { allowedRoles: ['PURCHASING_STAFF', 'DEPARTMENT_HEAD', 'GENERAL_MANAGER', 'VICE_PRESIDENT', 'PRESIDENT', 'SYSTEM_ADMIN'] });

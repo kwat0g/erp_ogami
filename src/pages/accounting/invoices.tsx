@@ -14,12 +14,12 @@ import { formatDate, formatCurrency, getStatusColor } from '@/lib/utils';
 interface InvoiceItem {
   id?: string;
   itemId?: string;
-  description: string;
-  quantity: string;
-  unitPrice: string;
-  totalPrice: number;
-  taxRate: string;
-  discountRate: string;
+  description?: string;
+  quantity?: string;
+  unitPrice?: string;
+  totalPrice?: number;
+  taxRate?: string;
+  discountRate?: string;
 }
 
 interface Invoice {
@@ -145,15 +145,13 @@ export default function InvoicesPage() {
     let discountAmount = 0;
 
     invoiceItems.forEach((item) => {
-      const qty = parseFloat(item.quantity) || 0;
-      const price = parseFloat(item.unitPrice) || 0;
+      const qty = parseFloat(item?.quantity ?? '0') || 0;
+      const price = parseFloat(item?.unitPrice ?? '0') || 0;
       const itemTotal = qty * price;
-      
-      const discount = (itemTotal * (parseFloat(item.discountRate) || 0)) / 100;
+      const discount = (itemTotal * (parseFloat(item?.discountRate ?? '0') || 0)) / 100;
       const afterDiscount = itemTotal - discount;
-      const tax = (afterDiscount * (parseFloat(item.taxRate) || 0)) / 100;
-
-      subtotal += itemTotal;
+      const tax = (afterDiscount * (parseFloat(item?.taxRate ?? '0') || 0)) / 100;
+      subtotal += afterDiscount + tax;
       discountAmount += discount;
       taxAmount += tax;
     });
@@ -188,7 +186,7 @@ export default function InvoicesPage() {
     }
 
     const validItems = invoiceItems.filter(
-      (item) => item.description.trim() && parseFloat(item.quantity) > 0 && parseFloat(item.unitPrice) > 0
+      (item) => item.description?.trim() && parseFloat(item.quantity ?? '0') > 0 && parseFloat(item.unitPrice ?? '0') > 0
     );
 
     if (validItems.length === 0) {
@@ -203,10 +201,10 @@ export default function InvoicesPage() {
       ...totals,
       items: validItems.map((item) => ({
         ...item,
-        quantity: parseFloat(item.quantity),
-        unitPrice: parseFloat(item.unitPrice),
-        taxRate: parseFloat(item.taxRate) || 0,
-        discountRate: parseFloat(item.discountRate) || 0,
+        quantity: parseFloat(item.quantity ?? '0'),
+        unitPrice: parseFloat(item.unitPrice ?? '0'),
+        taxRate: parseFloat(item.taxRate ?? '0') || 0,
+        discountRate: parseFloat(item.discountRate ?? '0') || 0,
       })),
     };
 
@@ -254,16 +252,19 @@ export default function InvoicesPage() {
 
   const updateItemRow = (index: number, field: string, value: any) => {
     const updated = [...invoiceItems];
-    updated[index] = { ...updated[index], [field]: value };
+    updated[index] = { ...updated[index], [field]: value } as InvoiceItem;
 
     if (field === 'quantity' || field === 'unitPrice' || field === 'taxRate' || field === 'discountRate') {
-      const qty = parseFloat(updated[index].quantity) || 0;
-      const price = parseFloat(updated[index].unitPrice) || 0;
-      const itemTotal = qty * price;
-      const discount = (itemTotal * (parseFloat(updated[index].discountRate) || 0)) / 100;
-      const afterDiscount = itemTotal - discount;
-      const tax = (afterDiscount * (parseFloat(updated[index].taxRate) || 0)) / 100;
-      updated[index].totalPrice = afterDiscount + tax;
+      const item = updated[index];
+      if (item) {
+        const qty = parseFloat(item.quantity ?? '0') || 0;
+        const price = parseFloat(item.unitPrice ?? '0') || 0;
+        const itemTotal = qty * price;
+        const discount = (itemTotal * (parseFloat(item.discountRate ?? '0') || 0)) / 100;
+        const afterDiscount = itemTotal - discount;
+        const tax = (afterDiscount * (parseFloat(item.taxRate ?? '0') || 0)) / 100;
+        item.totalPrice = afterDiscount + tax;
+      }
     }
 
     setInvoiceItems(updated);

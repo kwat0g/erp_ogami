@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, Search, Eye } from 'lucide-react';
 import { hasWritePermission } from '@/lib/permissions';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 
 interface Item {
   id: string;
@@ -43,6 +44,8 @@ export default function ItemsPage() {
   const [canWrite, setCanWrite] = useState(true);
   const [warehouses, setWarehouses] = useState<any[]>([]);
   const [originalData, setOriginalData] = useState<any>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
   const [itemStockLevels, setItemStockLevels] = useState<any[]>([]);
   const [stockAdjustment, setStockAdjustment] = useState({
     warehouseId: '',
@@ -305,17 +308,24 @@ export default function ItemsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this item?')) return;
+    setDeletingItemId(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deletingItemId) return;
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/inventory/items/${id}`, {
+      const response = await fetch(`/api/inventory/items/${deletingItemId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.ok) {
         fetchItems();
+        setShowDeleteConfirm(false);
+        setDeletingItemId(null);
       }
     } catch (error) {
       console.error('Error deleting item:', error);
@@ -491,7 +501,7 @@ export default function ItemsPage() {
                   <Label htmlFor="isActive">Active</Label>
                 </div>
                 <div className="flex gap-2">
-                  <Button type="submit" disabled={editingItem && !hasChanges()}>
+                  <Button type="submit" disabled={editingItem ? !hasChanges() : false}>
                     {editingItem ? 'Update' : 'Create'} Item
                   </Button>
                   <Button type="button" variant="outline" onClick={resetForm}>
@@ -603,6 +613,20 @@ export default function ItemsPage() {
             )}
           </CardContent>
         </Card>
+
+        <ConfirmationDialog
+          open={showDeleteConfirm}
+          title="Delete Item"
+          message="Are you sure you want to delete this item? This action cannot be undone."
+          confirmText="Yes, Delete"
+          cancelText="Cancel"
+          variant="destructive"
+          onConfirm={confirmDelete}
+          onCancel={() => {
+            setShowDeleteConfirm(false);
+            setDeletingItemId(null);
+          }}
+        />
       </div>
     </MainLayout>
   );

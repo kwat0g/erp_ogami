@@ -10,9 +10,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Search, Plus, Trash2, CheckCircle, XCircle, Edit2, FileText } from 'lucide-react';
+import { Search, Plus, Trash2, CheckCircle, XCircle, Edit2, FileText, Eye } from 'lucide-react';
 import { formatDate, formatCurrency, getStatusColor, formatIntegerInput, sanitizeInteger } from '@/lib/utils';
 import { useToast } from '@/components/ui/toast';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 
 interface PRItem {
   id?: string;
@@ -37,6 +38,9 @@ interface PurchaseRequisition {
   approvedBy?: string;
   approvedByName?: string;
   approvedDate?: string;
+  sourceType?: string;
+  sourceReference?: string;
+  rejectionReason?: string;
   notes?: string;
   items?: PRItem[];
 }
@@ -67,6 +71,16 @@ function PurchaseRequisitionsPage() {
     notes: '',
   });
   const [originalData, setOriginalData] = useState<any>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [viewingPR, setViewingPR] = useState<PurchaseRequisition | null>(null);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [rejectingPRId, setRejectingPRId] = useState<string | null>(null);
+  const [showApproveConfirm, setShowApproveConfirm] = useState(false);
+  const [approvingPRId, setApprovingPRId] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingPRId, setDeletingPRId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     prDate: new Date().toISOString().split('T')[0],
     department: '',
@@ -83,9 +97,53 @@ function PurchaseRequisitionsPage() {
     fetchRequisitions();
     fetchItems();
     fetchDepartments();
-    fetchSuppliers();
     fetchUserRole();
   }, []);
+
+  useEffect(() => {
+    // Check if there's a view query parameter from notification
+    if (router.query.view && requisitions.length > 0) {
+      const prId = router.query.view as string;
+      const pr = requisitions.find(r => r.id === prId);
+      if (pr) {
+        handleView(pr);
+        // Clear the query param
+        router.replace('/purchasing/requisitions', undefined, { shallow: true });
+      }
+    }
+  }, [router.query, requisitions]);
+
+  // Track changes when editing PR
+  useEffect(() => {
+    if (!editingPR || !originalData) {
+      setHasUnsavedChanges(false);
+      return;
+    }
+
+    // Check form data changes
+    const formChanged = JSON.stringify(formData) !== JSON.stringify(originalData.formData);
+
+    // Check items changes
+    const currentItemsStr = JSON.stringify(prItems.map(item => ({
+      itemId: item.itemId,
+      quantity: Number(item.quantity),
+      estimatedUnitPrice: Number(item.estimatedUnitPrice),
+      requiredDate: item.requiredDate,
+      purpose: item.purpose,
+    })));
+
+    const originalItemsStr = JSON.stringify(originalData.items.map((item: any) => ({
+      itemId: item.itemId,
+      quantity: Number(item.quantity),
+      estimatedUnitPrice: Number(item.estimatedUnitPrice),
+      requiredDate: item.requiredDate,
+      purpose: item.purpose,
+    })));
+
+    const itemsChanged = currentItemsStr !== originalItemsStr;
+
+    setHasUnsavedChanges(formChanged || itemsChanged);
+  }, [editingPR, originalData, formData, prItems]);
 
   const fetchSuppliers = async () => {
     try {
@@ -178,54 +236,140 @@ function PurchaseRequisitionsPage() {
         }),
       });
 
+      const data = await response.json();
       if (response.ok) {
+        showToast('success', editingPR ? 'PR updated successfully' : 'PR created successfully');
         fetchRequisitions();
         resetForm();
+      } else {
+        showToast(data.message || 'Failed to save PR', 'error');
       }
     } catch (error) {
       console.error('Error saving requisition:', error);
     }
   };
 
-  const handleApprove = async (id: string) => {
-    if (!confirm('Approve this purchase requisition?')) return;
-
+  const handleSubmitForApproval = async (id: string) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/purchasing/requisitions/${id}/approve`, {
+      const response = await fetch(`/api/purchasing/requisitions/${id}/submit`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      const data = await response.json();
       if (response.ok) {
+        showToast('success', 'PR submitted for approval successfully');
         fetchRequisitions();
+      } else {
+        showToast(data.message || 'Failed to submit PR', 'error');
+      }
+    } catch (error) {
+      console.error('Error submitting requisition:', error);
+      showToast('error', 'Error submitting requisition');
+    }
+  };
+
+  const handleApprove = async (id: string) => {
+    setApprovingPRId(id);
+    setShowApproveConfirm(true);
+  };
+
+  const confirmApprove = async () => {
+    if (!approvingPRId) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/purchasing/requisitions/${approvingPRId}/approve`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        showToast('success', 'PR approved successfully');
+        fetchRequisitions();
+        setShowViewModal(false);
+        setShowApproveConfirm(false);
+        setApprovingPRId(null);
+      } else {
+        showToast(data.message || 'Failed to approve PR', 'error');
       }
     } catch (error) {
       console.error('Error approving requisition:', error);
+      showToast('error', 'Error approving requisition');
     }
   };
 
   const handleReject = async (id: string) => {
-    const reason = prompt('Enter rejection reason:');
-    if (!reason) return;
+    setRejectingPRId(id);
+    setRejectionReason('');
+    setShowRejectModal(true);
+  };
+
+  const confirmReject = async () => {
+    if (!rejectionReason.trim()) {
+      showToast('error', 'Rejection reason is required. Please provide a reason for rejecting this PR.');
+      return;
+    }
+
+    if (!rejectingPRId) return;
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/purchasing/requisitions/${id}/reject`, {
+      const response = await fetch(`/api/purchasing/requisitions/${rejectingPRId}/reject`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ reason }),
+        body: JSON.stringify({ reason: rejectionReason }),
       });
 
+      const data = await response.json();
       if (response.ok) {
+        showToast('success', 'PR rejected');
         fetchRequisitions();
+        setShowViewModal(false);
+        setShowRejectModal(false);
+        setRejectionReason('');
+        setRejectingPRId(null);
+      } else {
+        showToast(data.message || 'Failed to reject PR', 'error');
       }
     } catch (error) {
       console.error('Error rejecting requisition:', error);
+      showToast('error', 'Error rejecting requisition');
     }
+  };
+
+  const handleView = async (pr: PurchaseRequisition) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/purchasing/requisitions/${pr.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      
+      if (data.requisition) {
+        setViewingPR({ ...pr, items: data.requisition.items || [] });
+        setShowViewModal(true);
+      }
+    } catch (error) {
+      console.error('Error fetching PR details:', error);
+      showToast('error', 'Error loading PR details');
+    }
+  };
+
+  const handleApproveFromModal = async () => {
+    if (!viewingPR) return;
+    await handleApprove(viewingPR.id);
+    setShowViewModal(false);
+  };
+
+  const handleRejectFromModal = async () => {
+    if (!viewingPR) return;
+    handleReject(viewingPR.id);
   };
 
   const handleEdit = async (pr: PurchaseRequisition) => {
@@ -264,45 +408,53 @@ function PurchaseRequisitionsPage() {
           }));
           setPrItems(itemsToSet);
           
-          // Store original data for change detection
+          // Store original data for change detection - use deep copy to avoid reference issues
           setOriginalData({
-            formData: formDataToSet,
-            items: itemsToSet,
+            formData: JSON.parse(JSON.stringify(formDataToSet)),
+            items: JSON.parse(JSON.stringify(itemsToSet)),
           });
         }
       }
       setShowForm(true);
     } catch (error) {
       console.error('Error fetching PR details:', error);
-      showToast('Error loading PR details', 'error');
+      showToast('error', 'Error loading PR details');
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this PR? This action cannot be undone.')) return;
+    setDeletingPRId(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deletingPRId) return;
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/purchasing/requisitions/${id}`, {
+      const response = await fetch(`/api/purchasing/requisitions/${deletingPRId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.ok) {
-        showToast('PR deleted successfully', 'success');
+        showToast('success', 'PR deleted successfully');
         fetchRequisitions();
+        setShowDeleteConfirm(false);
+        setDeletingPRId(null);
       } else {
         const data = await response.json();
         showToast(data.message || 'Error deleting PR', 'error');
       }
     } catch (error) {
       console.error('Error deleting PR:', error);
-      showToast('Error deleting PR', 'error');
+      showToast('error', 'Error deleting PR');
     }
   };
 
   const handleConvertToPO = (prId: string) => {
     setSelectedPRForConvert(prId);
+    fetchSuppliers();
     setShowConvertModal(true);
   };
 
@@ -331,7 +483,7 @@ function PurchaseRequisitionsPage() {
 
   const convertToPO = async () => {
     if (!selectedPRForConvert || !convertFormData.supplierId) {
-      showToast('Please select a supplier', 'error');
+      showToast('error', 'Please select a supplier');
       return;
     }
 
@@ -351,7 +503,7 @@ function PurchaseRequisitionsPage() {
 
       if (response.ok) {
         const data = await response.json();
-        showToast('PO created successfully from PR', 'success');
+        showToast('success', 'PO created successfully from PR');
         setShowConvertModal(false);
         setConvertFormData({
           supplierId: '',
@@ -368,7 +520,7 @@ function PurchaseRequisitionsPage() {
       }
     } catch (error) {
       console.error('Error converting PR to PO:', error);
-      showToast('Error converting PR to PO', 'error');
+      showToast('error', 'Error converting PR to PO');
     }
   };
 
@@ -385,28 +537,30 @@ function PurchaseRequisitionsPage() {
 
   const updateItemRow = (index: number, field: string, value: any) => {
     const updated = [...prItems];
+    const item = updated[index];
+    if (!item) return;
     
     // Handle quantity as integer only (no decimals)
     if (field === 'quantity') {
       const sanitized = sanitizeInteger(value);
-      updated[index].quantity = sanitized;
-      updated[index].estimatedTotalPrice = sanitized * updated[index].estimatedUnitPrice;
+      item.quantity = sanitized;
+      item.estimatedTotalPrice = sanitized * item.estimatedUnitPrice;
     }
     // Auto-populate unit price when item is selected (read-only)
     else if (field === 'itemId') {
-      updated[index].itemId = value;
+      item.itemId = value;
       const selectedItem = items.find(i => i.id === value);
       if (selectedItem && selectedItem.standardCost) {
-        updated[index].estimatedUnitPrice = parseFloat(selectedItem.standardCost);
-        updated[index].estimatedTotalPrice = updated[index].quantity * parseFloat(selectedItem.standardCost);
+        item.estimatedUnitPrice = parseFloat(selectedItem.standardCost);
+        item.estimatedTotalPrice = item.quantity * parseFloat(selectedItem.standardCost);
       } else {
-        updated[index].estimatedUnitPrice = 0;
-        updated[index].estimatedTotalPrice = 0;
+        item.estimatedUnitPrice = 0;
+        item.estimatedTotalPrice = 0;
       }
     }
     // For other fields (requiredDate, purpose)
     else {
-      updated[index] = { ...updated[index], [field]: value };
+      Object.assign(item, { [field]: value });
     }
     
     setPrItems(updated);
@@ -426,37 +580,16 @@ function PurchaseRequisitionsPage() {
     ]);
     setEditingPR(null);
     setOriginalData(null);
+    setHasUnsavedChanges(false);
     setShowForm(false);
   };
 
   const hasChanges = () => {
-    if (!editingPR || !originalData) return true; // Allow submit for new PRs
+    // For new PRs, always allow submit
+    if (!editingPR) return true;
     
-    // Check if form data changed
-    const formChanged = JSON.stringify(formData) !== JSON.stringify(originalData.formData);
-    
-    // Check if items changed - normalize items for comparison
-    const normalizedCurrentItems = prItems.map(item => ({
-      itemId: item.itemId,
-      quantity: Number(item.quantity),
-      estimatedUnitPrice: Number(item.estimatedUnitPrice),
-      estimatedTotalPrice: Number(item.estimatedTotalPrice),
-      requiredDate: item.requiredDate,
-      purpose: item.purpose,
-    }));
-    
-    const normalizedOriginalItems = originalData.items.map((item: any) => ({
-      itemId: item.itemId,
-      quantity: Number(item.quantity),
-      estimatedUnitPrice: Number(item.estimatedUnitPrice),
-      estimatedTotalPrice: Number(item.estimatedTotalPrice),
-      requiredDate: item.requiredDate,
-      purpose: item.purpose,
-    }));
-    
-    const itemsChanged = JSON.stringify(normalizedCurrentItems) !== JSON.stringify(normalizedOriginalItems);
-    
-    return formChanged || itemsChanged;
+    // For editing PRs, check if there are unsaved changes
+    return hasUnsavedChanges;
   };
 
   const canCreatePR = () => {
@@ -464,19 +597,17 @@ function PurchaseRequisitionsPage() {
   };
 
   const canApprovePR = () => {
-    return ['DEPARTMENT_HEAD', 'GENERAL_MANAGER', 'PRESIDENT'].includes(userRole);
+    return ['DEPARTMENT_HEAD', 'GENERAL_MANAGER', 'VICE_PRESIDENT', 'PRESIDENT'].includes(userRole);
   };
 
   const filteredRequisitions = requisitions.filter((pr) => {
-    const matchesSearch =
-      pr.prNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      pr.department?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      pr.requestedByName?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+    const matchesSearch = pr.prNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         pr.department?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         pr.requestedByName?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = !statusFilter || pr.status === statusFilter;
     const matchesDepartment = !departmentFilter || pr.department === departmentFilter;
-    
-    return matchesSearch && matchesStatus && matchesDepartment;
+    const matchesSourceType = !sourceTypeFilter || (pr.sourceType || 'MANUAL') === sourceTypeFilter;
+    return matchesSearch && matchesStatus && matchesDepartment && matchesSourceType;
   });
 
   return (
@@ -677,7 +808,7 @@ function PurchaseRequisitionsPage() {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button type="submit" disabled={editingPR && !hasChanges()}>
+                  <Button type="submit" disabled={editingPR ? !hasChanges() : false}>
                     {editingPR ? 'Update PR' : 'Submit PR'}
                   </Button>
                   <Button type="button" variant="outline" onClick={resetForm}>
@@ -811,25 +942,55 @@ function PurchaseRequisitionsPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            {['DRAFT', 'PENDING'].includes(pr.status) && pr.requestedBy === userId && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleView(pr)}
+                              title="View PR Details"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            {pr.requestedBy === userId && (
                               <>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleEdit(pr)}
-                                  title="Edit PR"
-                                >
-                                  <Edit2 className="h-4 w-4" />
-                                </Button>
                                 {pr.status === 'DRAFT' && (
+                                  <>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleEdit(pr)}
+                                      title="Edit PR"
+                                    >
+                                      <Edit2 className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => handleSubmitForApproval(pr.id)}
+                                      className="text-primary"
+                                      title="Submit for Approval"
+                                    >
+                                      <CheckCircle className="h-4 w-4 mr-1" />
+                                      Submit
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleDelete(pr.id)}
+                                      className="text-destructive"
+                                      title="Delete PR"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </>
+                                )}
+                                {pr.status === 'PENDING' && (
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => handleDelete(pr.id)}
-                                    className="text-destructive"
-                                    title="Delete PR"
+                                    onClick={() => handleEdit(pr)}
+                                    title="Edit PR"
                                   >
-                                    <Trash2 className="h-4 w-4" />
+                                    <Edit2 className="h-4 w-4" />
                                   </Button>
                                 )}
                               </>
@@ -878,9 +1039,158 @@ function PurchaseRequisitionsPage() {
           </CardContent>
         </Card>
 
+        {showViewModal && viewingPR && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <Card className="w-full max-w-3xl max-h-[85vh] overflow-y-auto">
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <CardTitle className="text-xl">{viewingPR.prNumber}</CardTitle>
+                      <Badge className={getStatusColor(viewingPR.status)}>{viewingPR.status}</Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-0.5">
+                      {formatDate(viewingPR.prDate)} • {viewingPR.department || 'N/A'}
+                    </p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-3 gap-x-6 gap-y-2 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">Requested By:</span>
+                    <p className="font-medium">{viewingPR.requestedByName}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Required Date:</span>
+                    <p className="font-medium">{viewingPR.requiredDate ? formatDate(viewingPR.requiredDate) : 'N/A'}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Source:</span>
+                    <p className="font-medium">{viewingPR.sourceType || 'MANUAL'}</p>
+                  </div>
+                  {viewingPR.sourceReference && (
+                    <div className="col-span-3">
+                      <span className="text-muted-foreground">Reference:</span>
+                      <p className="font-medium">{viewingPR.sourceReference}</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="border rounded-lg overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-muted/50">
+                        <TableHead className="font-semibold">Item</TableHead>
+                        <TableHead className="text-right font-semibold">Qty</TableHead>
+                        <TableHead className="text-right font-semibold">Est. Price</TableHead>
+                        <TableHead className="text-right font-semibold">Total</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {viewingPR.items && viewingPR.items.length > 0 ? (
+                        viewingPR.items.map((item: any, index: number) => (
+                          <TableRow key={index}>
+                            <TableCell className="font-medium">{item.itemName || item.itemCode}</TableCell>
+                            <TableCell className="text-right">{item.quantity}</TableCell>
+                            <TableCell className="text-right">{formatCurrency(item.estimatedUnitPrice)}</TableCell>
+                            <TableCell className="text-right font-semibold">{formatCurrency(item.estimatedTotalPrice)}</TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={4} className="text-center text-muted-foreground">No items</TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {viewingPR.notes && (
+                  <div className="text-sm">
+                    <span className="text-muted-foreground">Notes:</span>
+                    <p className="mt-1 p-2 bg-muted/50 rounded text-sm">{viewingPR.notes}</p>
+                  </div>
+                )}
+
+                {viewingPR.status === 'APPROVED' && viewingPR.approvedByName && (
+                  <div className="flex gap-6 text-sm border-t pt-3">
+                    <div>
+                      <span className="text-muted-foreground">Approved By:</span>
+                      <p className="font-medium">{viewingPR.approvedByName}</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Date:</span>
+                      <p className="font-medium">{viewingPR.approvedDate ? formatDate(viewingPR.approvedDate) : 'N/A'}</p>
+                    </div>
+                  </div>
+                )}
+
+                {viewingPR.status === 'REJECTED' && viewingPR.rejectionReason && (
+                  <div className="text-sm border-t pt-3">
+                    <span className="text-muted-foreground">Rejection Reason:</span>
+                    <p className="mt-1 p-2 bg-destructive/10 text-destructive rounded text-sm">{viewingPR.rejectionReason}</p>
+                  </div>
+                )}
+
+                <div className="flex gap-2 border-t pt-3">
+                  {viewingPR.status === 'PENDING' && canApprovePR() && (
+                    <>
+                      <Button onClick={handleApproveFromModal} className="bg-green-600 hover:bg-green-700">
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Approve
+                      </Button>
+                      <Button onClick={handleRejectFromModal} variant="destructive">
+                        <XCircle className="h-4 w-4 mr-2" />
+                        Reject
+                      </Button>
+                    </>
+                  )}
+                  <Button variant="outline" onClick={() => setShowViewModal(false)} className="ml-auto">
+                    Close
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {showRejectModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <Card className="w-full max-w-md">
+              <CardHeader>
+                <CardTitle>Reject Purchase Requisition</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="rejectionReason">Rejection Reason *</Label>
+                    <Textarea
+                      id="rejectionReason"
+                      value={rejectionReason}
+                      onChange={(e) => setRejectionReason(e.target.value)}
+                      placeholder="Please provide a reason for rejecting this PR..."
+                      rows={4}
+                      className="mt-2"
+                    />
+                  </div>
+                  <div className="flex gap-2 justify-end">
+                    <Button variant="outline" onClick={() => setShowRejectModal(false)}>
+                      Cancel
+                    </Button>
+                    <Button variant="destructive" onClick={confirmReject}>
+                      Confirm Rejection
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {showConvertModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <Card className="w-full max-w-2xl">
+            <Card className="w-full max-w-xl">
               <CardHeader>
                 <CardTitle>Convert PR to Purchase Order</CardTitle>
               </CardHeader>
@@ -920,7 +1230,7 @@ function PurchaseRequisitionsPage() {
                       id="deliveryAddress"
                       value={convertFormData.deliveryAddress}
                       onChange={(e) => setConvertFormData({ ...convertFormData, deliveryAddress: e.target.value })}
-                      rows={2}
+                      rows={1}
                     />
                   </div>
                   <div>
@@ -938,7 +1248,7 @@ function PurchaseRequisitionsPage() {
                       id="convertNotes"
                       value={convertFormData.notes}
                       onChange={(e) => setConvertFormData({ ...convertFormData, notes: e.target.value })}
-                      rows={2}
+                      rows={1}
                     />
                   </div>
                   <div className="flex gap-2">
@@ -950,9 +1260,37 @@ function PurchaseRequisitionsPage() {
             </Card>
           </div>
         )}
+
+        <ConfirmationDialog
+          open={showApproveConfirm}
+          title="Approve Purchase Requisition"
+          message="Are you sure you want to approve this PR? This will allow it to proceed to the next stage."
+          confirmText="Yes, Approve"
+          cancelText="Cancel"
+          variant="default"
+          onConfirm={confirmApprove}
+          onCancel={() => {
+            setShowApproveConfirm(false);
+            setApprovingPRId(null);
+          }}
+        />
+
+        <ConfirmationDialog
+          open={showDeleteConfirm}
+          title="Delete Purchase Requisition"
+          message="Are you sure you want to delete this PR? This action cannot be undone."
+          confirmText="Yes, Delete"
+          cancelText="Cancel"
+          variant="destructive"
+          onConfirm={confirmDelete}
+          onCancel={() => {
+            setShowDeleteConfirm(false);
+            setDeletingPRId(null);
+          }}
+        />
       </div>
     </MainLayout>
   );
 }
 
-export default withAuth(PurchaseRequisitionsPage, { allowedRoles: ['PURCHASING_STAFF', 'DEPARTMENT_HEAD', 'GENERAL_MANAGER', 'SYSTEM_ADMIN'] });
+export default withAuth(PurchaseRequisitionsPage, { allowedRoles: ['PURCHASING_STAFF', 'DEPARTMENT_HEAD', 'GENERAL_MANAGER', 'VICE_PRESIDENT', 'PRESIDENT', 'SYSTEM_ADMIN'] });

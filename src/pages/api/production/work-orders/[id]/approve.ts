@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { queryOne, execute } from '@/lib/db';
+import { queryOne, execute, query } from '@/lib/db';
 import { findSessionByToken, hasPermission } from '@/lib/auth';
 import { createAuditLog } from '@/lib/audit';
+import { createNotification } from '@/lib/notification-helper';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const token = req.headers.authorization?.replace('Bearer ', '');
@@ -53,6 +54,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         oldValues: { status: wo.status },
         newValues: { status: 'APPROVED' },
       });
+
+      // Notify supervisors to release the work order
+      const supervisors = await query(
+        `SELECT id FROM users WHERE role = 'PRODUCTION_SUPERVISOR' AND is_active = 1`
+      );
+
+      for (const supervisor of supervisors as any[]) {
+        await createNotification({
+          userId: supervisor.id,
+          title: 'Work Order Ready to Release',
+          message: `Work Order ${wo.wo_number} has been approved and is ready to be released to production`,
+          type: 'ACTION_REQUIRED',
+          category: 'PRODUCTION',
+          referenceType: 'WORK_ORDER',
+          referenceId: id as string,
+        });
+      }
 
       return res.status(200).json({ message: 'Work order approved successfully' });
     } catch (error) {

@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { query, execute, transaction } from '@/lib/db';
 import { findSessionByToken } from '@/lib/auth';
 import { createAuditLog } from '@/lib/audit';
+import { createNotification } from '@/lib/notification-helper';
 import { hasWritePermission } from '@/lib/permissions';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -83,9 +84,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       await transaction(async (connection) => {
         // Generate PO number
-        const [lastPO] = await connection.query(
+        const [lastPORows] = await connection.query(
           "SELECT po_number FROM purchase_orders ORDER BY created_at DESC LIMIT 1"
         );
+        const lastPO = lastPORows as any[];
 
         let poNumber = 'PO-0001';
         if (lastPO && lastPO.length > 0) {
@@ -149,6 +151,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           recordId: poId.toString(),
           newValues: { poNumber, poDate, supplierId, totalAmount },
         });
+
+        // Notify approvers (GENERAL_MANAGER, VICE_PRESIDENT, PRESIDENT) - exclude creator
+        const approvers: any = await query(`
+          SELECT DISTINCT u.id, u.username
+          FROM users u
+          WHERE u.is_active = 1 
+            AND u.role IN ('GENERAL_MANAGER', 'VICE_PRESIDENT', 'PRESIDENT')
+            AND u.id != ?
+        `, [session.userId]);
+
+        for (const approver of approvers) {
+          await createNotification({
+            userId: approver.id,
+            title: 'New PO Awaiting Approval',
+            message: `Purchase Order ${poNumber} has been created and requires your approval`,
+            type: 'ACTION_REQUIRED',
+            category: 'PURCHASING',
+            referenceType: 'PURCHASE_ORDER',
+            referenceId: poId.toString(),
+          });
+        }
 
         return res.status(201).json({
           message: 'Purchase order created successfully',

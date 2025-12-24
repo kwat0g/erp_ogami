@@ -51,18 +51,18 @@ interface POItem {
 }
 
 interface ReceiptItem {
-  poItemId: string;
-  itemId: string;
-  itemCode: string;
-  itemName: string;
-  orderedQty: number;
-  receivedQty: number;
-  pendingQty: number;
-  quantityReceived: string;
-  quantityAccepted: string;
-  quantityRejected: string;
-  rejectionReason: string;
-  notes: string;
+  poItemId?: string;
+  itemId?: string;
+  itemCode?: string;
+  itemName?: string;
+  orderedQty?: number;
+  receivedQty?: number;
+  pendingQty?: number;
+  quantityReceived?: string;
+  quantityAccepted?: string;
+  quantityRejected?: string;
+  rejectionReason?: string;
+  notes?: string;
 }
 
 function ReceivingPage() {
@@ -184,12 +184,15 @@ function ReceivingPage() {
 
   const updateReceiptItem = (index: number, field: string, value: string) => {
     const updated = [...receiptItems];
-    updated[index] = { ...updated[index], [field]: value };
+    updated[index] = { ...updated[index], [field]: value } as ReceiptItem;
     
     if (field === 'quantityReceived' || field === 'quantityRejected') {
-      const received = parseFloat(updated[index].quantityReceived) || 0;
-      const rejected = parseFloat(updated[index].quantityRejected) || 0;
-      updated[index].quantityAccepted = (received - rejected).toString();
+      const item = updated[index];
+      if (item) {
+        const received = parseFloat(item.quantityReceived ?? '0') || 0;
+        const rejected = parseFloat(item.quantityRejected ?? '0') || 0;
+        item.quantityAccepted = (received - rejected).toString();
+      }
     }
     
     setReceiptItems(updated);
@@ -209,8 +212,8 @@ function ReceivingPage() {
     }
 
     const hasInvalidItems = receiptItems.some(item => {
-      const received = parseFloat(item.quantityReceived) || 0;
-      const accepted = parseFloat(item.quantityAccepted) || 0;
+      const received = parseFloat(item.quantityReceived ?? '0') || 0;
+      const accepted = parseFloat(item.quantityAccepted ?? '0') || 0;
       return received <= 0 || accepted < 0 || accepted > received;
     });
 
@@ -235,9 +238,9 @@ function ReceivingPage() {
       const items = receiptItems.map(item => ({
         poItemId: item.poItemId,
         itemId: item.itemId,
-        quantityReceived: parseFloat(item.quantityReceived),
-        quantityAccepted: parseFloat(item.quantityAccepted),
-        quantityRejected: parseFloat(item.quantityRejected) || 0,
+        quantityReceived: parseFloat(item.quantityReceived ?? '0'),
+        quantityAccepted: parseFloat(item.quantityAccepted ?? '0'),
+        quantityRejected: parseFloat(item.quantityRejected ?? '0') || 0,
         rejectionReason: item.rejectionReason || null,
         notes: item.notes || null,
       }));
@@ -353,7 +356,7 @@ function ReceivingPage() {
           </Card>
         </div>
 
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'receipts' | 'create')}>
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'receipts' | 'create')} defaultValue="receipts">
           <TabsList>
             <TabsTrigger value="receipts">Goods Receipts</TabsTrigger>
             <TabsTrigger value="create">Create Receipt</TabsTrigger>
@@ -581,4 +584,4 @@ function ReceivingPage() {
   );
 }
 
-export default withAuth(ReceivingPage, { allowedRoles: ['PURCHASING_STAFF', 'WAREHOUSE_STAFF', 'GENERAL_MANAGER'] });
+export default withAuth(ReceivingPage, { allowedRoles: ['PURCHASING_STAFF', 'WAREHOUSE_STAFF', 'DEPARTMENT_HEAD', 'GENERAL_MANAGER', 'VICE_PRESIDENT', 'PRESIDENT', 'SYSTEM_ADMIN'] });

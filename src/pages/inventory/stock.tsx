@@ -9,6 +9,8 @@ import { Search, AlertTriangle } from 'lucide-react';
 
 interface StockItem {
   id: string;
+  itemId: string;
+  warehouseId: string;
   itemCode: string;
   itemName: string;
   warehouseName: string;

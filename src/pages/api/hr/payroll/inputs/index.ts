@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { query, execute } from '@/lib/db';
 import { findSessionByToken } from '@/lib/auth';
 import { createAuditLog } from '@/lib/audit';
+import { hasWritePermission } from '@/lib/permissions';
 import { assertEnum, assertNumber, isValidISODate, sanitizeOptionalText, sanitizeText } from '@/utils/validation';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -11,8 +12,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const session = await findSessionByToken(token);
   if (!session) return res.status(401).json({ message: 'Invalid or expired session' });
 
-  // HR_STAFF can encode, ACCOUNTING_STAFF can view, SYSTEM_ADMIN can do both
-  const canAccess = ['HR_STAFF', 'ACCOUNTING_STAFF', 'SYSTEM_ADMIN'].includes(session.role);
+  // HR_STAFF can encode, ACCOUNTING_STAFF can view, GENERAL_MANAGER can view, SYSTEM_ADMIN can do both
+  const canAccess = ['HR_STAFF', 'GENERAL_MANAGER', 'ACCOUNTING_STAFF', 'SYSTEM_ADMIN'].includes(session.role);
   if (!canAccess) return res.status(403).json({ message: 'Access denied' });
 
   if (req.method === 'GET') {
@@ -79,9 +80,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === 'POST') {
-    // Only HR can encode payroll inputs
-    if (!['HR_STAFF', 'SYSTEM_ADMIN'].includes(session.role)) {
-      return res.status(403).json({ message: 'Only HR can encode payroll inputs' });
+    // Check write permission - SYSTEM_ADMIN is read-only
+    if (!hasWritePermission(session.role as any, 'hr_payroll')) {
+      return res.status(403).json({ 
+        message: 'Access Denied: SYSTEM_ADMIN has read-only access. Only HR_STAFF can encode payroll inputs.' 
+      });
     }
 
     try {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,8 +9,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Search, Plus, Edit, CheckCircle } from 'lucide-react';
+import { Search, Plus, Edit, CheckCircle, Play, Eye, X } from 'lucide-react';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { formatDate, formatCurrency, getStatusColor, getPriorityColor } from '@/lib/utils';
+import { withAuth } from '@/components/auth/withAuth';
 
 interface WorkOrder {
   id: string;
@@ -27,12 +30,20 @@ interface WorkOrder {
   warehouseName?: string;
 }
 
-export default function ProductionWorkOrdersPage() {
+function ProductionWorkOrdersPage() {
+  const router = useRouter();
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
+  const [items, setItems] = useState<any[]>([]);
+  const [warehouses, setWarehouses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [userRole, setUserRole] = useState<string>('');
+  const [showApproveDialog, setShowApproveDialog] = useState(false);
+  const [showReleaseDialog, setShowReleaseDialog] = useState(false);
+  const [currentWorkOrderId, setCurrentWorkOrderId] = useState<string | null>(null);
+  const [viewingWorkOrder, setViewingWorkOrder] = useState<WorkOrder | null>(null);
+  const [showViewModal, setShowViewModal] = useState(false);
   const [formData, setFormData] = useState({
     woDate: new Date().toISOString().split('T')[0],
     itemId: '',
@@ -47,7 +58,20 @@ export default function ProductionWorkOrdersPage() {
   useEffect(() => {
     fetchWorkOrders();
     fetchUserRole();
+    fetchItems();
+    fetchWarehouses();
   }, []);
+
+  useEffect(() => {
+    const viewId = router.query.view as string;
+    if (viewId && workOrders.length > 0) {
+      const wo = workOrders.find(w => w.id === viewId);
+      if (wo) {
+        handleView(wo);
+        router.replace('/production/work-orders', undefined, { shallow: true });
+      }
+    }
+  }, [router.query.view, workOrders]);
 
   const fetchUserRole = async () => {
     try {
@@ -66,6 +90,11 @@ export default function ProductionWorkOrdersPage() {
 
   const canManageWorkOrders = () => {
     return ['PRODUCTION_PLANNER', 'PRODUCTION_SUPERVISOR', 'GENERAL_MANAGER'].includes(userRole);
+  };
+
+  const handleView = (wo: WorkOrder) => {
+    setViewingWorkOrder(wo);
+    setShowViewModal(true);
   };
 
   const fetchWorkOrders = async () => {
@@ -90,7 +119,11 @@ export default function ProductionWorkOrdersPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
-      setItems(data.items || []);
+      // Only show finished goods and semi-finished items (producible items)
+      const producibleItems = (data.items || []).filter(
+        (item: any) => item.itemType === 'FINISHED_GOODS' || item.itemType === 'SEMI_FINISHED'
+      );
+      setItems(producibleItems);
     } catch (error) {
       console.error('Error fetching items:', error);
     }
@@ -163,12 +196,17 @@ export default function ProductionWorkOrdersPage() {
     }
   };
 
-  const handleApprove = async (id: string) => {
-    if (!confirm('Approve this work order?')) return;
+  const handleApprove = (id: string) => {
+    setCurrentWorkOrderId(id);
+    setShowApproveDialog(true);
+  };
+
+  const confirmApprove = async () => {
+    if (!currentWorkOrderId) return;
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/production/work-orders/${id}/approve`, {
+      const response = await fetch(`/api/production/work-orders/${currentWorkOrderId}/approve`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -179,15 +217,23 @@ export default function ProductionWorkOrdersPage() {
       }
     } catch (error) {
       console.error('Error approving work order:', error);
+    } finally {
+      setShowApproveDialog(false);
+      setCurrentWorkOrderId(null);
     }
   };
 
-  const handleRelease = async (id: string) => {
-    if (!confirm('Release this work order to production?')) return;
+  const handleRelease = (id: string) => {
+    setCurrentWorkOrderId(id);
+    setShowReleaseDialog(true);
+  };
+
+  const confirmRelease = async () => {
+    if (!currentWorkOrderId) return;
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/production/work-orders/${id}/release`, {
+      const response = await fetch(`/api/production/work-orders/${currentWorkOrderId}/release`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -198,6 +244,9 @@ export default function ProductionWorkOrdersPage() {
       }
     } catch (error) {
       console.error('Error releasing work order:', error);
+    } finally {
+      setShowReleaseDialog(false);
+      setCurrentWorkOrderId(null);
     }
   };
 
@@ -411,24 +460,32 @@ export default function ProductionWorkOrdersPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            {wo.status === 'PENDING' && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleView(wo)}
+                              title="View Details"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            {(wo.status === 'DRAFT' || wo.status === 'PENDING') && userRole === 'GENERAL_MANAGER' && (
                               <Button
                                 variant="ghost"
-                                size="icon"
+                                size="sm"
                                 onClick={() => handleApprove(wo.id)}
                                 title="Approve"
                               >
-                                <CheckCircle className="h-4 w-4 text-success" />
+                                <CheckCircle className="h-4 w-4 text-green-600" />
                               </Button>
                             )}
-                            {wo.status === 'APPROVED' && (
+                            {wo.status === 'APPROVED' && userRole === 'PRODUCTION_SUPERVISOR' && (
                               <Button
                                 variant="ghost"
-                                size="icon"
+                                size="sm"
                                 onClick={() => handleRelease(wo.id)}
                                 title="Release to Production"
                               >
-                                <Play className="h-4 w-4 text-primary" />
+                                <Play className="h-4 w-4 text-blue-600" />
                               </Button>
                             )}
                           </div>
@@ -442,6 +499,133 @@ export default function ProductionWorkOrdersPage() {
           </CardContent>
         </Card>
       </div>
+
+      <ConfirmationDialog
+        open={showApproveDialog}
+        onCancel={() => setShowApproveDialog(false)}
+        onConfirm={confirmApprove}
+        title="Approve Work Order"
+        message="Are you sure you want to approve this work order?"
+        confirmText="Approve"
+        variant="default"
+      />
+
+      <ConfirmationDialog
+        open={showReleaseDialog}
+        onCancel={() => setShowReleaseDialog(false)}
+        onConfirm={confirmRelease}
+        title="Release Work Order"
+        message="Release this work order to production? This will make it available for execution."
+        confirmText="Release"
+        variant="default"
+      />
+
+      {showViewModal && viewingWorkOrder && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Work Order Details - {viewingWorkOrder.woNumber}</CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowViewModal(false)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>WO Date</Label>
+                  <p className="text-sm">{formatDate(viewingWorkOrder.woDate)}</p>
+                </div>
+                <div>
+                  <Label>Status</Label>
+                  <div>
+                    <Badge className={getStatusColor(viewingWorkOrder.status)}>
+                      {viewingWorkOrder.status}
+                    </Badge>
+                  </div>
+                </div>
+                <div>
+                  <Label>Item</Label>
+                  <p className="text-sm">{viewingWorkOrder.itemCode} - {viewingWorkOrder.itemName}</p>
+                </div>
+                <div>
+                  <Label>Priority</Label>
+                  <div>
+                    <Badge className={getPriorityColor(viewingWorkOrder.priority)}>
+                      {viewingWorkOrder.priority}
+                    </Badge>
+                  </div>
+                </div>
+                <div>
+                  <Label>Planned Quantity</Label>
+                  <p className="text-sm font-semibold">{Number(viewingWorkOrder.plannedQuantity).toFixed(2)}</p>
+                </div>
+                <div>
+                  <Label>Produced Quantity</Label>
+                  <p className="text-sm font-semibold text-green-600">{Number(viewingWorkOrder.producedQuantity).toFixed(2)}</p>
+                </div>
+                <div>
+                  <Label>Rejected Quantity</Label>
+                  <p className="text-sm font-semibold text-red-600">{Number(viewingWorkOrder.rejectedQuantity).toFixed(2)}</p>
+                </div>
+                <div>
+                  <Label>Target Warehouse</Label>
+                  <p className="text-sm">{viewingWorkOrder.warehouseName || '-'}</p>
+                </div>
+                {viewingWorkOrder.scheduledStartDate && (
+                  <div>
+                    <Label>Scheduled Start</Label>
+                    <p className="text-sm">{formatDate(viewingWorkOrder.scheduledStartDate)}</p>
+                  </div>
+                )}
+                {viewingWorkOrder.scheduledEndDate && (
+                  <div>
+                    <Label>Scheduled End</Label>
+                    <p className="text-sm">{formatDate(viewingWorkOrder.scheduledEndDate)}</p>
+                  </div>
+                )}
+              </div>
+              <div className="flex gap-2 pt-4 border-t">
+                {(viewingWorkOrder.status === 'DRAFT' || viewingWorkOrder.status === 'PENDING') && userRole === 'GENERAL_MANAGER' && (
+                  <Button
+                    onClick={() => {
+                      setShowViewModal(false);
+                      handleApprove(viewingWorkOrder.id);
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <CheckCircle className="h-4 w-4" />
+                    Approve Work Order
+                  </Button>
+                )}
+                {viewingWorkOrder.status === 'APPROVED' && userRole === 'PRODUCTION_SUPERVISOR' && (
+                  <Button
+                    onClick={() => {
+                      setShowViewModal(false);
+                      handleRelease(viewingWorkOrder.id);
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <Play className="h-4 w-4" />
+                    Release to Production
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  onClick={() => setShowViewModal(false)}
+                >
+                  Close
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </MainLayout>
   );
 }
+
+export default withAuth(ProductionWorkOrdersPage, { allowedRoles: ['SYSTEM_ADMIN', 'PRODUCTION_PLANNER', 'PRODUCTION_SUPERVISOR', 'PRODUCTION_OPERATOR', 'DEPARTMENT_HEAD', 'GENERAL_MANAGER'] });

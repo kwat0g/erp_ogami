@@ -21,8 +21,9 @@ export function withAuth<P extends object>(
       const checkAuth = async () => {
         try {
           const token = localStorage.getItem('token');
+          const user = localStorage.getItem('user');
           
-          if (!token) {
+          if (!token || !user) {
             router.push('/login');
             return;
           }
@@ -32,7 +33,15 @@ export function withAuth<P extends object>(
           });
 
           if (!response.ok) {
+            // Session invalidated (possibly by another login)
             localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            
+            // Show alert if session was invalidated
+            if (response.status === 401) {
+              alert('Your session has been terminated because you logged in from another location.');
+            }
+            
             router.push('/login');
             return;
           }
@@ -40,6 +49,8 @@ export function withAuth<P extends object>(
           const data = await response.json();
           
           if (!data.user) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
             router.push('/login');
             return;
           }
@@ -53,6 +64,8 @@ export function withAuth<P extends object>(
           setIsAuthorized(true);
         } catch (error) {
           console.error('Auth check failed:', error);
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
           router.push('/login');
         } finally {
           setIsLoading(false);
@@ -60,6 +73,28 @@ export function withAuth<P extends object>(
       };
 
       checkAuth();
+      
+      // Periodic session validation (every 30 seconds)
+      const interval = setInterval(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+          fetch('/api/auth/verify', {
+            headers: { Authorization: `Bearer ${token}` },
+          }).then(response => {
+            if (!response.ok) {
+              // Session invalidated
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+              alert('Your session has been terminated because you logged in from another location.');
+              router.push('/login');
+            }
+          }).catch(() => {
+            // Network error, ignore
+          });
+        }
+      }, 30000);
+
+      return () => clearInterval(interval);
     }, [router]);
 
     if (isLoading) {

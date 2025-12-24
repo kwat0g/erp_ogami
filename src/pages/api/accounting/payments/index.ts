@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           p.id, p.payment_number as paymentNumber, p.payment_date as paymentDate,
           p.payment_type as paymentType, p.payment_method as paymentMethod,
           p.amount, p.reference_number as referenceNumber, p.bank_account as bankAccount,
-          p.status, s.name as supplierName, c.name as customerName,
+          p.status, s.name as supplierName, c.customer_name as customerName,
           i.invoice_number as invoiceNumber,
           CONCAT(u.first_name, ' ', u.last_name) as createdByName
         FROM payments p
@@ -81,10 +81,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       await transaction(async (connection) => {
         // Generate payment number
-        const [lastPayment] = await connection.query(
+        const [lastPaymentRows] = await connection.query(
           `SELECT payment_number FROM payments WHERE payment_type = ? ORDER BY created_at DESC LIMIT 1`,
           [paymentType]
         );
+        const lastPayment = lastPaymentRows as any[];
 
         let paymentNumber = paymentType === 'PAYMENT' ? 'PAY-0001' : 'REC-0001';
         if (lastPayment && lastPayment.length > 0) {
@@ -94,7 +95,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         // Insert payment
-        const [paymentResult] = await connection.query(
+        const paymentResult: any = await connection.query(
           `INSERT INTO payments (
             payment_number, payment_date, payment_type, payment_method,
             invoice_id, supplier_id, customer_id, amount, reference_number,
@@ -116,7 +117,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           ]
         );
 
-        const paymentId = paymentResult.insertId;
+        const paymentId = paymentResult[0].insertId;
 
         // Update invoice paid amount if invoice is linked
         if (invoiceId) {

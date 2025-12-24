@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           i.invoice_type as invoiceType, i.due_date as dueDate, i.payment_terms as paymentTerms,
           i.status, i.subtotal, i.tax_amount as taxAmount, i.discount_amount as discountAmount,
           i.total_amount as totalAmount, i.paid_amount as paidAmount, i.balance_amount as balanceAmount,
-          s.name as supplierName, c.name as customerName
+          s.name as supplierName, c.customer_name as customerName
         FROM invoices i
         LEFT JOIN suppliers s ON i.supplier_id = s.id
         LEFT JOIN customers c ON i.customer_id = c.id
@@ -90,10 +90,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         );
 
         let invoiceNumber = invoiceType === 'PURCHASE' ? 'PI-0001' : 'SI-0001';
-        if (Array.isArray(lastInvoiceRows) && lastInvoiceRows.length > 0) {
-          const lastNumber = parseInt(String(lastInvoiceRows[0].invoice_number).split('-')[1]);
-          const prefix = invoiceType === 'PURCHASE' ? 'PI' : 'SI';
-          invoiceNumber = `${prefix}-${String(lastNumber + 1).padStart(4, '0')}`;
+        if (Array.isArray(lastInvoiceRows) && lastInvoiceRows.length > 0 && lastInvoiceRows[0]?.invoice_number) {
+          const parts = String(lastInvoiceRows[0].invoice_number).split('-');
+          if (parts[1]) {
+            const lastNumber = parseInt(parts[1]);
+            const prefix = invoiceType === 'PURCHASE' ? 'PI' : 'SI';
+            invoiceNumber = `${prefix}-${String(lastNumber + 1).padStart(4, '0')}`;
+          }
         }
 
         // Insert invoice

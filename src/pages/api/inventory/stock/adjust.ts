@@ -3,6 +3,7 @@ import { query, execute } from '@/lib/db';
 import { findSessionByToken } from '@/lib/auth';
 import { hasWritePermission } from '@/lib/permissions';
 import { updateStockWithAutoStatus } from '@/lib/inventory-utils';
+import { createNotification } from '@/lib/notification-helper';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const token = req.headers.authorization?.replace('Bearer ', '');
@@ -83,6 +84,36 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         ) VALUES (?, NOW(), 'ADJUSTMENT', ?, ?, ?, 'MANUAL_ADJUSTMENT', ?, ?)`,
         [txnNumber, itemId, warehouseId, quantityChange, notes || 'Stock adjustment', session.userId]
       );
+
+      // Check if stock is below reorder level and notify
+      const [itemDetails] = await query(
+        `SELECT i.code, i.name, i.reorder_level, s.quantity
+         FROM items i
+         JOIN inventory_stock s ON i.id = s.item_id
+         WHERE i.id = ? AND s.warehouse_id = ?`,
+        [itemId, warehouseId]
+      );
+
+      if (itemDetails && itemDetails.quantity <= itemDetails.reorder_level) {
+        // Notify warehouse and purchasing staff
+        const notifyUsers = await query(
+          `SELECT id FROM users 
+           WHERE role IN ('WAREHOUSE_STAFF', 'PURCHASING_STAFF') 
+           AND is_active = 1`
+        );
+
+        for (const user of notifyUsers as any[]) {
+          await createNotification({
+            userId: user.id,
+            title: 'Low Stock Alert',
+            message: `${itemDetails.code} - ${itemDetails.name} is below reorder level (${itemDetails.quantity}/${itemDetails.reorder_level})`,
+            type: 'WARNING',
+            category: 'INVENTORY',
+            referenceType: 'ITEM',
+            referenceId: itemId,
+          });
+        }
+      }
 
       return res.status(200).json({ 
         message: 'Stock adjusted successfully',

@@ -49,8 +49,22 @@ export async function updateLastLogin(userId: string): Promise<void> {
 }
 
 export async function createSession(userId: string, token: string, expiresAt: Date): Promise<void> {
+  // Invalidate all existing sessions for this user (enforce single session)
+  await invalidateUserSessions(userId);
+  
   const sql = 'INSERT INTO sessions (user_id, token, expires_at) VALUES (?, ?, ?)';
   await query(sql, [userId, token, expiresAt]);
+}
+
+export async function invalidateUserSessions(userId: string): Promise<void> {
+  const sql = 'DELETE FROM sessions WHERE user_id = ?';
+  await query(sql, [userId]);
+}
+
+export async function checkActiveSession(userId: string): Promise<boolean> {
+  const sql = 'SELECT COUNT(*) as count FROM sessions WHERE user_id = ? AND expires_at > NOW()';
+  const result: any = await queryOne(sql, [userId]);
+  return result && result.count > 0;
 }
 
 export async function findSessionByToken(token: string): Promise<any | null> {

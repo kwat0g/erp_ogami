@@ -677,4 +677,4 @@ function EmployeesPage() {
   );
 }
 
-export default withAuth(EmployeesPage, { allowedRoles: ['HR_STAFF'] });
+export default withAuth(EmployeesPage, { allowedRoles: ['SYSTEM_ADMIN', 'HR_STAFF', 'GENERAL_MANAGER'] });

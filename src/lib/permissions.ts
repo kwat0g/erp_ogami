@@ -40,6 +40,10 @@ export const SYSTEM_ADMIN_READ_ONLY_MODULES = [
   'maintenance_schedules',
   'mold_management',
   'hr_employees',
+  'hr_attendance',
+  'hr_leave',
+  'hr_payroll',
+  'hr_recruitment',
   'impex_documents',
 ];
 
@@ -119,14 +123,24 @@ export const MODULE_PERMISSIONS: Record<string, UserRole[]> = {
     'SYSTEM_ADMIN',
     'PRODUCTION_PLANNER',
     'PRODUCTION_SUPERVISOR',
+    'PRODUCTION_OPERATOR',
+    'DEPARTMENT_HEAD',
+    'GENERAL_MANAGER',
+  ],
+  production_bom: [
+    'SYSTEM_ADMIN',
+    'PRODUCTION_PLANNER',
+    'PRODUCTION_SUPERVISOR',
     'DEPARTMENT_HEAD',
     'GENERAL_MANAGER',
   ],
   production_execution: [
     'SYSTEM_ADMIN',
+    'PRODUCTION_PLANNER',
     'PRODUCTION_SUPERVISOR',
     'PRODUCTION_OPERATOR',
     'DEPARTMENT_HEAD',
+    'GENERAL_MANAGER',
   ],
 
   // Quality Module
@@ -154,6 +168,12 @@ export const MODULE_PERMISSIONS: Record<string, UserRole[]> = {
     'MAINTENANCE_TECHNICIAN',
     'DEPARTMENT_HEAD',
   ],
+  maintenance_equipment: [
+    'SYSTEM_ADMIN',
+    'MAINTENANCE_TECHNICIAN',
+    'DEPARTMENT_HEAD',
+    'GENERAL_MANAGER',
+  ],
 
   // Mold Module
   mold_management: [
@@ -165,6 +185,28 @@ export const MODULE_PERMISSIONS: Record<string, UserRole[]> = {
 
   // HR Module
   hr_employees: [
+    'SYSTEM_ADMIN',
+    'HR_STAFF',
+    'DEPARTMENT_HEAD',
+    'GENERAL_MANAGER',
+  ],
+  hr_attendance: [
+    'SYSTEM_ADMIN',
+    'HR_STAFF',
+    'GENERAL_MANAGER',
+  ],
+  hr_recruitment: [
+    'SYSTEM_ADMIN',
+    'HR_STAFF',
+    'GENERAL_MANAGER',
+  ],
+  hr_payroll: [
+    'SYSTEM_ADMIN',
+    'HR_STAFF',
+    'ACCOUNTING_STAFF',
+    'GENERAL_MANAGER',
+  ],
+  hr_leave: [
     'SYSTEM_ADMIN',
     'HR_STAFF',
     'DEPARTMENT_HEAD',
@@ -286,7 +328,7 @@ export function getAccessibleModules(userRole: UserRole): string[] {
   }
   
   return Object.keys(MODULE_PERMISSIONS).filter((module) =>
-    MODULE_PERMISSIONS[module].includes(userRole)
+    MODULE_PERMISSIONS[module as keyof typeof MODULE_PERMISSIONS]?.includes(userRole)
   );
 }
 
@@ -353,4 +395,42 @@ export function getPermissionLevel(userRole: UserRole, module: string): 'FULL' |
   }
   
   return 'FULL';
+}
+
+// Enhanced permission helpers
+export function canRead(userRole: UserRole, module: string): boolean {
+  return hasModuleAccess(userRole, module);
+}
+
+export function canWrite(userRole: UserRole, module: string): boolean {
+  return hasWritePermission(userRole, module);
+}
+
+export function canDelete(userRole: UserRole, module: string): boolean {
+  // Same as write permission - if you can write, you can delete
+  return hasWritePermission(userRole, module);
+}
+
+export function canApproveDocument(userRole: UserRole, documentType: string): boolean {
+  return canApprove(userRole, documentType);
+}
+
+// Check if user can perform specific action
+export function canPerformAction(
+  userRole: UserRole,
+  module: string,
+  action: 'READ' | 'WRITE' | 'DELETE' | 'APPROVE'
+): boolean {
+  switch (action) {
+    case 'READ':
+      return canRead(userRole, module);
+    case 'WRITE':
+      return canWrite(userRole, module);
+    case 'DELETE':
+      return canDelete(userRole, module);
+    case 'APPROVE':
+      return canApprove(userRole, module);
+    default:
+      return false;
+  }
 }

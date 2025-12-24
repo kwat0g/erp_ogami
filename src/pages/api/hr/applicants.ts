@@ -4,7 +4,6 @@ import { findSessionByToken } from '@/lib/auth';
 import { createAuditLog } from '@/lib/audit';
 import {
   isValidEmail,
-  isValidISODate,
   isValidName,
   isValidPhone,
   normalizeEmail,
@@ -13,6 +12,7 @@ import {
   sanitizeOptionalText,
   sanitizeText,
 } from '@/utils/validation';
+import { isValidISODate } from '@/utils/validation';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const token = req.headers.authorization?.replace('Bearer ', '');
@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const session = await findSessionByToken(token);
   if (!session) return res.status(401).json({ message: 'Invalid or expired session' });
 
-  const canAccess = ['HR_STAFF', 'SYSTEM_ADMIN'].includes(session.role);
+  const canAccess = ['HR_STAFF', 'GENERAL_MANAGER', 'SYSTEM_ADMIN'].includes(session.role);
   if (!canAccess) return res.status(403).json({ message: 'Access denied' });
 
   if (req.method === 'GET') {
@@ -109,7 +109,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (!isValidEmail(emailNorm)) return res.status(400).json({ message: 'Invalid email address', fieldErrors: { email: 'Invalid email address' } });
       if (phoneNorm && !isValidPhone(phoneNorm)) return res.status(400).json({ message: 'Invalid phone number', fieldErrors: { phone: 'Invalid phone number' } });
 
-      const appDate = applicationDate ? sanitizeText(applicationDate) : new Date().toISOString().split('T')[0];
+      const sanitizedAppDate = applicationDate ? sanitizeText(applicationDate) : null;
+      const appDate = (sanitizedAppDate || new Date().toISOString().split('T')[0]) as string;
       if (!isValidISODate(appDate)) return res.status(400).json({ message: 'Invalid application date', fieldErrors: { applicationDate: 'Invalid application date' } });
 
       const existingEmail = await query('SELECT id FROM applicants WHERE LOWER(email) = LOWER(?) LIMIT 1', [emailNorm]);

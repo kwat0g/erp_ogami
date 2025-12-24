@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/main-layout';
 import { withAuth } from '@/components/auth/withAuth';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/toast';
+import { useRouter } from 'next/router';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
@@ -9,8 +11,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Search, Plus, Trash2, CheckCircle, XCircle, FileText, Send, Edit2 } from 'lucide-react';
+import { Search, Plus, Trash2, Edit2, CheckCircle, XCircle, Eye, Send, FileText } from 'lucide-react';
 import { formatDate, formatCurrency, getStatusColor, formatIntegerInput, sanitizeInteger } from '@/lib/utils';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 
 interface POItem {
   id?: string;
@@ -29,9 +32,20 @@ interface PurchaseOrder {
   poDate: string;
   supplierName: string;
   deliveryDate?: string;
+  deliveryAddress?: string;
+  paymentTerms?: string;
   status: string;
+  subtotal?: number;
+  discount?: number;
+  discountAmount?: number;
+  tax?: number;
+  taxAmount?: number;
   totalAmount: number;
   createdByName: string;
+  approvedByName?: string;
+  approvedAt?: string;
+  notes?: string;
+  items?: any[];
 }
 
 function PurchaseOrdersPage() {
@@ -58,6 +72,14 @@ function PurchaseOrdersPage() {
   const [poItems, setPoItems] = useState<POItem[]>([
     { itemId: '', quantity: '', unitPrice: '', totalPrice: 0, taxRate: '12', discountRate: '' },
   ]);
+  const [viewingPO, setViewingPO] = useState<PurchaseOrder | null>(null);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [showApproveConfirm, setShowApproveConfirm] = useState(false);
+  const [approvingPOId, setApprovingPOId] = useState<string | null>(null);
+  const [showSendConfirm, setShowSendConfirm] = useState(false);
+  const [sendingPOId, setSendingPOId] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingPOId, setDeletingPOId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchOrders();
@@ -201,8 +223,13 @@ function PurchaseOrdersPage() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/purchasing/orders', {
-        method: 'POST',
+      const url = editingPO 
+        ? `/api/purchasing/orders/${editingPO.id}` 
+        : '/api/purchasing/orders';
+      const method = editingPO ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -215,9 +242,9 @@ function PurchaseOrdersPage() {
       if (response.ok) {
         fetchOrders();
         resetForm();
-        alert('Purchase order created successfully');
+        alert(editingPO ? 'Purchase order updated successfully' : 'Purchase order created successfully');
       } else {
-        alert(data.message || 'Error creating purchase order');
+        alert(data.message || `Error ${editingPO ? 'updating' : 'creating'} purchase order`);
       }
     } catch (error) {
       console.error('Error saving purchase order:', error);
@@ -238,48 +265,50 @@ function PurchaseOrdersPage() {
 
   const updateItemRow = (index: number, field: string, value: any) => {
     const updated = [...poItems];
+    const item = updated[index];
+    if (!item) return;
     
     // Handle quantity as integer only (no decimals)
     if (field === 'quantity') {
       const sanitized = sanitizeInteger(value);
-      updated[index].quantity = sanitized.toString();
-      const price = parseFloat(updated[index].unitPrice) || 0;
+      item.quantity = sanitized.toString();
+      const price = parseFloat(item.unitPrice) || 0;
       const itemTotal = sanitized * price;
-      const discount = (itemTotal * (parseFloat(updated[index].discountRate) || 0)) / 100;
+      const discount = (itemTotal * (parseFloat(item.discountRate) || 0)) / 100;
       const afterDiscount = itemTotal - discount;
-      const tax = (afterDiscount * (parseFloat(updated[index].taxRate) || 0)) / 100;
-      updated[index].totalPrice = afterDiscount + tax;
+      const tax = (afterDiscount * (parseFloat(item.taxRate) || 0)) / 100;
+      item.totalPrice = afterDiscount + tax;
     }
     // Auto-populate unit price when item is selected (read-only)
     else if (field === 'itemId') {
-      updated[index].itemId = value;
+      item.itemId = value;
       const selectedItem = items.find(i => i.id === value);
       if (selectedItem) {
-        updated[index].itemName = selectedItem.name;
-        updated[index].unitPrice = selectedItem.standardCost?.toString() || '0';
-        const qty = parseFloat(updated[index].quantity) || 0;
+        item.itemName = selectedItem.name;
+        item.unitPrice = selectedItem.standardCost?.toString() || '0';
+        const qty = parseFloat(item.quantity) || 0;
         const price = parseFloat(selectedItem.standardCost) || 0;
         const itemTotal = qty * price;
-        const discount = (itemTotal * (parseFloat(updated[index].discountRate) || 0)) / 100;
+        const discount = (itemTotal * (parseFloat(item.discountRate) || 0)) / 100;
         const afterDiscount = itemTotal - discount;
-        const tax = (afterDiscount * (parseFloat(updated[index].taxRate) || 0)) / 100;
-        updated[index].totalPrice = afterDiscount + tax;
+        const tax = (afterDiscount * (parseFloat(item.taxRate) || 0)) / 100;
+        item.totalPrice = afterDiscount + tax;
       }
     }
     // Handle tax and discount rate changes
     else if (field === 'taxRate' || field === 'discountRate') {
-      updated[index] = { ...updated[index], [field]: value };
-      const qty = parseFloat(updated[index].quantity) || 0;
-      const price = parseFloat(updated[index].unitPrice) || 0;
+      Object.assign(item, { [field]: value });
+      const qty = parseFloat(item.quantity) || 0;
+      const price = parseFloat(item.unitPrice) || 0;
       const itemTotal = qty * price;
-      const discount = (itemTotal * (parseFloat(updated[index].discountRate) || 0)) / 100;
+      const discount = (itemTotal * (parseFloat(item.discountRate) || 0)) / 100;
       const afterDiscount = itemTotal - discount;
-      const tax = (afterDiscount * (parseFloat(updated[index].taxRate) || 0)) / 100;
-      updated[index].totalPrice = afterDiscount + tax;
+      const tax = (afterDiscount * (parseFloat(item.taxRate) || 0)) / 100;
+      item.totalPrice = afterDiscount + tax;
     }
     // For other fields
     else {
-      updated[index] = { ...updated[index], [field]: value };
+      Object.assign(item, { [field]: value });
     }
     
     setPoItems(updated);
@@ -372,41 +401,102 @@ function PurchaseOrdersPage() {
     }
   };
 
-  const handleApprove = async (id: string) => {
-    if (!confirm('Approve this purchase order?')) return;
+  const router = useRouter();
+  const { showToast } = useToast();
 
+  useEffect(() => {
+    // Check if there's a view query parameter
+    if (router.query.view) {
+      const poId = router.query.view as string;
+      const po = orders.find(o => o.id === poId);
+      if (po) {
+        handleView(po);
+      }
+    }
+  }, [router.query, orders]);
+
+  const handleView = async (po: PurchaseOrder) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/purchasing/orders/${id}/approve`, {
-        method: 'POST',
+      const response = await fetch(`/api/purchasing/orders/${po.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      if (response.ok) {
-        fetchOrders();
-        alert('Purchase order approved successfully');
+      const data = await response.json();
+      
+      if (data.order) {
+        setViewingPO({ ...po, ...data.order, items: data.order.items || [] });
+        setShowViewModal(true);
       }
     } catch (error) {
-      console.error('Error approving order:', error);
+      console.error('Error fetching PO details:', error);
+      showToast('error', 'Error loading PO details');
     }
   };
 
-  const handleSend = async (id: string) => {
-    if (!confirm('Send this purchase order to supplier?')) return;
+  const handleApprove = async (id: string) => {
+    setApprovingPOId(id);
+    setShowApproveConfirm(true);
+  };
+
+  const confirmApprove = async () => {
+    if (!approvingPOId) return;
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/purchasing/orders/${id}/send`, {
+      const response = await fetch(`/api/purchasing/orders/${approvingPOId}/approve`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        showToast('success', 'Purchase order approved successfully');
+        fetchOrders();
+        setShowViewModal(false);
+        setShowApproveConfirm(false);
+        setApprovingPOId(null);
+      } else {
+        showToast(data.message || 'Failed to approve PO', 'error');
+      }
+    } catch (error) {
+      console.error('Error approving order:', error);
+      showToast('error', 'Error approving order');
+    }
+  };
+
+  const handleApproveFromModal = async () => {
+    if (!viewingPO) return;
+    await handleApprove(viewingPO.id);
+  };
+
+  const handleSend = async (id: string) => {
+    setSendingPOId(id);
+    setShowSendConfirm(true);
+  };
+
+  const confirmSend = async () => {
+    if (!sendingPOId) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/purchasing/orders/${sendingPOId}/send`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.ok) {
         fetchOrders();
-        alert('Purchase order sent to supplier');
+        setShowViewModal(false);
+        setShowSendConfirm(false);
+        setSendingPOId(null);
+        showToast('success', 'Purchase order sent to supplier');
+      } else {
+        const data = await response.json();
+        showToast(data.message || 'Failed to send PO', 'error');
       }
     } catch (error) {
       console.error('Error sending order:', error);
+      showToast('error', 'Error sending order');
     }
   };
 
@@ -447,7 +537,7 @@ function PurchaseOrdersPage() {
         // Store original data for change detection
         setOriginalData({
           formData: formDataToSet,
-          poItems: itemsToSet.map(item => ({
+          poItems: itemsToSet.map((item: any) => ({
             itemId: item.itemId,
             quantity: item.quantity,
             unitPrice: item.unitPrice,
@@ -465,25 +555,32 @@ function PurchaseOrdersPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this purchase order? This action cannot be undone.')) return;
+    setDeletingPOId(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deletingPOId) return;
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/purchasing/orders/${id}`, {
+      const response = await fetch(`/api/purchasing/orders/${deletingPOId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.ok) {
-        alert('Purchase order deleted successfully');
+        showToast('success', 'Purchase order deleted successfully');
         fetchOrders();
+        setShowDeleteConfirm(false);
+        setDeletingPOId(null);
       } else {
         const data = await response.json();
-        alert(data.message || 'Error deleting purchase order');
+        showToast(data.message || 'Error deleting purchase order', 'error');
       }
     } catch (error) {
       console.error('Error deleting purchase order:', error);
-      alert('Error deleting purchase order');
+      showToast('error', 'Error deleting purchase order');
     }
   };
 
@@ -722,7 +819,7 @@ function PurchaseOrdersPage() {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button type="submit" disabled={editingPO && !hasChanges()}>
+                  <Button type="submit" disabled={editingPO ? !hasChanges() : false}>
                     {editingPO ? 'Update PO' : 'Create PO'}
                   </Button>
                   <Button type="button" variant="outline" onClick={resetForm}>
@@ -833,6 +930,14 @@ function PurchaseOrdersPage() {
                         <TableCell>{po.createdByName}</TableCell>
                         <TableCell>
                           <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleView(po)}
+                              title="View PO Details"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
                             {po.status === 'DRAFT' && canCreatePO() && (
                               <>
                                 <Button
@@ -898,9 +1003,179 @@ function PurchaseOrdersPage() {
             )}
           </CardContent>
         </Card>
+
+        {showViewModal && viewingPO && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <Card className="w-full max-w-3xl max-h-[85vh] overflow-y-auto">
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <CardTitle className="text-xl">{viewingPO.poNumber}</CardTitle>
+                      <Badge className={getStatusColor(viewingPO.status)}>{viewingPO.status}</Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-0.5">
+                      {formatDate(viewingPO.poDate)} • {viewingPO.supplierName}
+                    </p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-3 gap-x-6 gap-y-2 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">Delivery Date:</span>
+                    <p className="font-medium">{viewingPO.deliveryDate ? formatDate(viewingPO.deliveryDate) : 'N/A'}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Payment Terms:</span>
+                    <p className="font-medium">{viewingPO.paymentTerms || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Created By:</span>
+                    <p className="font-medium">{viewingPO.createdByName}</p>
+                  </div>
+                  {viewingPO.deliveryAddress && (
+                    <div className="col-span-3">
+                      <span className="text-muted-foreground">Delivery Address:</span>
+                      <p className="font-medium">{viewingPO.deliveryAddress}</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="border rounded-lg overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-muted/50">
+                        <TableHead className="font-semibold">Item</TableHead>
+                        <TableHead className="text-right font-semibold">Qty</TableHead>
+                        <TableHead className="text-right font-semibold">Price</TableHead>
+                        <TableHead className="text-right font-semibold">Total</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {viewingPO.items && viewingPO.items.length > 0 ? (
+                        viewingPO.items.map((item: any, index: number) => (
+                          <TableRow key={index}>
+                            <TableCell className="font-medium">{item.itemName || item.itemCode}</TableCell>
+                            <TableCell className="text-right">{item.quantity}</TableCell>
+                            <TableCell className="text-right">{formatCurrency(item.unitPrice)}</TableCell>
+                            <TableCell className="text-right font-semibold">{formatCurrency(item.totalPrice)}</TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={4} className="text-center text-muted-foreground">No items</TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                <div className="flex justify-end gap-6 text-sm border-t pt-3">
+                  <div className="text-right">
+                    <span className="text-muted-foreground">Subtotal:</span>
+                    <p className="font-medium">{formatCurrency(viewingPO.subtotal || 0)}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-muted-foreground">Discount:</span>
+                    <p className="font-medium">-{formatCurrency(viewingPO.discountAmount || 0)}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-muted-foreground">Tax:</span>
+                    <p className="font-medium">{formatCurrency(viewingPO.taxAmount || 0)}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-muted-foreground font-semibold">Total:</span>
+                    <p className="font-bold text-lg">{formatCurrency(viewingPO.totalAmount)}</p>
+                  </div>
+                </div>
+
+                {viewingPO.notes && (
+                  <div className="text-sm">
+                    <span className="text-muted-foreground">Notes:</span>
+                    <p className="mt-1 p-2 bg-muted/50 rounded text-sm">{viewingPO.notes}</p>
+                  </div>
+                )}
+
+                {viewingPO.status === 'APPROVED' && viewingPO.approvedByName && (
+                  <div className="flex gap-6 text-sm border-t pt-3">
+                    <div>
+                      <span className="text-muted-foreground">Approved By:</span>
+                      <p className="font-medium">{viewingPO.approvedByName}</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Date:</span>
+                      <p className="font-medium">{viewingPO.approvedAt ? formatDate(viewingPO.approvedAt) : 'N/A'}</p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex gap-2 border-t pt-3">
+                  {viewingPO.status === 'PENDING' && canApprovePO() && (
+                    <Button onClick={handleApproveFromModal} className="bg-green-600 hover:bg-green-700">
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Approve
+                    </Button>
+                  )}
+                  {viewingPO.status === 'APPROVED' && canApprovePO() && (
+                    <Button onClick={() => handleSend(viewingPO.id)} className="bg-blue-600 hover:bg-blue-700">
+                      <Send className="h-4 w-4 mr-2" />
+                      Send to Supplier
+                    </Button>
+                  )}
+                  <Button variant="outline" onClick={() => setShowViewModal(false)} className="ml-auto">
+                    Close
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        <ConfirmationDialog
+          open={showApproveConfirm}
+          title="Approve Purchase Order"
+          message="Are you sure you want to approve this PO? This will allow it to proceed to the next stage."
+          confirmText="Yes, Approve"
+          cancelText="Cancel"
+          variant="default"
+          onConfirm={confirmApprove}
+          onCancel={() => {
+            setShowApproveConfirm(false);
+            setApprovingPOId(null);
+          }}
+        />
+
+        <ConfirmationDialog
+          open={showSendConfirm}
+          title="Send Purchase Order to Supplier"
+          message="Are you sure you want to send this PO to the supplier? The supplier will receive this order."
+          confirmText="Yes, Send"
+          cancelText="Cancel"
+          variant="default"
+          onConfirm={confirmSend}
+          onCancel={() => {
+            setShowSendConfirm(false);
+            setSendingPOId(null);
+          }}
+        />
+
+        <ConfirmationDialog
+          open={showDeleteConfirm}
+          title="Delete Purchase Order"
+          message="Are you sure you want to delete this PO? This action cannot be undone."
+          confirmText="Yes, Delete"
+          cancelText="Cancel"
+          variant="destructive"
+          onConfirm={confirmDelete}
+          onCancel={() => {
+            setShowDeleteConfirm(false);
+            setDeletingPOId(null);
+          }}
+        />
       </div>
     </MainLayout>
   );
 }
 
-export default withAuth(PurchaseOrdersPage, { allowedRoles: ['PURCHASING_STAFF', 'GENERAL_MANAGER', 'SYSTEM_ADMIN'] });
+export default withAuth(PurchaseOrdersPage, { allowedRoles: ['PURCHASING_STAFF', 'DEPARTMENT_HEAD', 'GENERAL_MANAGER', 'VICE_PRESIDENT', 'PRESIDENT', 'SYSTEM_ADMIN'] });

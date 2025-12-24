@@ -107,7 +107,7 @@ function RecruitmentPage() {
     }
   };
 
-  const canEncode = () => ['HR_STAFF', 'SYSTEM_ADMIN'].includes(userRole);
+  const canEncode = () => ['HR_STAFF'].includes(userRole);
 
   const fetchJobPostings = async () => {
     try {
@@ -542,7 +542,7 @@ function RecruitmentPage() {
           </Card>
         </div>
 
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'jobs' | 'applicants')} className="space-y-4">
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'jobs' | 'applicants')} defaultValue="jobs" className="space-y-4">
           <TabsList>
             <TabsTrigger value="jobs">Job Postings</TabsTrigger>
             <TabsTrigger value="applicants">Applicants</TabsTrigger>
@@ -940,4 +940,4 @@ function RecruitmentPage() {
   );
 }
 
-export default withAuth(RecruitmentPage, { allowedRoles: ['HR_STAFF'] });
+export default withAuth(RecruitmentPage, { allowedRoles: ['SYSTEM_ADMIN', 'HR_STAFF', 'GENERAL_MANAGER'] });

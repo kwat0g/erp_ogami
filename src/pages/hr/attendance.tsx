@@ -38,7 +38,8 @@ function AttendancePage() {
   const [showForm, setShowForm] = useState(false);
   const [editingLog, setEditingLog] = useState<AttendanceLog | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [userRole, setUserRole] = useState<string>('');
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean;
     title: string;
@@ -61,12 +62,27 @@ function AttendancePage() {
     overtimeHours: '0',
     notes: '',
   });
+  const [originalFormData, setOriginalFormData] = useState<typeof formData | null>(null);
 
   useEffect(() => {
+    fetchUserRole();
     fetchAttendanceLogs();
     fetchEmployees();
     setLoading(false);
   }, [selectedDate]);
+
+  const fetchUserRole = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } });
+      const data = await response.json();
+      setUserRole(data.user?.role || '');
+    } catch (error) {
+      console.error('Error fetching user role:', error);
+    }
+  };
+
+  const canLogAttendance = () => ['HR_STAFF'].includes(userRole);
 
   const fetchAttendanceLogs = async () => {
     try {
@@ -174,15 +190,19 @@ function AttendancePage() {
       return;
     }
     setEditingLog(log);
-    setFormData({
+    // Format date properly for input field (YYYY-MM-DD)
+    const formattedDate = log.attendanceDate ? new Date(log.attendanceDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+    const editData = {
       employeeId: log.employeeId || '',
-      attendanceDate: log.attendanceDate,
-      timeIn: log.timeIn,
-      timeOut: log.timeOut,
-      status: log.status,
+      attendanceDate: formattedDate,
+      timeIn: log.timeIn || '',
+      timeOut: log.timeOut || '',
+      status: log.status || 'PRESENT',
       overtimeHours: log.overtimeHours?.toString() || '0',
       notes: log.notes || '',
-    });
+    };
+    setFormData(editData);
+    setOriginalFormData(editData);
     setShowForm(true);
   };
 
@@ -196,17 +216,32 @@ function AttendancePage() {
       overtimeHours: '0',
       notes: '',
     });
+    setOriginalFormData(null);
     setEditingLog(null);
     setShowForm(false);
+  };
+
+  const hasFormChanged = () => {
+    if (!editingLog || !originalFormData) return true;
+    return (
+      formData.employeeId !== originalFormData.employeeId ||
+      formData.attendanceDate !== originalFormData.attendanceDate ||
+      formData.timeIn !== originalFormData.timeIn ||
+      formData.timeOut !== originalFormData.timeOut ||
+      formData.status !== originalFormData.status ||
+      formData.overtimeHours !== originalFormData.overtimeHours ||
+      formData.notes !== originalFormData.notes
+    );
   };
 
   const formatTime12Hour = (time24: string) => {
     if (!time24) return '-';
     const [hours, minutes] = time24.split(':');
+    if (!hours) return '-';
     const hour = parseInt(hours);
     const ampm = hour >= 12 ? 'PM' : 'AM';
     const hour12 = hour % 12 || 12;
-    return `${hour12}:${minutes} ${ampm}`;
+    return `${hour12}:${minutes ?? '00'} ${ampm}`;
   };
 
   const getAttendanceStats = () => {
@@ -234,10 +269,12 @@ function AttendancePage() {
             <h1 className="text-3xl font-bold">Attendance Monitoring</h1>
             <p className="text-muted-foreground">Track and validate employee attendance</p>
           </div>
-          <Button onClick={() => setShowForm(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Log Attendance
-          </Button>
+          {canLogAttendance() && (
+            <Button onClick={() => setShowForm(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Log Attendance
+            </Button>
+          )}
         </div>
 
         <div className="grid gap-4 md:grid-cols-5">
@@ -375,7 +412,9 @@ function AttendancePage() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button type="submit">Log Attendance</Button>
+                  <Button type="submit" disabled={!!(editingLog && !hasFormChanged())}>
+                    {editingLog ? 'Update Attendance' : 'Log Attendance'}
+                  </Button>
                   <Button type="button" variant="outline" onClick={resetForm}>Cancel</Button>
                 </div>
               </form>
@@ -510,4 +549,4 @@ function AttendancePage() {
   );
 }
 
-export default withAuth(AttendancePage, { allowedRoles: ['HR_STAFF'] });
+export default withAuth(AttendancePage, { allowedRoles: ['SYSTEM_ADMIN', 'HR_STAFF', 'GENERAL_MANAGER'] });

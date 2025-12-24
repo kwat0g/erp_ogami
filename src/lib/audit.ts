@@ -9,14 +9,16 @@ interface AuditLogData {
   newValues?: any;
   ipAddress?: string;
   userAgent?: string;
+  status?: 'SUCCESS' | 'FAILED';
+  errorMessage?: string;
 }
 
 export async function createAuditLog(data: AuditLogData): Promise<void> {
   const sql = `
     INSERT INTO audit_logs (
-      user_id, action, table_name, record_id, 
-      old_values, new_values, ip_address, user_agent
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      user_id, action, module, record_id, record_type,
+      old_value, new_value, ip_address, user_agent, status, error_message
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
   
   await execute(sql, [
@@ -24,10 +26,13 @@ export async function createAuditLog(data: AuditLogData): Promise<void> {
     data.action,
     data.tableName,
     data.recordId || null,
+    data.tableName,
     data.oldValues ? JSON.stringify(data.oldValues) : null,
     data.newValues ? JSON.stringify(data.newValues) : null,
     data.ipAddress || null,
     data.userAgent || null,
+    data.status || 'SUCCESS',
+    data.errorMessage || null,
   ]);
 }
 
@@ -42,9 +47,9 @@ export async function getAuditLogs(filters: {
 }): Promise<any[]> {
   let sql = `
     SELECT 
-      al.id, al.user_id as userId, al.action, al.table_name as tableName,
-      al.record_id as recordId, al.old_values as oldValues, al.new_values as newValues,
-      al.ip_address as ipAddress, al.user_agent as userAgent, al.created_at as createdAt,
+      al.id, al.user_id as userId, al.action, al.module as tableName,
+      al.record_id as recordId, al.old_value as oldValues, al.new_value as newValues,
+      al.ip_address as ipAddress, al.user_agent as userAgent, al.status, al.created_at as createdAt,
       u.username, u.first_name as firstName, u.last_name as lastName
     FROM audit_logs al
     LEFT JOIN users u ON al.user_id = u.id
@@ -54,7 +59,7 @@ export async function getAuditLogs(filters: {
   const params: any[] = [];
   
   if (filters.tableName) {
-    sql += ' AND al.table_name = ?';
+    sql += ' AND al.module = ?';
     params.push(filters.tableName);
   }
   

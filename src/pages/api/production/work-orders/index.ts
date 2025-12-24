@@ -3,6 +3,7 @@ import { query, execute, transaction } from '@/lib/db';
 import { findSessionByToken } from '@/lib/auth';
 import { createAuditLog } from '@/lib/audit';
 import { hasWritePermission } from '@/lib/permissions';
+import { createNotification } from '@/lib/notification-helper';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const token = req.headers.authorization?.replace('Bearer ', '');
@@ -66,20 +67,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ message: 'WO date, item, and valid planned quantity are required' });
       }
 
+      let woNumber = '';
+      let woId = '';
+
       await transaction(async (connection) => {
         // Generate WO number
-        const [lastWO] = await connection.query(
+        const [lastWORows] = await connection.query(
           "SELECT wo_number FROM work_orders ORDER BY created_at DESC LIMIT 1"
         );
+        const lastWO = lastWORows as any[];
 
-        let woNumber = 'WO-0001';
+        woNumber = 'WO-0001';
         if (lastWO && lastWO.length > 0) {
           const lastNumber = parseInt(lastWO[0].wo_number.split('-')[1]);
           woNumber = `WO-${String(lastNumber + 1).padStart(4, '0')}`;
         }
 
         // Insert work order
-        const [woResult] = await connection.query(
+        const woResult: any = await connection.query(
           `INSERT INTO work_orders (
             wo_number, wo_date, item_id, planned_quantity, scheduled_start_date,
             scheduled_end_date, status, priority, warehouse_id, notes, created_by
@@ -98,21 +103,46 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           ]
         );
 
-        const woId = woResult.insertId;
+        woId = woResult[0].insertId;
 
+        // Create audit log
         await createAuditLog({
           userId: session.userId,
           action: 'CREATE',
           tableName: 'work_orders',
-          recordId: woId.toString(),
-          newValues: { woNumber, woDate, plannedQuantity },
+          recordId: woResult[0].insertId.toString(),
+          newValues: { woNumber, itemId, plannedQuantity }
         });
 
-        return res.status(201).json({
-          message: 'Work order created successfully',
-          id: woId,
-          woNumber,
-        });
+        // Get item name for notification
+        const [itemRows] = await connection.query(
+          'SELECT name FROM items WHERE id = ?',
+          [itemId]
+        );
+        const itemName = (itemRows as any[])[0]?.name || 'Unknown Item';
+
+        // Notify approvers (GENERAL_MANAGER)
+        const approvers = await connection.query(
+          `SELECT id FROM users WHERE role = 'GENERAL_MANAGER' AND is_active = 1`
+        );
+
+        for (const approver of (approvers[0] as any[])) {
+          await createNotification({
+            userId: approver.id,
+            title: 'Work Order Approval Required',
+            message: `Work Order ${woNumber} for ${itemName} (Qty: ${plannedQuantity}) requires your approval`,
+            type: 'ACTION_REQUIRED',
+            category: 'PRODUCTION',
+            referenceType: 'WORK_ORDER',
+            referenceId: woResult[0].insertId.toString(),
+          });
+        }
+      });
+
+      return res.status(201).json({
+        message: 'Work order created successfully',
+        id: woId,
+        woNumber,
       });
     } catch (error: any) {
       console.error('Error creating work order:', error);

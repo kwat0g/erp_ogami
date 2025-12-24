@@ -18,12 +18,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === 'GET') {
     try {
       const sql = `
-        SELECT id, code, name, contact_person as contactPerson, email, phone,
-               address, city, country, payment_terms as paymentTerms,
+        SELECT id, customer_code as code, customer_name as name, contact_person as contactPerson, 
+               email, phone, address, city, country, payment_terms_days as paymentTerms,
                credit_limit as creditLimit, is_active as isActive
         FROM customers
         WHERE is_active = TRUE
-        ORDER BY name
+        ORDER BY customer_name
       `;
 
       const customers = await query(sql);

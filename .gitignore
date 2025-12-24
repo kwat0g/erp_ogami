@@ -13,6 +13,10 @@ node_modules/
 # Production
 /build
 
+/a
+/docs
+/database
+
 # Misc
 .DS_Store
 *.pem
@@ -23,8 +27,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # Local env files
-.env*.local
-.env
+# .env*.local
+# .env
 
 # IDE
 .idea/

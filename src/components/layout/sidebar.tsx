@@ -98,28 +98,31 @@ export function Sidebar() {
       title: 'Inventory',
       icon: Package,
       id: 'inventory',
-      allowedRoles: ['SYSTEM_ADMIN', 'GENERAL_MANAGER', 'WAREHOUSE_STAFF', 'PURCHASING_STAFF', 'PRODUCTION_PLANNER'],
+      allowedRoles: ['SYSTEM_ADMIN', 'WAREHOUSE_STAFF', 'PURCHASING_STAFF', 'PRODUCTION_PLANNER', 'GENERAL_MANAGER'],
       submenu: [
         { title: 'Items', href: '/inventory/items' },
         { title: 'Stock Levels', href: '/inventory/stock' },
+        { title: 'Stock Issues', href: '/inventory/stock-issues' },
+        { title: 'Warehouses', href: '/inventory/warehouses' },
       ],
     },
     {
       title: 'Purchasing',
       icon: ShoppingCart,
       id: 'purchasing',
-      allowedRoles: ['SYSTEM_ADMIN', 'GENERAL_MANAGER', 'PRESIDENT', 'PURCHASING_STAFF', 'DEPARTMENT_HEAD'],
+      allowedRoles: ['SYSTEM_ADMIN', 'GENERAL_MANAGER', 'PRESIDENT', 'PURCHASING_STAFF', 'DEPARTMENT_HEAD', 'VICE_PRESIDENT'],
       submenu: [
         { title: 'Suppliers', href: '/purchasing/suppliers' },
         { title: 'Requisitions', href: '/purchasing/requisitions' },
         { title: 'Purchase Orders', href: '/purchasing/orders' },
+        { title: 'Goods Receipt', href: '/purchasing/receiving' },
       ],
     },
     {
       title: 'Accounting',
       icon: DollarSign,
       id: 'accounting',
-      allowedRoles: ['SYSTEM_ADMIN', 'GENERAL_MANAGER', 'PRESIDENT', 'ACCOUNTING_STAFF'],
+      allowedRoles: ['SYSTEM_ADMIN', 'PRESIDENT', 'ACCOUNTING_STAFF'],
       submenu: [
         { title: 'Invoices', href: '/accounting/invoices' },
         { title: 'Payments', href: '/accounting/payments' },
@@ -129,16 +132,18 @@ export function Sidebar() {
       title: 'Production',
       icon: Factory,
       id: 'production',
-      allowedRoles: ['SYSTEM_ADMIN', 'GENERAL_MANAGER', 'PRODUCTION_PLANNER', 'PRODUCTION_SUPERVISOR', 'PRODUCTION_OPERATOR'],
+      allowedRoles: ['SYSTEM_ADMIN', 'PRODUCTION_PLANNER', 'PRODUCTION_SUPERVISOR', 'PRODUCTION_OPERATOR', 'WAREHOUSE_STAFF', 'DEPARTMENT_HEAD', 'GENERAL_MANAGER'],
       submenu: [
         { title: 'Work Orders', href: '/production/work-orders' },
+        { title: 'BOM', href: '/production/bom' },
+        { title: 'Execution', href: '/production/execution' },
       ],
     },
     {
       title: 'Quality',
       icon: ClipboardCheck,
       id: 'quality',
-      allowedRoles: ['SYSTEM_ADMIN', 'GENERAL_MANAGER', 'QC_INSPECTOR'],
+      allowedRoles: ['SYSTEM_ADMIN', 'QC_INSPECTOR', 'DEPARTMENT_HEAD', 'GENERAL_MANAGER'],
       submenu: [
         { title: 'Inspections', href: '/quality/inspections' },
         { title: 'NCR', href: '/quality/ncr' },
@@ -148,17 +153,18 @@ export function Sidebar() {
       title: 'Maintenance',
       icon: Wrench,
       id: 'maintenance',
-      allowedRoles: ['SYSTEM_ADMIN', 'GENERAL_MANAGER', 'MAINTENANCE_TECHNICIAN'],
+      allowedRoles: ['SYSTEM_ADMIN', 'MAINTENANCE_TECHNICIAN', 'DEPARTMENT_HEAD', 'GENERAL_MANAGER'],
       submenu: [
         { title: 'Work Orders', href: '/maintenance/work-orders' },
         { title: 'Equipment', href: '/maintenance/equipment' },
+        { title: 'Schedules', href: '/maintenance/schedules' },
       ],
     },
     {
       title: 'HR',
       icon: Users,
       id: 'hr',
-      allowedRoles: ['SYSTEM_ADMIN', 'GENERAL_MANAGER', 'HR_STAFF'],
+      allowedRoles: ['SYSTEM_ADMIN', 'GENERAL_MANAGER', 'DEPARTMENT_HEAD', 'HR_STAFF'],
       submenu: [
         { title: 'Employees', href: '/hr/employees' },
         { title: 'Recruitment', href: '/hr/recruitment' },
@@ -171,14 +177,17 @@ export function Sidebar() {
     {
       title: 'Import/Export',
       icon: FileSpreadsheet,
-      href: '/impex/documents',
-      allowedRoles: ['SYSTEM_ADMIN', 'GENERAL_MANAGER', 'IMPEX_OFFICER'],
+      id: 'impex',
+      allowedRoles: ['SYSTEM_ADMIN', 'IMPEX_OFFICER', 'GENERAL_MANAGER', 'DEPARTMENT_HEAD'],
+      submenu: [
+        { title: 'Documents', href: '/impex/documents' },
+      ],
     },
     {
       title: 'Reports',
       icon: FileText,
       href: '/reports/audit-logs',
-      allowedRoles: ['SYSTEM_ADMIN', 'GENERAL_MANAGER', 'PRESIDENT', 'AUDITOR'],
+      allowedRoles: ['SYSTEM_ADMIN', 'PRESIDENT', 'AUDITOR'],
     },
     {
       title: 'Administration',

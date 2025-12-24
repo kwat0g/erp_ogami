@@ -5,6 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/components/ui/toast';
 import { Search, Wrench, Plus } from 'lucide-react';
 import { formatDate, getStatusColor } from '@/lib/utils';
 
@@ -21,16 +24,30 @@ interface MaintenanceWO {
 }
 
 export default function MaintenanceWorkOrdersPage() {
+  const { showToast } = useToast();
   const [workOrders, setWorkOrders] = useState<any[]>([]);
+  const [equipment, setEquipment] = useState<any[]>([]);
+  const [employees, setEmployees] = useState<any[]>([]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [userRole, setUserRole] = useState<string>('');
   const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState({
+    equipmentId: '',
+    maintenanceType: 'PREVENTIVE',
+    priority: 'NORMAL',
+    scheduledDate: '',
+    assignedTo: '',
+    description: '',
+  });
 
   useEffect(() => {
     setLoading(false);
     fetchUserRole();
     fetchWorkOrders();
+    fetchEquipment();
+    fetchEmployees();
   }, []);
 
   const fetchUserRole = async () => {
@@ -42,6 +59,7 @@ export default function MaintenanceWorkOrdersPage() {
       const data = await response.json();
       if (data.user) {
         setUserRole(data.user.role);
+        setCurrentUser(data.user);
       }
     } catch (error) {
       console.error('Error fetching user role:', error);
@@ -65,11 +83,95 @@ export default function MaintenanceWorkOrdersPage() {
     }
   };
 
+  const fetchEquipment = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/maintenance/equipment', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      setEquipment(data.equipment || []);
+    } catch (error) {
+      console.error('Error fetching equipment:', error);
+    }
+  };
+
+  const fetchEmployees = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/hr/employees', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      // If 403, user doesn't have permission - that's okay, we'll handle it
+      if (response.status === 403) {
+        console.log('No permission to fetch all employees - will use current user');
+        return;
+      }
+      
+      const data = await response.json();
+      setEmployees(data.employees || []);
+    } catch (error) {
+      console.error('Error fetching employees:', error);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.equipmentId || !formData.scheduledDate || !formData.assignedTo) {
+      showToast('error', 'Please fill in all required fields');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/maintenance/work-orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        showToast('success', 'Work order created successfully');
+        fetchWorkOrders();
+        resetForm();
+      } else {
+        showToast('error', data.message || 'Failed to create work order');
+      }
+    } catch (error) {
+      console.error('Error creating work order:', error);
+      showToast('error', 'An error occurred while creating work order');
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      equipmentId: '',
+      maintenanceType: 'PREVENTIVE',
+      priority: 'NORMAL',
+      scheduledDate: '',
+      assignedTo: '',
+      description: '',
+    });
+    setShowForm(false);
+  };
+
   const filteredWorkOrders = workOrders.filter(
     (wo) =>
       wo.woNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       wo.equipmentName.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const formatStatus = (status: string) => {
+    if (!status) return 'N/A';
+    return status.replace(/_/g, ' ');
+  };
 
   return (
     <MainLayout>
@@ -185,7 +287,7 @@ export default function MaintenanceWorkOrdersPage() {
                         <TableCell>{wo.scheduledDate ? formatDate(wo.scheduledDate) : '-'}</TableCell>
                         <TableCell>{wo.assignedToName}</TableCell>
                         <TableCell>
-                          <Badge className={getStatusColor(wo.status)}>{wo.status}</Badge>
+                          <Badge className={getStatusColor(wo.status)}>{formatStatus(wo.status)}</Badge>
                         </TableCell>
                       </TableRow>
                     ))
@@ -195,6 +297,122 @@ export default function MaintenanceWorkOrdersPage() {
             )}
           </CardContent>
         </Card>
+
+        <Dialog open={showForm} onOpenChange={setShowForm}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create Maintenance Work Order</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid gap-4">
+                <div>
+                  <Label htmlFor="equipmentId">Equipment *</Label>
+                  <select
+                    id="equipmentId"
+                    value={formData.equipmentId}
+                    onChange={(e) => setFormData({ ...formData, equipmentId: e.target.value })}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2"
+                    required
+                  >
+                    <option value="">Select equipment...</option>
+                    {equipment.map((eq) => (
+                      <option key={eq.id} value={eq.id}>
+                        {eq.equipmentCode} - {eq.equipmentName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <Label htmlFor="maintenanceType">Maintenance Type *</Label>
+                  <select
+                    id="maintenanceType"
+                    value={formData.maintenanceType}
+                    onChange={(e) => setFormData({ ...formData, maintenanceType: e.target.value })}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2"
+                    required
+                  >
+                    <option value="PREVENTIVE">Preventive</option>
+                    <option value="PREDICTIVE">Predictive</option>
+                    <option value="CORRECTIVE">Corrective</option>
+                    <option value="ROUTINE">Routine</option>
+                  </select>
+                </div>
+
+                <div>
+                  <Label htmlFor="priority">Priority *</Label>
+                  <select
+                    id="priority"
+                    value={formData.priority}
+                    onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2"
+                    required
+                  >
+                    <option value="LOW">Low</option>
+                    <option value="NORMAL">Normal</option>
+                    <option value="HIGH">High</option>
+                    <option value="URGENT">Urgent</option>
+                  </select>
+                </div>
+
+                <div>
+                  <Label htmlFor="scheduledDate">Scheduled Date *</Label>
+                  <Input
+                    id="scheduledDate"
+                    type="date"
+                    value={formData.scheduledDate}
+                    onChange={(e) => setFormData({ ...formData, scheduledDate: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="assignedTo">Assign To *</Label>
+                  <select
+                    id="assignedTo"
+                    value={formData.assignedTo}
+                    onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2"
+                    required
+                  >
+                    <option value="">Select technician...</option>
+                    {employees.length > 0 ? (
+                      employees
+                        .filter((emp) => emp.status === 'ACTIVE')
+                        .map((emp) => (
+                          <option key={emp.id} value={emp.id}>
+                            {emp.firstName} {emp.lastName} - {emp.position}
+                          </option>
+                        ))
+                    ) : currentUser ? (
+                      <option value={currentUser.id}>
+                        {currentUser.username} (Me)
+                      </option>
+                    ) : null}
+                  </select>
+                </div>
+
+                <div>
+                  <Label htmlFor="description">Description</Label>
+                  <textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 min-h-[100px]"
+                    placeholder="Describe the maintenance work to be performed..."
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-2 justify-end">
+                <Button type="button" variant="outline" onClick={resetForm}>
+                  Cancel
+                </Button>
+                <Button type="submit">Create Work Order</Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </MainLayout>
   );

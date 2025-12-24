@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { findUserByUsername, verifyPassword, updateLastLogin, createSession } from '@/lib/auth';
 import { generateId } from '@/lib/utils';
+import { logAudit, getRequestMetadata } from '@/lib/audit-log';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -23,6 +24,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const isValidPassword = await verifyPassword(password, user.password);
 
     if (!isValidPassword) {
+      // Log failed login attempt
+      const metadata = getRequestMetadata(req);
+      await logAudit({
+        userId: user.id,
+        action: 'USER_LOGIN',
+        module: 'AUTHENTICATION',
+        status: 'FAILED',
+        errorMessage: 'Invalid password',
+        ...metadata,
+      });
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
@@ -32,7 +43,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
 
+    // This will invalidate any existing sessions (single session enforcement)
     await createSession(user.id, token, expiresAt);
+
+    // Log successful login and session creation
+    const metadata = getRequestMetadata(req);
+    await logAudit({
+      userId: user.id,
+      action: 'USER_LOGIN',
+      module: 'AUTHENTICATION',
+      status: 'SUCCESS',
+      newValue: { username: user.username, role: user.role },
+      ...metadata,
+    });
 
     const userResponse = {
       id: user.id,

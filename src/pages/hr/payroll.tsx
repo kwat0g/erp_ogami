@@ -120,7 +120,7 @@ function PayrollSupportPage() {
     }
   };
 
-  const canEncode = () => ['HR_STAFF', 'SYSTEM_ADMIN'].includes(userRole);
+  const canEncode = () => ['HR_STAFF'].includes(userRole);
 
   const getInputTypeBadge = (type: string) => {
     switch (type) {
@@ -489,4 +489,4 @@ function PayrollSupportPage() {
   );
 }
 
-export default withAuth(PayrollSupportPage, { allowedRoles: ['HR_STAFF'] });
+export default withAuth(PayrollSupportPage, { allowedRoles: ['SYSTEM_ADMIN', 'HR_STAFF', 'GENERAL_MANAGER'] });

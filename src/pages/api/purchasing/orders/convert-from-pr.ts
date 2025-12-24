@@ -18,8 +18,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === 'POST') {
-    if (!hasWritePermission(session.role as any, 'purchase_orders')) {
-      return res.status(403).json({ message: 'Access denied' });
+    // Only purchasing staff, dept heads, and managers can convert PR to PO
+    const canConvert = ['PURCHASING_STAFF', 'DEPARTMENT_HEAD', 'GENERAL_MANAGER', 'VICE_PRESIDENT', 'PRESIDENT'].includes(session.role);
+    if (!canConvert) {
+      return res.status(403).json({ message: 'Access denied: Only purchasing staff and managers can convert PR to PO' });
     }
 
     try {
@@ -55,13 +57,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ message: 'PR has no items' });
       }
 
-      let poId: string;
+      let poId: string = '';
 
       await transaction(async (connection) => {
         // Generate PO number
-        const [lastPO] = await connection.query(
+        const [lastPORows] = await connection.query(
           "SELECT po_number FROM purchase_orders ORDER BY created_at DESC LIMIT 1"
         );
+        const lastPO = lastPORows as any[];
         
         let poNumber = 'PO-0001';
         if (lastPO && lastPO.length > 0) {

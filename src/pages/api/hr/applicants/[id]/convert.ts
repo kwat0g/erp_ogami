@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const session = await findSessionByToken(token);
   if (!session) return res.status(401).json({ message: 'Invalid or expired session' });
 
-  const canAccess = ['HR_STAFF', 'SYSTEM_ADMIN'].includes(session.role);
+  const canAccess = ['HR_STAFF', 'GENERAL_MANAGER', 'SYSTEM_ADMIN'].includes(session.role);
   if (!canAccess) return res.status(403).json({ message: 'Access denied' });
 
   const { id } = req.query;

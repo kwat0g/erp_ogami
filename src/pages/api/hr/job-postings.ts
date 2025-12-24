@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { query, execute } from '@/lib/db';
 import { findSessionByToken } from '@/lib/auth';
 import { createAuditLog } from '@/lib/audit';
+import { hasWritePermission } from '@/lib/permissions';
 import { assertEnum, isValidISODate, sanitizeOptionalText, sanitizeText } from '@/utils/validation';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -11,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const session = await findSessionByToken(token);
   if (!session) return res.status(401).json({ message: 'Invalid or expired session' });
 
-  const canAccess = ['HR_STAFF', 'SYSTEM_ADMIN'].includes(session.role);
+  const canAccess = ['HR_STAFF', 'GENERAL_MANAGER', 'SYSTEM_ADMIN'].includes(session.role);
   if (!canAccess) return res.status(403).json({ message: 'Access denied' });
 
   if (req.method === 'GET') {
@@ -46,6 +47,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === 'POST') {
+    // Check write permission - SYSTEM_ADMIN is read-only
+    if (!hasWritePermission(session.role as any, 'hr_recruitment')) {
+      return res.status(403).json({ 
+        message: 'Access Denied: SYSTEM_ADMIN has read-only access. Only HR_STAFF can create job postings.' 
+      });
+    }
+
     try {
       const {
         jobTitle,
@@ -71,7 +79,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         assertEnum(employmentType, ['FULL_TIME', 'PART_TIME', 'CONTRACT', 'INTERNSHIP'] as const) || 'FULL_TIME';
       const statusEnum = assertEnum(status, ['DRAFT', 'OPEN', 'CLOSED', 'FILLED'] as const) || 'OPEN';
 
-      const postedDateVal = postedDate ? sanitizeText(postedDate) : new Date().toISOString().split('T')[0];
+      const sanitizedPostedDate = postedDate ? sanitizeText(postedDate) : null;
+      const postedDateVal = (sanitizedPostedDate || new Date().toISOString().split('T')[0]) as string;
       const closingDateVal = sanitizeOptionalText(closingDate);
 
       if (!jobTitleSan || !departmentIdSan || !jobDescriptionSan) {

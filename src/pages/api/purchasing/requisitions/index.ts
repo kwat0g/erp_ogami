@@ -72,9 +72,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       await transaction(async (connection) => {
         // Generate PR number
-        const [lastPR] = await connection.query(
+        const [lastPRRows] = await connection.query(
           "SELECT pr_number FROM purchase_requisitions ORDER BY created_at DESC LIMIT 1"
         );
+        const lastPR = lastPRRows as any[];
         
         let prNumber = 'PR-0001';
         if (lastPR && lastPR.length > 0) {

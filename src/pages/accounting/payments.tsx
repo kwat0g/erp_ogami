@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Search, Plus, DollarSign, CheckCircle } from 'lucide-react';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { formatDate, formatCurrency, getStatusColor } from '@/lib/utils';
 
 interface Payment {
@@ -35,6 +36,8 @@ export default function PaymentsPage() {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [userRole, setUserRole] = useState<string>('');
+  const [showApproveDialog, setShowApproveDialog] = useState(false);
+  const [currentPaymentId, setCurrentPaymentId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     paymentDate: new Date().toISOString().split('T')[0],
     paymentType: 'PAYMENT',
@@ -188,12 +191,17 @@ export default function PaymentsPage() {
     }
   };
 
-  const handleApprove = async (id: string) => {
-    if (!confirm('Approve this payment?')) return;
+  const handleApprove = (id: string) => {
+    setCurrentPaymentId(id);
+    setShowApproveDialog(true);
+  };
+
+  const confirmApprove = async () => {
+    if (!currentPaymentId) return;
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/accounting/payments/${id}/approve`, {
+      const response = await fetch(`/api/accounting/payments/${currentPaymentId}/approve`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -204,6 +212,9 @@ export default function PaymentsPage() {
       }
     } catch (error) {
       console.error('Error approving payment:', error);
+    } finally {
+      setShowApproveDialog(false);
+      setCurrentPaymentId(null);
     }
   };
 
@@ -485,6 +496,16 @@ export default function PaymentsPage() {
           </CardContent>
         </Card>
       </div>
+
+      <ConfirmationDialog
+        open={showApproveDialog}
+        onCancel={() => setShowApproveDialog(false)}
+        onConfirm={confirmApprove}
+        title="Approve Payment"
+        message="Are you sure you want to approve this payment?"
+        confirmText="Approve"
+        variant="default"
+      />
     </MainLayout>
   );
 }

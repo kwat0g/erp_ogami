@@ -92,16 +92,17 @@ export async function issueStock(
       return { success: false, message: 'No stock record found' };
     }
 
-    if (stock.quantity < quantity) {
-      return { success: false, message: 'Insufficient stock quantity' };
+    // Check if we have enough reserved stock (stock was reserved when issue was created)
+    if (stock.reserved_quantity < quantity) {
+      return { success: false, message: 'Insufficient reserved stock quantity' };
     }
 
     // Reduce both actual quantity and reserved quantity
     await execute(
       `UPDATE inventory_stock 
        SET quantity = quantity - ?,
-           reserved_quantity = GREATEST(0, reserved_quantity - ?),
-           available_quantity = (quantity - ?) - GREATEST(0, reserved_quantity - ?)
+           reserved_quantity = reserved_quantity - ?,
+           available_quantity = quantity - ? - (reserved_quantity - ?)
        WHERE item_id = ? AND warehouse_id = ?`,
       [quantity, quantity, quantity, quantity, itemId, warehouseId]
     );

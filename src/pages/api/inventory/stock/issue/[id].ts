@@ -29,8 +29,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           si.status, si.notes, si.approved_by as approvedBy,
           si.approved_date as approvedDate
         FROM stock_issues si
-        JOIN warehouses w ON si.warehouse_id = w.id
-        JOIN users u ON si.requested_by = u.id
+        JOIN warehouses w ON si.warehouse_id COLLATE utf8mb4_unicode_ci = w.id COLLATE utf8mb4_unicode_ci
+        JOIN users u ON si.requested_by COLLATE utf8mb4_unicode_ci = u.id COLLATE utf8mb4_unicode_ci
         WHERE si.id = ?`,
         [id]
       );
@@ -45,8 +45,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           sii.id, sii.item_id as itemId, i.code as itemCode, i.name as itemName,
           sii.quantity, sii.purpose, u.name as uomName
         FROM stock_issue_items sii
-        JOIN items i ON sii.item_id = i.id
-        LEFT JOIN units_of_measure u ON i.uom_id = u.id
+        JOIN items i ON sii.item_id COLLATE utf8mb4_unicode_ci = i.id COLLATE utf8mb4_unicode_ci
+        LEFT JOIN units_of_measure u ON i.uom_id COLLATE utf8mb4_unicode_ci = u.id COLLATE utf8mb4_unicode_ci
         WHERE sii.issue_id = ?`,
         [id]
       );

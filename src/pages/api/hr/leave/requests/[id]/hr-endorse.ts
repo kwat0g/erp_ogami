@@ -3,6 +3,7 @@ import { query, execute } from '@/lib/db';
 import { findSessionByToken } from '@/lib/auth';
 import { createAuditLog } from '@/lib/audit';
 import { sanitizeText } from '@/utils/validation';
+import { createNotification } from '@/lib/notification-helper';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const token = req.headers.authorization?.replace('Bearer ', '');
@@ -62,6 +63,40 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       recordId: idStr,
       newValues: { approvalStage: 'DEPARTMENT_HEAD' },
     });
+
+    // Get employee and leave details for notification
+    const [leaveDetails] = await query(
+      `SELECT lr.start_date, lr.end_date, lr.days_requested,
+              CONCAT(e.first_name, ' ', e.last_name) as employeeName,
+              lt.leave_name as leaveType,
+              e.department_id as departmentId
+       FROM leave_requests lr
+       JOIN employees e ON lr.employee_id = e.id
+       JOIN leave_types lt ON lr.leave_type_id = lt.id
+       WHERE lr.id = ?`,
+      [idStr]
+    );
+
+    // Notify department head
+    const deptHeads = await query(
+      `SELECT u.id FROM users u
+       JOIN employees e ON e.department_id = ?
+       WHERE u.role = 'DEPARTMENT_HEAD' AND u.is_active = 1
+       LIMIT 1`,
+      [leaveDetails.departmentId]
+    );
+
+    if (deptHeads.length > 0) {
+      await createNotification({
+        userId: deptHeads[0].id,
+        title: 'Leave Request Approval Required',
+        message: `${leaveDetails.employeeName} has requested ${leaveDetails.leaveType} from ${new Date(leaveDetails.start_date).toLocaleDateString()} to ${new Date(leaveDetails.end_date).toLocaleDateString()} (${leaveDetails.days_requested} days)`,
+        type: 'ACTION_REQUIRED',
+        category: 'HR',
+        referenceType: 'LEAVE_REQUEST',
+        referenceId: idStr,
+      });
+    }
 
     return res.status(200).json({ message: 'Endorsed by HR. Pending Department Head approval.' });
   } catch (error) {
